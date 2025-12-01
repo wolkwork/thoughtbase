@@ -1,8 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
-import { platformAuthClient } from "~/lib/platform-auth/auth-client";
-import { authQueryOptions } from "~/lib/platform-auth/queries";
+import { authClient } from "~/lib/auth/auth-client";
+import { authQueryOptions } from "~/lib/auth/queries";
 
 export function SignOutButton() {
   const queryClient = useQueryClient();
@@ -10,7 +10,7 @@ export function SignOutButton() {
   return (
     <Button
       onClick={async () => {
-        await platformAuthClient.signOut({
+        await authClient.signOut({
           fetchOptions: {
             onResponse: async () => {
               // manually set to null to avoid unnecessary refetching

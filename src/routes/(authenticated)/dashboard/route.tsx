@@ -1,31 +1,28 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { AppSidebar } from "~/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { $getSidebarCounts } from "~/lib/api/ideas";
 
 export const Route = createFileRoute("/(authenticated)/dashboard")({
   component: DashboardLayout,
 });
 
 function DashboardLayout() {
+  const { data: counts } = useQuery({
+    queryKey: ["sidebar-counts"],
+    queryFn: () => $getSidebarCounts(),
+  });
+
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-10 p-2">
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-3xl font-bold sm:text-4xl">Dashboard Layout</h1>
-        <pre className="bg-card text-card-foreground mb-4 rounded-md border p-1 text-xs">
-          routes/(authenticated)/dashboard/route.tsx
-        </pre>
-        <div className="text-foreground/80 mb-4 flex flex-col items-center gap-2 text-sm">
-          This is a protected layout from the authenticated layout route:
-          <pre className="bg-card text-card-foreground rounded-md border p-1 text-xs">
-            routes/(authenticated)/route.tsx
-          </pre>
+    <SidebarProvider>
+      <AppSidebar counts={counts} />
+      <main className="flex-1 overflow-auto w-full">
+        <div className="p-4">
+            <SidebarTrigger />
         </div>
-
-        <Button type="button" asChild className="w-fit" size="lg">
-          <Link to="/">Back to home</Link>
-        </Button>
-      </div>
-
-      <Outlet />
-    </div>
+        <Outlet />
+      </main>
+    </SidebarProvider>
   );
 }

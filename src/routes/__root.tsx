@@ -11,7 +11,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
-import { authQueryOptions, type AuthQueryResult } from "~/lib/platform-auth/queries";
+import { authQueryOptions, type AuthQueryResult } from "~/lib/auth/queries";
 import appCss from "~/styles.css?url";
 
 import { ThemeProvider } from "~/components/theme-provider";

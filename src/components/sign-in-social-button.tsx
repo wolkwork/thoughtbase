@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import { platformAuthClient } from "~/lib/platform-auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client";
 
 interface SocialLoginButtonProps {
   provider: string;
@@ -18,7 +18,7 @@ export function SignInSocialButton(props: SocialLoginButtonProps) {
 
   const mutation = useMutation({
     mutationFn: async () =>
-      await platformAuthClient.signIn.social(
+      await authClient.signIn.social(
         {
           provider: props.provider,
           callbackURL: props.callbackURL,

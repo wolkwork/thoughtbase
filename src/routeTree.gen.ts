@@ -12,12 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as authPagesRouteRouteImport } from './routes/(auth-pages)/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExamplesSsoRouteImport } from './routes/examples/sso'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
 import { Route as authPagesLoginRouteImport } from './routes/(auth-pages)/login'
+import { Route as OrgSlugRouteRouteImport } from './routes/org/$slug/route'
 import { Route as authenticatedDashboardRouteRouteImport } from './routes/(authenticated)/dashboard/route'
+import { Route as OrgSlugIndexRouteImport } from './routes/org/$slug/index'
 import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authenticated)/dashboard/index'
-import { Route as ApiAuthPlatformSplatRouteImport } from './routes/api/auth/platform/$'
-import { Route as ApiAuthEndUserSplatRouteImport } from './routes/api/auth/end-user/$'
+import { Route as OrgSlugRoadmapRouteImport } from './routes/org/$slug/roadmap'
+import { Route as OrgSlugIdeaIdRouteImport } from './routes/org/$slug/$ideaId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as authenticatedDashboardSettingsIndexRouteImport } from './routes/(authenticated)/dashboard/settings/index'
+import { Route as authenticatedDashboardRoadmapIndexRouteImport } from './routes/(authenticated)/dashboard/roadmap/index'
+import { Route as authenticatedDashboardMembersIndexRouteImport } from './routes/(authenticated)/dashboard/members/index'
+import { Route as authenticatedDashboardIdeasIndexRouteImport } from './routes/(authenticated)/dashboard/ideas/index'
+import { Route as authenticatedDashboardIdeasIdeaIdRouteImport } from './routes/(authenticated)/dashboard/ideas/$ideaId'
 
 const authenticatedRouteRoute = authenticatedRouteRouteImport.update({
   id: '/(authenticated)',
@@ -32,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamplesSsoRoute = ExamplesSsoRouteImport.update({
+  id: '/examples/sso',
+  path: '/examples/sso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authPagesSignupRoute = authPagesSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -42,45 +56,107 @@ const authPagesLoginRoute = authPagesLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => authPagesRouteRoute,
 } as any)
+const OrgSlugRouteRoute = OrgSlugRouteRouteImport.update({
+  id: '/org/$slug',
+  path: '/org/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authenticatedDashboardRouteRoute =
   authenticatedDashboardRouteRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => authenticatedRouteRoute,
   } as any)
+const OrgSlugIndexRoute = OrgSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OrgSlugRouteRoute,
+} as any)
 const authenticatedDashboardIndexRoute =
   authenticatedDashboardIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => authenticatedDashboardRouteRoute,
   } as any)
-const ApiAuthPlatformSplatRoute = ApiAuthPlatformSplatRouteImport.update({
-  id: '/api/auth/platform/$',
-  path: '/api/auth/platform/$',
+const OrgSlugRoadmapRoute = OrgSlugRoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => OrgSlugRouteRoute,
+} as any)
+const OrgSlugIdeaIdRoute = OrgSlugIdeaIdRouteImport.update({
+  id: '/$ideaId',
+  path: '/$ideaId',
+  getParentRoute: () => OrgSlugRouteRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthEndUserSplatRoute = ApiAuthEndUserSplatRouteImport.update({
-  id: '/api/auth/end-user/$',
-  path: '/api/auth/end-user/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const authenticatedDashboardSettingsIndexRoute =
+  authenticatedDashboardSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => authenticatedDashboardRouteRoute,
+  } as any)
+const authenticatedDashboardRoadmapIndexRoute =
+  authenticatedDashboardRoadmapIndexRouteImport.update({
+    id: '/roadmap/',
+    path: '/roadmap/',
+    getParentRoute: () => authenticatedDashboardRouteRoute,
+  } as any)
+const authenticatedDashboardMembersIndexRoute =
+  authenticatedDashboardMembersIndexRouteImport.update({
+    id: '/members/',
+    path: '/members/',
+    getParentRoute: () => authenticatedDashboardRouteRoute,
+  } as any)
+const authenticatedDashboardIdeasIndexRoute =
+  authenticatedDashboardIdeasIndexRouteImport.update({
+    id: '/ideas/',
+    path: '/ideas/',
+    getParentRoute: () => authenticatedDashboardRouteRoute,
+  } as any)
+const authenticatedDashboardIdeasIdeaIdRoute =
+  authenticatedDashboardIdeasIdeaIdRouteImport.update({
+    id: '/ideas/$ideaId',
+    path: '/ideas/$ideaId',
+    getParentRoute: () => authenticatedDashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof authenticatedDashboardRouteRouteWithChildren
+  '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
+  '/examples/sso': typeof ExamplesSsoRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
+  '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard/': typeof authenticatedDashboardIndexRoute
-  '/api/auth/end-user/$': typeof ApiAuthEndUserSplatRoute
-  '/api/auth/platform/$': typeof ApiAuthPlatformSplatRoute
+  '/org/$slug/': typeof OrgSlugIndexRoute
+  '/dashboard/ideas/$ideaId': typeof authenticatedDashboardIdeasIdeaIdRoute
+  '/dashboard/ideas': typeof authenticatedDashboardIdeasIndexRoute
+  '/dashboard/members': typeof authenticatedDashboardMembersIndexRoute
+  '/dashboard/roadmap': typeof authenticatedDashboardRoadmapIndexRoute
+  '/dashboard/settings': typeof authenticatedDashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
+  '/examples/sso': typeof ExamplesSsoRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
+  '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard': typeof authenticatedDashboardIndexRoute
-  '/api/auth/end-user/$': typeof ApiAuthEndUserSplatRoute
-  '/api/auth/platform/$': typeof ApiAuthPlatformSplatRoute
+  '/org/$slug': typeof OrgSlugIndexRoute
+  '/dashboard/ideas/$ideaId': typeof authenticatedDashboardIdeasIdeaIdRoute
+  '/dashboard/ideas': typeof authenticatedDashboardIdeasIndexRoute
+  '/dashboard/members': typeof authenticatedDashboardMembersIndexRoute
+  '/dashboard/roadmap': typeof authenticatedDashboardRoadmapIndexRoute
+  '/dashboard/settings': typeof authenticatedDashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,49 +164,85 @@ export interface FileRoutesById {
   '/(auth-pages)': typeof authPagesRouteRouteWithChildren
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/(authenticated)/dashboard': typeof authenticatedDashboardRouteRouteWithChildren
+  '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/(auth-pages)/login': typeof authPagesLoginRoute
   '/(auth-pages)/signup': typeof authPagesSignupRoute
+  '/examples/sso': typeof ExamplesSsoRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
+  '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
-  '/api/auth/end-user/$': typeof ApiAuthEndUserSplatRoute
-  '/api/auth/platform/$': typeof ApiAuthPlatformSplatRoute
+  '/org/$slug/': typeof OrgSlugIndexRoute
+  '/(authenticated)/dashboard/ideas/$ideaId': typeof authenticatedDashboardIdeasIdeaIdRoute
+  '/(authenticated)/dashboard/ideas/': typeof authenticatedDashboardIdeasIndexRoute
+  '/(authenticated)/dashboard/members/': typeof authenticatedDashboardMembersIndexRoute
+  '/(authenticated)/dashboard/roadmap/': typeof authenticatedDashboardRoadmapIndexRoute
+  '/(authenticated)/dashboard/settings/': typeof authenticatedDashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/org/$slug'
     | '/login'
     | '/signup'
+    | '/examples/sso'
+    | '/api/auth/$'
+    | '/org/$slug/$ideaId'
+    | '/org/$slug/roadmap'
     | '/dashboard/'
-    | '/api/auth/end-user/$'
-    | '/api/auth/platform/$'
+    | '/org/$slug/'
+    | '/dashboard/ideas/$ideaId'
+    | '/dashboard/ideas'
+    | '/dashboard/members'
+    | '/dashboard/roadmap'
+    | '/dashboard/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/signup'
+    | '/examples/sso'
+    | '/api/auth/$'
+    | '/org/$slug/$ideaId'
+    | '/org/$slug/roadmap'
     | '/dashboard'
-    | '/api/auth/end-user/$'
-    | '/api/auth/platform/$'
+    | '/org/$slug'
+    | '/dashboard/ideas/$ideaId'
+    | '/dashboard/ideas'
+    | '/dashboard/members'
+    | '/dashboard/roadmap'
+    | '/dashboard/settings'
   id:
     | '__root__'
     | '/'
     | '/(auth-pages)'
     | '/(authenticated)'
     | '/(authenticated)/dashboard'
+    | '/org/$slug'
     | '/(auth-pages)/login'
     | '/(auth-pages)/signup'
+    | '/examples/sso'
+    | '/api/auth/$'
+    | '/org/$slug/$ideaId'
+    | '/org/$slug/roadmap'
     | '/(authenticated)/dashboard/'
-    | '/api/auth/end-user/$'
-    | '/api/auth/platform/$'
+    | '/org/$slug/'
+    | '/(authenticated)/dashboard/ideas/$ideaId'
+    | '/(authenticated)/dashboard/ideas/'
+    | '/(authenticated)/dashboard/members/'
+    | '/(authenticated)/dashboard/roadmap/'
+    | '/(authenticated)/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   authPagesRouteRoute: typeof authPagesRouteRouteWithChildren
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
-  ApiAuthEndUserSplatRoute: typeof ApiAuthEndUserSplatRoute
-  ApiAuthPlatformSplatRoute: typeof ApiAuthPlatformSplatRoute
+  OrgSlugRouteRoute: typeof OrgSlugRouteRouteWithChildren
+  ExamplesSsoRoute: typeof ExamplesSsoRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/examples/sso': {
+      id: '/examples/sso'
+      path: '/examples/sso'
+      fullPath: '/examples/sso'
+      preLoaderRoute: typeof ExamplesSsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth-pages)/signup': {
       id: '/(auth-pages)/signup'
       path: '/signup'
@@ -170,12 +289,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authPagesLoginRouteImport
       parentRoute: typeof authPagesRouteRoute
     }
+    '/org/$slug': {
+      id: '/org/$slug'
+      path: '/org/$slug'
+      fullPath: '/org/$slug'
+      preLoaderRoute: typeof OrgSlugRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(authenticated)/dashboard': {
       id: '/(authenticated)/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof authenticatedDashboardRouteRouteImport
       parentRoute: typeof authenticatedRouteRoute
+    }
+    '/org/$slug/': {
+      id: '/org/$slug/'
+      path: '/'
+      fullPath: '/org/$slug/'
+      preLoaderRoute: typeof OrgSlugIndexRouteImport
+      parentRoute: typeof OrgSlugRouteRoute
     }
     '/(authenticated)/dashboard/': {
       id: '/(authenticated)/dashboard/'
@@ -184,19 +317,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedDashboardIndexRouteImport
       parentRoute: typeof authenticatedDashboardRouteRoute
     }
-    '/api/auth/platform/$': {
-      id: '/api/auth/platform/$'
-      path: '/api/auth/platform/$'
-      fullPath: '/api/auth/platform/$'
-      preLoaderRoute: typeof ApiAuthPlatformSplatRouteImport
+    '/org/$slug/roadmap': {
+      id: '/org/$slug/roadmap'
+      path: '/roadmap'
+      fullPath: '/org/$slug/roadmap'
+      preLoaderRoute: typeof OrgSlugRoadmapRouteImport
+      parentRoute: typeof OrgSlugRouteRoute
+    }
+    '/org/$slug/$ideaId': {
+      id: '/org/$slug/$ideaId'
+      path: '/$ideaId'
+      fullPath: '/org/$slug/$ideaId'
+      preLoaderRoute: typeof OrgSlugIdeaIdRouteImport
+      parentRoute: typeof OrgSlugRouteRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/end-user/$': {
-      id: '/api/auth/end-user/$'
-      path: '/api/auth/end-user/$'
-      fullPath: '/api/auth/end-user/$'
-      preLoaderRoute: typeof ApiAuthEndUserSplatRouteImport
-      parentRoute: typeof rootRouteImport
+    '/(authenticated)/dashboard/settings/': {
+      id: '/(authenticated)/dashboard/settings/'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof authenticatedDashboardSettingsIndexRouteImport
+      parentRoute: typeof authenticatedDashboardRouteRoute
+    }
+    '/(authenticated)/dashboard/roadmap/': {
+      id: '/(authenticated)/dashboard/roadmap/'
+      path: '/roadmap'
+      fullPath: '/dashboard/roadmap'
+      preLoaderRoute: typeof authenticatedDashboardRoadmapIndexRouteImport
+      parentRoute: typeof authenticatedDashboardRouteRoute
+    }
+    '/(authenticated)/dashboard/members/': {
+      id: '/(authenticated)/dashboard/members/'
+      path: '/members'
+      fullPath: '/dashboard/members'
+      preLoaderRoute: typeof authenticatedDashboardMembersIndexRouteImport
+      parentRoute: typeof authenticatedDashboardRouteRoute
+    }
+    '/(authenticated)/dashboard/ideas/': {
+      id: '/(authenticated)/dashboard/ideas/'
+      path: '/ideas'
+      fullPath: '/dashboard/ideas'
+      preLoaderRoute: typeof authenticatedDashboardIdeasIndexRouteImport
+      parentRoute: typeof authenticatedDashboardRouteRoute
+    }
+    '/(authenticated)/dashboard/ideas/$ideaId': {
+      id: '/(authenticated)/dashboard/ideas/$ideaId'
+      path: '/ideas/$ideaId'
+      fullPath: '/dashboard/ideas/$ideaId'
+      preLoaderRoute: typeof authenticatedDashboardIdeasIdeaIdRouteImport
+      parentRoute: typeof authenticatedDashboardRouteRoute
     }
   }
 }
@@ -217,11 +392,26 @@ const authPagesRouteRouteWithChildren = authPagesRouteRoute._addFileChildren(
 
 interface authenticatedDashboardRouteRouteChildren {
   authenticatedDashboardIndexRoute: typeof authenticatedDashboardIndexRoute
+  authenticatedDashboardIdeasIdeaIdRoute: typeof authenticatedDashboardIdeasIdeaIdRoute
+  authenticatedDashboardIdeasIndexRoute: typeof authenticatedDashboardIdeasIndexRoute
+  authenticatedDashboardMembersIndexRoute: typeof authenticatedDashboardMembersIndexRoute
+  authenticatedDashboardRoadmapIndexRoute: typeof authenticatedDashboardRoadmapIndexRoute
+  authenticatedDashboardSettingsIndexRoute: typeof authenticatedDashboardSettingsIndexRoute
 }
 
 const authenticatedDashboardRouteRouteChildren: authenticatedDashboardRouteRouteChildren =
   {
     authenticatedDashboardIndexRoute: authenticatedDashboardIndexRoute,
+    authenticatedDashboardIdeasIdeaIdRoute:
+      authenticatedDashboardIdeasIdeaIdRoute,
+    authenticatedDashboardIdeasIndexRoute:
+      authenticatedDashboardIdeasIndexRoute,
+    authenticatedDashboardMembersIndexRoute:
+      authenticatedDashboardMembersIndexRoute,
+    authenticatedDashboardRoadmapIndexRoute:
+      authenticatedDashboardRoadmapIndexRoute,
+    authenticatedDashboardSettingsIndexRoute:
+      authenticatedDashboardSettingsIndexRoute,
   }
 
 const authenticatedDashboardRouteRouteWithChildren =
@@ -241,12 +431,29 @@ const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
 const authenticatedRouteRouteWithChildren =
   authenticatedRouteRoute._addFileChildren(authenticatedRouteRouteChildren)
 
+interface OrgSlugRouteRouteChildren {
+  OrgSlugIdeaIdRoute: typeof OrgSlugIdeaIdRoute
+  OrgSlugRoadmapRoute: typeof OrgSlugRoadmapRoute
+  OrgSlugIndexRoute: typeof OrgSlugIndexRoute
+}
+
+const OrgSlugRouteRouteChildren: OrgSlugRouteRouteChildren = {
+  OrgSlugIdeaIdRoute: OrgSlugIdeaIdRoute,
+  OrgSlugRoadmapRoute: OrgSlugRoadmapRoute,
+  OrgSlugIndexRoute: OrgSlugIndexRoute,
+}
+
+const OrgSlugRouteRouteWithChildren = OrgSlugRouteRoute._addFileChildren(
+  OrgSlugRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authPagesRouteRoute: authPagesRouteRouteWithChildren,
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
-  ApiAuthEndUserSplatRoute: ApiAuthEndUserSplatRoute,
-  ApiAuthPlatformSplatRoute: ApiAuthPlatformSplatRoute,
+  OrgSlugRouteRoute: OrgSlugRouteRouteWithChildren,
+  ExamplesSsoRoute: ExamplesSsoRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

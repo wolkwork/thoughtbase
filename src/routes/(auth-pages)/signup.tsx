@@ -6,8 +6,8 @@ import { SignInSocialButton } from "~/components/sign-in-social-button";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { platformAuthClient } from "~/lib/platform-auth/auth-client";
-import { authQueryOptions } from "~/lib/platform-auth/queries";
+import { authClient } from "~/lib/auth/auth-client";
+import { authQueryOptions } from "~/lib/auth/queries";
 
 export const Route = createFileRoute("/(auth-pages)/signup")({
   component: SignupForm,
@@ -20,7 +20,7 @@ function SignupForm() {
 
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (data: { name: string; email: string; password: string }) => {
-      await platformAuthClient.signUp.email(
+      await authClient.signUp.email(
         {
           ...data,
           callbackURL: redirectUrl,

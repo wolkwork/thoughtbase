@@ -12,6 +12,12 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+    POLAR_ACCESS_TOKEN: z.string().min(1),
+    POLAR_WEBHOOK_SECRET: z.string().min(1),
+    
+    POLAR_STARTER_ID: z.string().min(1),
+    POLAR_GROWTH_ID: z.string().min(1),
   },
   runtimeEnv: process.env,
 });

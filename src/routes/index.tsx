@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { SignOutButton } from "~/components/sign-out-button";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { Button } from "~/components/ui/button";
-import { authQueryOptions } from "~/lib/platform-auth/queries";
+import { authQueryOptions } from "~/lib/auth/queries";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
