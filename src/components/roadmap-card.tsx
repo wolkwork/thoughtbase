@@ -32,8 +32,8 @@ export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex flex-col gap-2 rounded-md border bg-card p-3 shadow-sm transition-all hover:border-primary/50 cursor-grab active:cursor-grabbing",
-        isDragging && "z-50 shadow-xl ring-2 ring-primary/20"
+        "group relative flex flex-col gap-2 rounded-md border bg-card p-3 transition-all hover:border-primary/50 cursor-grab active:cursor-grabbing",
+        isDragging && "z-50 ring-2 ring-primary/20"
       )}
     >
       <div className="flex items-start justify-between gap-2">

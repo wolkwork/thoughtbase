@@ -8,7 +8,7 @@ import { env } from "~/env/server";
 import { db } from "~/lib/db";
 
 import { apiKey, organization } from "better-auth/plugins";
-import { polar, checkout, portal, usage, webhooks } from "@polar-sh/better-auth";
+import { polar, checkout, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk"
 
 
@@ -16,6 +16,7 @@ const polarClient = new Polar({
   accessToken: env.POLAR_ACCESS_TOKEN,
   server: "sandbox",
 })
+
 
 const getAuthConfig = createServerOnlyFn(() =>
   betterAuth({
@@ -36,6 +37,20 @@ const getAuthConfig = createServerOnlyFn(() =>
         apikey: schema.apikey,
       }
     }),
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
+        domain: new URL(env.VITE_BASE_URL).hostname
+      },
+      defaultCookieAttributes: {
+        sameSite: "none",
+        secure: true,
+        domain: ".thoughtbase.localhost"
+      },
+      trustedOrigins: [
+        env.VITE_BASE_URL,
+      ],
+    },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [tanstackStartCookies(), organization(), apiKey(), polar({ 

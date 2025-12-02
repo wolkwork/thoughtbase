@@ -1,12 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Copy, RefreshCw } from "lucide-react";
+import { Copy, RefreshCw, CreditCard } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { SubscriptionDialog } from "~/components/subscription-dialog";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
-import { auth } from "~/lib/auth/auth";
 import { authClient } from "~/lib/auth/auth-client";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/settings/")({
@@ -14,7 +15,8 @@ export const Route = createFileRoute("/(authenticated)/dashboard/settings/")({
 });
 
 function SettingsPage() {
-const {data: organization} = authClient.useActiveOrganization()
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+  const {data: organization} = authClient.useActiveOrganization()
 
   const { data: secretData, refetch } = useQuery({
     queryKey: ["org-secret"],
@@ -50,6 +52,21 @@ const {data: organization} = authClient.useActiveOrganization()
 
       <Card>
         <CardHeader>
+          <CardTitle>Subscription</CardTitle>
+          <CardDescription>
+            Manage your subscription plan and billing details.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setIsSubscriptionOpen(true)}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            Manage Subscription
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>SSO Secret</CardTitle>
           <CardDescription>
             Use this secret to sign JWTs for Single Sign-On (SSO) from your external application.
@@ -57,7 +74,7 @@ const {data: organization} = authClient.useActiveOrganization()
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {organization?.id}
+          {organization?.id && <div className="text-xs text-muted-foreground mb-2">Org ID: {organization.id}</div>}
           <div className="flex gap-2">
             <Input 
               value={secretData?.secret || "No secret generated"} 
@@ -72,14 +89,18 @@ const {data: organization} = authClient.useActiveOrganization()
           </div>
           
           <div className="flex justify-end">
-            <Button variant="destructive" onClick={() => generateSecret()} disabled={isPending}>
+            <Button variant="destructive" onClick={() => generateSecret(undefined)} disabled={isPending}>
               <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
               {secretData?.secret ? "Rotate Secret" : "Generate Secret"}
             </Button>
           </div>
         </CardContent>
       </Card>
+
+      <SubscriptionDialog 
+        open={isSubscriptionOpen} 
+        onOpenChange={setIsSubscriptionOpen} 
+      />
     </div>
   );
 }
-

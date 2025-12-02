@@ -1,24 +1,14 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  BarChart3,
-  CheckCircle2,
-  Circle,
-  Clock,
-  FileText,
-  Layout,
   MessageSquare,
-  PenSquare,
   Plus,
-  Settings,
-  Users,
-  XCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { authClient } from "~/lib/auth/auth-client";
-import { cn } from "~/lib/utils";
 import { CreateIdeaDialog } from "./create-idea-dialog";
 import { FeedbackWidget } from "./feedback-widget";
 import { SidebarOrganizationSwitcher } from "./sidebar-organization-switcher";
+import { StatusBadge, STATUSES } from "~/components/status-badge";
 import { Button } from "./ui/button";
 import {
   Sidebar,
@@ -40,15 +30,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   counts?: Record<string, number>;
 }
 
-const statusItems = [
-  { name: "Pending", slug: "pending", icon: Circle, color: "text-yellow-500" },
-  { name: "Reviewing", slug: "reviewing", icon: Clock, color: "text-orange-500" },
-  { name: "Planned", slug: "planned", icon: Layout, color: "text-blue-500" },
-  { name: "In Progress", slug: "in_progress", icon: PenSquare, color: "text-purple-500" },
-  { name: "Completed", slug: "completed", icon: CheckCircle2, color: "text-green-500" },
-  { name: "Closed", slug: "closed", icon: XCircle, color: "text-gray-500" },
-];
-
 export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [widgetOpen, setWidgetOpen] = useState(false);
@@ -58,6 +39,8 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
   
   const activeOrg = organizations?.find(org => org.id === organizationId);
   const orgSlug = activeOrg?.slug;
+
+  const location = useLocation();
 
   const workspaceItems = [
     { name: "Roadmap", href: "/dashboard/roadmap", icon: KanbanIcon },
@@ -93,28 +76,27 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
             <SidebarGroupLabel className="uppercase tracking-wider text-muted-foreground">Ideas</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
-                    {statusItems.map((item) => {
-                        const isStatusActive = location.search?.status === item.slug;
+                    {Object.entries(STATUSES).map(([slug, config]) => {
+                        const isStatusActive = location.search?.status === slug;
                         return (
-                        <SidebarMenuItem key={item.slug}>
+                        <SidebarMenuItem key={slug} className="text-black/70">
                             <SidebarMenuButton asChild isActive={isStatusActive}>
                                 <Link 
                                     to="/dashboard/ideas" 
-                                    search={{ status: item.slug }}
+                                    search={{ status: slug }}
                                 >
-                                    <item.icon className={cn(item.color, "size-5")} />
-                                    <span>{item.name}</span>
+                                    <StatusBadge status={slug} iconClassName="size-5" />
                                 </Link>
                             </SidebarMenuButton>
-                            {counts[item.slug] > 0 && (
-                                <SidebarMenuBadge>{counts[item.slug]}</SidebarMenuBadge>
+                            {counts[slug] > 0 && (
+                                <SidebarMenuBadge>{counts[slug]}</SidebarMenuBadge>
                             )}
                         </SidebarMenuItem>
                     )})}
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/ideas" && !location.search?.status}>
                              <Link to="/dashboard/ideas" search={{ status: undefined }}>
-                                <Circle className="text-gray-400" />
+                                <StatusBadge status="all" showLabel={false} iconClassName="text-gray-400 size-5" />
                                 <span>All Ideas</span>
                              </Link>
                         </SidebarMenuButton>
@@ -137,6 +119,7 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
                                     to={item.href} 
                                     target={item.external ? "_blank" : undefined}
                                     rel={item.external ? "noopener noreferrer" : undefined}
+                                    className="text-black/70 flex gap-2.5"
                                 >
                                     <item.icon className="size-5.5!" weight="duotone" color="#7d7d7d"  />
                                     <span>{item.name}</span>

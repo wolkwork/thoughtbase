@@ -1,5 +1,8 @@
-Boards --> Topics/tags
-ETA
+- Boards --> Topics/tags
+- ETA
+- Revenue data for customer
+- Customization (logo, brand color)
+- White label / remove branding
 
 Paid:
 - Custom domain

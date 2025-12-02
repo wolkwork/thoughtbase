@@ -15,6 +15,7 @@ import { $updateIdeaStatus } from "~/lib/api/ideas";
 import { RoadmapCard } from "./roadmap-card";
 import { RoadmapColumn } from "./roadmap-column";
 import { createPortal } from "react-dom";
+import { STATUSES, type IdeaStatus } from "~/components/status-badge";
 
 interface RoadmapBoardProps {
   ideas: any[];
@@ -22,16 +23,14 @@ interface RoadmapBoardProps {
   publicOrgSlug?: string;
 }
 
-const COLUMNS = [
-  { id: "pending", title: "Pending" },
-  { id: "reviewing", title: "Reviewing" },
-  { id: "planned", title: "Planned" },
-  { id: "in_progress", title: "In Progress" },
-  { id: "completed", title: "Completed" },
-];
+const COLUMN_IDS: IdeaStatus[] = ["pending", "reviewing", "planned", "in_progress", "completed"];
+
+const COLUMNS = COLUMN_IDS.map((id) => ({
+  id,
+  title: STATUSES[id].label,
+}));
 
 export function RoadmapBoard({ ideas: initialIdeas, readOnly = false, publicOrgSlug }: RoadmapBoardProps) {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const [activeId, setActiveId] = useState<string | null>(null);
   // Optimistic state
@@ -125,7 +124,7 @@ export function RoadmapBoard({ ideas: initialIdeas, readOnly = false, publicOrgS
 
   if (readOnly) {
       return (
-         <div className="flex h-full gap-4 overflow-x-auto pb-4">
+         <div className="flex gap-4 overflow-x-auto pb-4">
             {COLUMNS.map((col) => (
               <RoadmapColumn
                 key={col.id}
@@ -145,7 +144,7 @@ export function RoadmapBoard({ ideas: initialIdeas, readOnly = false, publicOrgS
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-full gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto pb-4 w-fit">
         {COLUMNS.map((col) => (
           <RoadmapColumn
             key={col.id}

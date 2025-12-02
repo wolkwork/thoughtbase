@@ -2,6 +2,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { cn } from "~/lib/utils";
 import { RoadmapCard } from "./roadmap-card";
+import { StatusBadge } from "./status-badge";
 
 interface RoadmapColumnProps {
   id: string;
@@ -16,11 +17,12 @@ export function RoadmapColumn({ id, title, ideas, publicOrgSlug }: RoadmapColumn
   });
 
   return (
-    <div className="flex h-full w-80 flex-col gap-4 rounded-lg bg-muted/50 p-4">
+    <div className="flex w-80 flex-col gap-4 rounded-lg bg-muted/50 p-4 border">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-sm uppercase text-muted-foreground">
-            {title}
-        </h3>
+        <StatusBadge 
+            status={id} 
+            className="font-medium text-black text-sm" 
+        />
         <span className="text-xs font-medium bg-muted px-2 py-0.5 rounded-full border">
             {ideas.length}
         </span>

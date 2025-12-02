@@ -27,6 +27,29 @@ export function getRouter() {
     defaultNotFoundComponent: DefaultNotFound,
     scrollRestoration: true,
     defaultStructuralSharing: true,
+
+    rewrite: {
+      input: ({url}) => {
+        const parts = url.hostname.split(".");
+        if (parts.length > 2) {
+          const subdomain = parts[0];
+
+          url.pathname = `/org/${subdomain}${url.pathname}`;
+        }
+
+        return url
+      },
+      output: ({url}) => {
+        const parts = url.hostname.split(".");
+        if (parts.length > 2) {
+          const subdomain = parts[0];
+
+          url.pathname = url.pathname.replace(`/org/${subdomain}`, "");
+        }
+
+        return url
+      },
+    }
   });
 
   setupRouterSsrQueryIntegration({
