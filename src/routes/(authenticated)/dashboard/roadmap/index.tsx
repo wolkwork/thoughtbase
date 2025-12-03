@@ -21,15 +21,14 @@ function RoadmapPage() {
   });
 
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden">
-      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+    <div className="flex h-full flex-col overflow-hidden p-6">
+      <div className="mb-6 flex flex-shrink-0 items-center justify-between">
         <h1 className="text-2xl font-bold">Roadmap</h1>
       </div>
-      
-      <div className="flex-1 min-h-0 overflow-x-auto">
+
+      <div className="min-h-0 flex-1 overflow-x-auto">
         <RoadmapBoard ideas={ideas} />
       </div>
     </div>
   );
 }
-

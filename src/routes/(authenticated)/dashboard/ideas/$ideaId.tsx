@@ -3,9 +3,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { IdeaDetail } from "~/components/idea-detail";
 import { $getIdea } from "~/lib/api/ideas";
 
-export const Route = createFileRoute(
-  "/(authenticated)/dashboard/ideas/$ideaId",
-)({
+export const Route = createFileRoute("/(authenticated)/dashboard/ideas/$ideaId")({
   loader: async ({ params: { ideaId } }) => {
     const idea = await $getIdea({ data: ideaId });
     if (!idea) {
@@ -29,9 +27,5 @@ function IdeaDetailPage() {
 
   if (!idea) return null;
 
-  return (
-    <div className="container mx-auto py-6 px-4 max-w-5xl">
-      <IdeaDetail idea={idea} currentUser={user} />
-    </div>
-  );
+  return <IdeaDetail idea={idea} currentUser={user} />;
 }

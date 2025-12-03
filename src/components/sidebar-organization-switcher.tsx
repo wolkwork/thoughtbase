@@ -1,10 +1,9 @@
-import { useRouter } from "@tanstack/react-router"
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
-import { authClient } from "~/lib/auth/auth-client"
-import { cn } from "~/lib/utils"
-import { CreateOrganizationDialog } from "./create-organization-dialog"
+import { useRouter } from "@tanstack/react-router";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { authClient } from "~/lib/auth/auth-client";
+import { CreateOrganizationDialog } from "./create-organization-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,36 +11,36 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "./ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "./ui/sidebar"
+} from "./ui/sidebar";
 
 export function SidebarOrganizationSwitcher() {
-  const { data: organizations } = authClient.useListOrganizations()
-  const { data: session } = authClient.useSession()
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const { isMobile } = useSidebar()
-  const router = useRouter()
-  
+  const { data: organizations } = authClient.useListOrganizations();
+  const { data: session } = authClient.useSession();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const { isMobile } = useSidebar();
+  const router = useRouter();
+
   const activeOrganization = organizations?.find(
-    (org) => org.id === session?.session?.activeOrganizationId
-  )
+    (org) => org.id === session?.session?.activeOrganizationId,
+  );
 
   const handleSetActive = async (organizationId: string) => {
     try {
       await authClient.organization.setActive({
         organizationId,
-      })
-      toast.success("Organization switched")
-      router.invalidate()
+      });
+      toast.success("Organization switched");
+      router.invalidate();
     } catch (error) {
-      toast.error("Failed to switch organization")
+      toast.error("Failed to switch organization");
     }
-  }
+  };
 
   return (
     <>
@@ -53,11 +52,17 @@ export function SidebarOrganizationSwitcher() {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   {activeOrganization?.logo ? (
-                      <img src={activeOrganization.logo} alt={activeOrganization.name} className="size-8 rounded-lg" />
+                    <img
+                      src={activeOrganization.logo}
+                      alt={activeOrganization.name}
+                      className="size-8 rounded-lg"
+                    />
                   ) : (
-                      <span className="font-semibold">{activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}</span>
+                    <span className="font-semibold">
+                      {activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}
+                    </span>
                   )}
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -72,9 +77,9 @@ export function SidebarOrganizationSwitcher() {
             <DropdownMenuContent
               className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
               align="start"
-side="bottom"
+              side="bottom"
             >
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
+              <DropdownMenuLabel className="text-muted-foreground text-xs">
                 Organizations
               </DropdownMenuLabel>
               {organizations?.map((org) => (
@@ -85,26 +90,33 @@ side="bottom"
                 >
                   <div className="flex size-6 items-center justify-center rounded-sm border">
                     {org.logo ? (
-                        <img src={org.logo} alt={org.name} className="size-6 rounded-sm" />
+                      <img src={org.logo} alt={org.name} className="size-6 rounded-sm" />
                     ) : (
-                        <span className="font-medium text-xs">{org.name.substring(0, 2).toUpperCase()}</span>
+                      <span className="text-xs font-medium">
+                        {org.name.substring(0, 2).toUpperCase()}
+                      </span>
                     )}
                   </div>
                   {org.name}
-                  {activeOrganization?.id === org.id && <Check className="ml-auto h-4 w-4" />}
+                  {activeOrganization?.id === org.id && (
+                    <Check className="ml-auto h-4 w-4" />
+                  )}
                 </DropdownMenuItem>
               ))}
               {organizations?.length === 0 && (
-                 <div className="p-2 text-sm text-muted-foreground text-center">
-                    No organizations found.
-                 </div>
+                <div className="text-muted-foreground p-2 text-center text-sm">
+                  No organizations found.
+                </div>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-2 p-2" onSelect={() => setShowCreateDialog(true)}>
-                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+              <DropdownMenuItem
+                className="gap-2 p-2"
+                onSelect={() => setShowCreateDialog(true)}
+              >
+                <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                   <Plus className="size-4" />
                 </div>
-                <div className="font-medium text-muted-foreground">Add Organization</div>
+                <div className="text-muted-foreground font-medium">Add Organization</div>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -115,6 +127,5 @@ side="bottom"
         onOpenChange={setShowCreateDialog}
       />
     </>
-  )
+  );
 }
-

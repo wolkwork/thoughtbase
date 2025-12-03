@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
-import { profile, externalUser } from "~/lib/db/schema";
+import { externalUser, profile } from "~/lib/db/schema";
 
 export const $getUnifiedUser = createServerFn({ method: "GET" }).handler(async () => {
   const ctx = await getUnifiedAuthContext();
@@ -73,13 +73,13 @@ export const $upsertUnifiedProfile = createServerFn({ method: "POST" })
       // Update external user name
       const [updatedUser] = await db
         .update(externalUser)
-        .set({ 
-            name: data.name,
-            updatedAt: new Date()
+        .set({
+          name: data.name,
+          updatedAt: new Date(),
         })
         .where(eq(externalUser.id, ctx.user.id))
         .returning();
-      
+
       return {
         id: updatedUser.id,
         name: updatedUser.name,

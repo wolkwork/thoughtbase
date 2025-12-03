@@ -1,11 +1,11 @@
-import { useRouter } from "@tanstack/react-router"
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
-import { authClient } from "~/lib/auth/auth-client"
-import { cn } from "~/lib/utils"
-import { CreateOrganizationDialog } from "./create-organization-dialog"
-import { Button } from "./ui/button"
+import { useRouter } from "@tanstack/react-router";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { authClient } from "~/lib/auth/auth-client";
+import { cn } from "~/lib/utils";
+import { CreateOrganizationDialog } from "./create-organization-dialog";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,31 +13,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "./ui/dropdown-menu";
 
 export function OrganizationSwitcher() {
-  const { data: organizations } = authClient.useListOrganizations()
-  const { data: session } = authClient.useSession()
-  const [open, setOpen] = useState(false)
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const router = useRouter()
-  
+  const { data: organizations } = authClient.useListOrganizations();
+  const { data: session } = authClient.useSession();
+  const [open, setOpen] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const router = useRouter();
+
   const activeOrganization = organizations?.find(
-    (org) => org.id === session?.session?.activeOrganizationId
-  )
+    (org) => org.id === session?.session?.activeOrganizationId,
+  );
 
   const handleSetActive = async (organizationId: string) => {
     try {
       await authClient.organization.setActive({
         organizationId,
-      })
-      toast.success("Organization switched")
-      setOpen(false)
-      router.invalidate()
+      });
+      toast.success("Organization switched");
+      setOpen(false);
+      router.invalidate();
     } catch (error) {
-      toast.error("Failed to switch organization")
+      toast.error("Failed to switch organization");
     }
-  }
+  };
 
   return (
     <>
@@ -56,25 +56,20 @@ export function OrganizationSwitcher() {
         <DropdownMenuContent className="w-[200px]">
           <DropdownMenuLabel>Organizations</DropdownMenuLabel>
           {organizations?.map((org) => (
-            <DropdownMenuItem
-              key={org.id}
-              onSelect={() => handleSetActive(org.id)}
-            >
+            <DropdownMenuItem key={org.id} onSelect={() => handleSetActive(org.id)}>
               <Check
                 className={cn(
                   "mr-2 h-4 w-4",
-                  activeOrganization?.id === org.id
-                    ? "opacity-100"
-                    : "opacity-0"
+                  activeOrganization?.id === org.id ? "opacity-100" : "opacity-0",
                 )}
               />
               {org.name}
             </DropdownMenuItem>
           ))}
           {organizations?.length === 0 && (
-             <div className="p-2 text-sm text-muted-foreground text-center">
-                No organizations found.
-             </div>
+            <div className="text-muted-foreground p-2 text-center text-sm">
+              No organizations found.
+            </div>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setShowCreateDialog(true)}>
@@ -88,6 +83,5 @@ export function OrganizationSwitcher() {
         onOpenChange={setShowCreateDialog}
       />
     </>
-  )
+  );
 }
-

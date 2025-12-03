@@ -5,7 +5,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { FeedbackWidget } from "~/components/feedback-widget";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { $getOrgSecret } from "~/lib/api/organizations";
@@ -21,9 +27,11 @@ function SSOExamplePage() {
   const [email, setEmail] = useState("external-user@example.com");
   const [id, setId] = useState("external-user-123");
   const [name, setName] = useState("External User");
-  const [avatarUrl, setAvatarUrl] = useState("https://api.dicebear.com/9.x/avataaars/svg?seed=Felix");
+  const [avatarUrl, setAvatarUrl] = useState(
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Felix",
+  );
   const [ssoToken, setSsoToken] = useState("");
-  
+
   // Manual inputs for organization ID and secret
   const [manualOrgId, setManualOrgId] = useState("");
   const [manualSecret, setManualSecret] = useState("");
@@ -37,10 +45,10 @@ function SSOExamplePage() {
 
   // Effect to auto-fill if logged in
   if (session?.session?.activeOrganizationId && !manualOrgId) {
-      setManualOrgId(session.session.activeOrganizationId);
+    setManualOrgId(session.session.activeOrganizationId);
   }
   if (secretData?.secret && !manualSecret) {
-      setManualSecret(secretData.secret);
+    setManualSecret(secretData.secret);
   }
 
   const generateToken = async () => {
@@ -49,63 +57,71 @@ function SSOExamplePage() {
       return;
     }
     if (!manualOrgId) {
-        toast.error("Please enter an organization ID.");
-        return;
+      toast.error("Please enter an organization ID.");
+      return;
     }
 
     const secret = new TextEncoder().encode(manualSecret);
-    
+
     try {
-    const token = await new SignJWT({ 
+      const token = await new SignJWT({
         sub: id,
-        email, 
-        name, 
-        image: avatarUrl 
+        email,
+        name,
+        image: avatarUrl,
       })
-          .setProtectedHeader({ alg: 'HS256' })
-          .setIssuedAt()
-          .setExpirationTime('1h')
-          .sign(secret);
-    
-        setSsoToken(token);
-        setIsOpen(true);
-        toast.success("SSO Token generated & Widget opened");
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setExpirationTime("1h")
+        .sign(secret);
+
+      setSsoToken(token);
+      setIsOpen(true);
+      toast.success("SSO Token generated & Widget opened");
     } catch (e) {
-        toast.error("Failed to generate token");
-        console.error(e);
+      toast.error("Failed to generate token");
+      console.error(e);
     }
   };
 
   return (
-    <div className="container mx-auto py-10 px-4">
-      <Card className="max-w-2xl mx-auto">
+    <div className="container mx-auto px-4 py-10">
+      <Card className="mx-auto max-w-2xl">
         <CardHeader>
           <CardTitle>SSO Integration Example</CardTitle>
           <CardDescription>
-            Simulate an external website embedding the widget with SSO.
-            Enter your Organization ID and Secret manually, or log in as admin to auto-fill.
+            Simulate an external website embedding the widget with SSO. Enter your
+            Organization ID and Secret manually, or log in as admin to auto-fill.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-4 border-b pb-6">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Organization Config</h3>
+            <h3 className="text-muted-foreground text-sm font-medium tracking-wider uppercase">
+              Organization Config
+            </h3>
             <div className="grid gap-2">
               <Label>Organization ID</Label>
-              <Input value={manualOrgId} onChange={(e) => setManualOrgId(e.target.value)} placeholder="org_..." />
+              <Input
+                value={manualOrgId}
+                onChange={(e) => setManualOrgId(e.target.value)}
+                placeholder="org_..."
+              />
             </div>
             <div className="grid gap-2">
               <Label>Organization Secret</Label>
-              <Input 
-                type="password" 
-                value={manualSecret} 
-                onChange={(e) => setManualSecret(e.target.value)} 
-                placeholder="Secret key..." 
-            />
+              <Input
+                type="password"
+                value={manualSecret}
+                onChange={(e) => setManualSecret(e.target.value)}
+                placeholder="Secret key..."
+              />
             </div>
           </div>
 
           <div className="grid gap-4">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">User Data</h3>
+            <h3 className="text-muted-foreground text-sm font-medium tracking-wider uppercase">
+              User Data
+            </h3>
             <div className="grid gap-2">
               <Label>User ID</Label>
               <Input value={id} onChange={(e) => setId(e.target.value)} />
@@ -124,29 +140,28 @@ function SSOExamplePage() {
             </div>
           </div>
 
-          <div className="flex justify-end items-center pt-4">
-             <Button onClick={generateToken}>
-                Generate Token & Open Widget
-             </Button>
+          <div className="flex items-center justify-end pt-4">
+            <Button onClick={generateToken}>Generate Token & Open Widget</Button>
           </div>
-          
+
           {ssoToken && (
-              <div className="p-4 bg-muted rounded-md overflow-hidden">
-                  <p className="text-xs font-mono break-all text-muted-foreground">{ssoToken}</p>
-              </div>
+            <div className="bg-muted overflow-hidden rounded-md p-4">
+              <p className="text-muted-foreground font-mono text-xs break-all">
+                {ssoToken}
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {manualOrgId && (
-          <FeedbackWidget 
-            organizationId={manualOrgId}
-            isOpen={isOpen} 
-            onClose={() => setIsOpen(false)}
-            ssoToken={ssoToken}
-          />
+        <FeedbackWidget
+          organizationId={manualOrgId}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          ssoToken={ssoToken}
+        />
       )}
     </div>
   );
 }
-

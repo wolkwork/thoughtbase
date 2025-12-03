@@ -27,9 +27,9 @@ export const Route = createFileRoute("/org/$slug")({
     // Fetch unified user and profile to support both internal and external users
     const user = await $getUnifiedUser();
     let profile = null;
-    
+
     if (user) {
-        profile = await $getUnifiedProfile({ data: { organizationId: org.id } });
+      profile = await $getUnifiedProfile({ data: { organizationId: org.id } });
     }
 
     return { org, user, profile };

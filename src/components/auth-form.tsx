@@ -76,12 +76,18 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
   };
 
   return (
-    <div className={mode === "page" ? "mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]" : "grid gap-6"}>
+    <div
+      className={
+        mode === "page"
+          ? "mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]"
+          : "grid gap-6"
+      }
+    >
       <div className="flex flex-col space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           {isSignUp ? "Create an account" : "Welcome back"}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {isSignUp
             ? "Enter your email below to create your account"
             : "Enter your email below to sign in"}{" "}
@@ -142,13 +148,13 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
         </form>
       </div>
 
-      <div className="px-8 text-center text-sm text-muted-foreground">
+      <div className="text-muted-foreground px-8 text-center text-sm">
         {isSignUp ? (
           <>
             Already have an account?{" "}
             <button
               onClick={() => setIsSignUp(false)}
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
             >
               Sign In
             </button>
@@ -158,7 +164,7 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
             Don't have an account?{" "}
             <button
               onClick={() => setIsSignUp(true)}
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
             >
               Sign Up
             </button>
@@ -168,4 +174,3 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
     </div>
   );
 }
-

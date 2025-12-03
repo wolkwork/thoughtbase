@@ -17,25 +17,25 @@ export function RoadmapColumn({ id, title, ideas, publicOrgSlug }: RoadmapColumn
   });
 
   return (
-    <div className="flex w-80 flex-col gap-4 rounded-lg bg-muted/50 p-4 border">
+    <div className="bg-muted/50 flex w-80 flex-col gap-4 rounded-lg border p-4">
       <div className="flex items-center justify-between">
-        <StatusBadge 
-            status={id} 
-            className="font-medium text-black text-sm" 
-        />
-        <span className="text-xs font-medium bg-muted px-2 py-0.5 rounded-full border">
-            {ideas.length}
+        <StatusBadge status={id} className="text-sm font-medium text-black" />
+        <span className="bg-muted rounded-full border px-2 py-0.5 text-xs font-medium">
+          {ideas.length}
         </span>
       </div>
 
       <div
         ref={setNodeRef}
         className={cn(
-            "flex flex-1 flex-col gap-2 overflow-y-auto min-h-[150px] rounded-md transition-colors",
-            isOver && "bg-muted/80 ring-2 ring-primary/20"
+          "flex min-h-[150px] flex-1 flex-col gap-2 overflow-y-auto rounded-md transition-colors",
+          isOver && "bg-muted/80 ring-primary/20 ring-2",
         )}
       >
-        <SortableContext items={ideas.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={ideas.map((i) => i.id)}
+          strategy={verticalListSortingStrategy}
+        >
           {ideas.map((idea) => (
             <RoadmapCard key={idea.id} idea={idea} publicOrgSlug={publicOrgSlug} />
           ))}
@@ -44,4 +44,3 @@ export function RoadmapColumn({ id, title, ideas, publicOrgSlug }: RoadmapColumn
     </div>
   );
 }
-

@@ -23,9 +23,9 @@ export const externalUser = pgTable(
     index("external_user_org_idx").on(table.organizationId),
     unique("external_user_org_external_id_unique").on(
       table.organizationId,
-      table.externalId
+      table.externalId,
     ),
-  ]
+  ],
 );
 
 export const externalSession = pgTable(
@@ -39,7 +39,7 @@ export const externalSession = pgTable(
     expiresAt: timestamp("expires_at").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [index("external_session_token_idx").on(table.token)]
+  (table) => [index("external_session_token_idx").on(table.token)],
 );
 
 export const externalUserRelations = relations(externalUser, ({ one }) => ({
@@ -55,4 +55,3 @@ export const externalSessionRelations = relations(externalSession, ({ one }) => 
     references: [externalUser.id],
   }),
 }));
-

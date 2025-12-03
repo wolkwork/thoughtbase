@@ -53,4 +53,3 @@ export function ProfileForm({ orgId, initialName = "", onSuccess }: ProfileFormP
     </form>
   );
 }
-

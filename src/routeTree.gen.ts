@@ -13,6 +13,7 @@ import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)
 import { Route as authPagesRouteRouteImport } from './routes/(auth-pages)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesSsoRouteImport } from './routes/examples/sso'
+import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
 import { Route as authPagesLoginRouteImport } from './routes/(auth-pages)/login'
 import { Route as OrgSlugRouteRouteImport } from './routes/org/$slug/route'
@@ -26,6 +27,7 @@ import { Route as authenticatedDashboardSettingsIndexRouteImport } from './route
 import { Route as authenticatedDashboardRoadmapIndexRouteImport } from './routes/(authenticated)/dashboard/roadmap/index'
 import { Route as authenticatedDashboardMembersIndexRouteImport } from './routes/(authenticated)/dashboard/members/index'
 import { Route as authenticatedDashboardIdeasIndexRouteImport } from './routes/(authenticated)/dashboard/ideas/index'
+import { Route as authenticatedDashboardAccountIndexRouteImport } from './routes/(authenticated)/dashboard/account/index'
 import { Route as authenticatedDashboardIdeasIdeaIdRouteImport } from './routes/(authenticated)/dashboard/ideas/$ideaId'
 
 const authenticatedRouteRoute = authenticatedRouteRouteImport.update({
@@ -44,6 +46,11 @@ const IndexRoute = IndexRouteImport.update({
 const ExamplesSsoRoute = ExamplesSsoRouteImport.update({
   id: '/examples/sso',
   path: '/examples/sso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadRoute = ApiUploadRouteImport.update({
+  id: '/api/upload',
+  path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authPagesSignupRoute = authPagesSignupRouteImport.update({
@@ -117,6 +124,12 @@ const authenticatedDashboardIdeasIndexRoute =
     path: '/ideas/',
     getParentRoute: () => authenticatedDashboardRouteRoute,
   } as any)
+const authenticatedDashboardAccountIndexRoute =
+  authenticatedDashboardAccountIndexRouteImport.update({
+    id: '/account/',
+    path: '/account/',
+    getParentRoute: () => authenticatedDashboardRouteRoute,
+  } as any)
 const authenticatedDashboardIdeasIdeaIdRoute =
   authenticatedDashboardIdeasIdeaIdRouteImport.update({
     id: '/ideas/$ideaId',
@@ -130,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
+  '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
@@ -137,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof authenticatedDashboardIndexRoute
   '/org/$slug/': typeof OrgSlugIndexRoute
   '/dashboard/ideas/$ideaId': typeof authenticatedDashboardIdeasIdeaIdRoute
+  '/dashboard/account': typeof authenticatedDashboardAccountIndexRoute
   '/dashboard/ideas': typeof authenticatedDashboardIdeasIndexRoute
   '/dashboard/members': typeof authenticatedDashboardMembersIndexRoute
   '/dashboard/roadmap': typeof authenticatedDashboardRoadmapIndexRoute
@@ -146,6 +161,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
+  '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
@@ -153,6 +169,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof authenticatedDashboardIndexRoute
   '/org/$slug': typeof OrgSlugIndexRoute
   '/dashboard/ideas/$ideaId': typeof authenticatedDashboardIdeasIdeaIdRoute
+  '/dashboard/account': typeof authenticatedDashboardAccountIndexRoute
   '/dashboard/ideas': typeof authenticatedDashboardIdeasIndexRoute
   '/dashboard/members': typeof authenticatedDashboardMembersIndexRoute
   '/dashboard/roadmap': typeof authenticatedDashboardRoadmapIndexRoute
@@ -167,6 +184,7 @@ export interface FileRoutesById {
   '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/(auth-pages)/login': typeof authPagesLoginRoute
   '/(auth-pages)/signup': typeof authPagesSignupRoute
+  '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
@@ -174,6 +192,7 @@ export interface FileRoutesById {
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
   '/org/$slug/': typeof OrgSlugIndexRoute
   '/(authenticated)/dashboard/ideas/$ideaId': typeof authenticatedDashboardIdeasIdeaIdRoute
+  '/(authenticated)/dashboard/account/': typeof authenticatedDashboardAccountIndexRoute
   '/(authenticated)/dashboard/ideas/': typeof authenticatedDashboardIdeasIndexRoute
   '/(authenticated)/dashboard/members/': typeof authenticatedDashboardMembersIndexRoute
   '/(authenticated)/dashboard/roadmap/': typeof authenticatedDashboardRoadmapIndexRoute
@@ -187,6 +206,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/login'
     | '/signup'
+    | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
     | '/org/$slug/$ideaId'
@@ -194,6 +214,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/org/$slug/'
     | '/dashboard/ideas/$ideaId'
+    | '/dashboard/account'
     | '/dashboard/ideas'
     | '/dashboard/members'
     | '/dashboard/roadmap'
@@ -203,6 +224,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/signup'
+    | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
     | '/org/$slug/$ideaId'
@@ -210,6 +232,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/org/$slug'
     | '/dashboard/ideas/$ideaId'
+    | '/dashboard/account'
     | '/dashboard/ideas'
     | '/dashboard/members'
     | '/dashboard/roadmap'
@@ -223,6 +246,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/(auth-pages)/login'
     | '/(auth-pages)/signup'
+    | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
     | '/org/$slug/$ideaId'
@@ -230,6 +254,7 @@ export interface FileRouteTypes {
     | '/(authenticated)/dashboard/'
     | '/org/$slug/'
     | '/(authenticated)/dashboard/ideas/$ideaId'
+    | '/(authenticated)/dashboard/account/'
     | '/(authenticated)/dashboard/ideas/'
     | '/(authenticated)/dashboard/members/'
     | '/(authenticated)/dashboard/roadmap/'
@@ -241,6 +266,7 @@ export interface RootRouteChildren {
   authPagesRouteRoute: typeof authPagesRouteRouteWithChildren
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
   OrgSlugRouteRoute: typeof OrgSlugRouteRouteWithChildren
+  ApiUploadRoute: typeof ApiUploadRoute
   ExamplesSsoRoute: typeof ExamplesSsoRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -273,6 +299,13 @@ declare module '@tanstack/react-router' {
       path: '/examples/sso'
       fullPath: '/examples/sso'
       preLoaderRoute: typeof ExamplesSsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/upload': {
+      id: '/api/upload'
+      path: '/api/upload'
+      fullPath: '/api/upload'
+      preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth-pages)/signup': {
@@ -366,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedDashboardIdeasIndexRouteImport
       parentRoute: typeof authenticatedDashboardRouteRoute
     }
+    '/(authenticated)/dashboard/account/': {
+      id: '/(authenticated)/dashboard/account/'
+      path: '/account'
+      fullPath: '/dashboard/account'
+      preLoaderRoute: typeof authenticatedDashboardAccountIndexRouteImport
+      parentRoute: typeof authenticatedDashboardRouteRoute
+    }
     '/(authenticated)/dashboard/ideas/$ideaId': {
       id: '/(authenticated)/dashboard/ideas/$ideaId'
       path: '/ideas/$ideaId'
@@ -393,6 +433,7 @@ const authPagesRouteRouteWithChildren = authPagesRouteRoute._addFileChildren(
 interface authenticatedDashboardRouteRouteChildren {
   authenticatedDashboardIndexRoute: typeof authenticatedDashboardIndexRoute
   authenticatedDashboardIdeasIdeaIdRoute: typeof authenticatedDashboardIdeasIdeaIdRoute
+  authenticatedDashboardAccountIndexRoute: typeof authenticatedDashboardAccountIndexRoute
   authenticatedDashboardIdeasIndexRoute: typeof authenticatedDashboardIdeasIndexRoute
   authenticatedDashboardMembersIndexRoute: typeof authenticatedDashboardMembersIndexRoute
   authenticatedDashboardRoadmapIndexRoute: typeof authenticatedDashboardRoadmapIndexRoute
@@ -404,6 +445,8 @@ const authenticatedDashboardRouteRouteChildren: authenticatedDashboardRouteRoute
     authenticatedDashboardIndexRoute: authenticatedDashboardIndexRoute,
     authenticatedDashboardIdeasIdeaIdRoute:
       authenticatedDashboardIdeasIdeaIdRoute,
+    authenticatedDashboardAccountIndexRoute:
+      authenticatedDashboardAccountIndexRoute,
     authenticatedDashboardIdeasIndexRoute:
       authenticatedDashboardIdeasIndexRoute,
     authenticatedDashboardMembersIndexRoute:
@@ -452,6 +495,7 @@ const rootRouteChildren: RootRouteChildren = {
   authPagesRouteRoute: authPagesRouteRouteWithChildren,
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
   OrgSlugRouteRoute: OrgSlugRouteRouteWithChildren,
+  ApiUploadRoute: ApiUploadRoute,
   ExamplesSsoRoute: ExamplesSsoRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

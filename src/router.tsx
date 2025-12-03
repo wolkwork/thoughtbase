@@ -29,7 +29,7 @@ export function getRouter() {
     defaultStructuralSharing: true,
 
     rewrite: {
-      input: ({url}) => {
+      input: ({ url }) => {
         const parts = url.hostname.split(".");
         if (parts.length > 2) {
           const subdomain = parts[0];
@@ -37,9 +37,9 @@ export function getRouter() {
           url.pathname = `/org/${subdomain}${url.pathname}`;
         }
 
-        return url
+        return url;
       },
-      output: ({url}) => {
+      output: ({ url }) => {
         const parts = url.hostname.split(".");
         if (parts.length > 2) {
           const subdomain = parts[0];
@@ -47,9 +47,9 @@ export function getRouter() {
           url.pathname = url.pathname.replace(`/org/${subdomain}`, "");
         }
 
-        return url
+        return url;
       },
-    }
+    },
   });
 
   setupRouterSsrQueryIntegration({

@@ -18,58 +18,58 @@ async function getAuthContext() {
   };
 }
 
-export const $generateOrgSecret = createServerFn({ method: "POST" })
-  .handler(async () => {
-    const ctx = await getAuthContext();
-    if (!ctx.user || !ctx.organizationId) {
-        throw new Error("Unauthorized or no active organization");
-    }
+export const $generateOrgSecret = createServerFn({ method: "POST" }).handler(async () => {
+  const ctx = await getAuthContext();
+  if (!ctx.user || !ctx.organizationId) {
+    throw new Error("Unauthorized or no active organization");
+  }
 
-    const member = await db.query.member.findFirst({
-        where: (member, { and, eq }) => and(
-            eq(member.userId, ctx.user!.id),
-            eq(member.organizationId, ctx.organizationId!)
-        )
-    });
-
-    if (!member || (member.role !== "admin" && member.role !== "owner")) {
-        throw new Error("Insufficient permissions");
-    }
-
-    const secret = nanoid(32);
-
-    await db.update(organization)
-        .set({ secret })
-        .where(eq(organization.id, ctx.organizationId));
-
-    return { secret };
+  const member = await db.query.member.findFirst({
+    where: (member, { and, eq }) =>
+      and(
+        eq(member.userId, ctx.user!.id),
+        eq(member.organizationId, ctx.organizationId!),
+      ),
   });
 
-export const $getOrgSecret = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const ctx = await getAuthContext();
-    if (!ctx.user || !ctx.organizationId) {
-        throw new Error("Unauthorized or no active organization");
-    }
+  if (!member || (member.role !== "admin" && member.role !== "owner")) {
+    throw new Error("Insufficient permissions");
+  }
 
-    const member = await db.query.member.findFirst({
-        where: (member, { and, eq }) => and(
-            eq(member.userId, ctx.user!.id),
-            eq(member.organizationId, ctx.organizationId!)
-        )
-    });
+  const secret = nanoid(32);
 
-    if (!member || (member.role !== "admin" && member.role !== "owner")) {
-        throw new Error("Insufficient permissions");
-    }
+  await db
+    .update(organization)
+    .set({ secret })
+    .where(eq(organization.id, ctx.organizationId));
 
-    const org = await db.query.organization.findFirst({
-        where: eq(organization.id, ctx.organizationId),
-        columns: {
-            secret: true
-        }
-    });
+  return { secret };
+});
 
-    return { secret: org?.secret };
+export const $getOrgSecret = createServerFn({ method: "GET" }).handler(async () => {
+  const ctx = await getAuthContext();
+  if (!ctx.user || !ctx.organizationId) {
+    throw new Error("Unauthorized or no active organization");
+  }
+
+  const member = await db.query.member.findFirst({
+    where: (member, { and, eq }) =>
+      and(
+        eq(member.userId, ctx.user!.id),
+        eq(member.organizationId, ctx.organizationId!),
+      ),
   });
 
+  if (!member || (member.role !== "admin" && member.role !== "owner")) {
+    throw new Error("Insufficient permissions");
+  }
+
+  const org = await db.query.organization.findFirst({
+    where: eq(organization.id, ctx.organizationId),
+    columns: {
+      secret: true,
+    },
+  });
+
+  return { secret: org?.secret };
+});

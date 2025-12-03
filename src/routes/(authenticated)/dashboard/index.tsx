@@ -11,7 +11,7 @@ function DashboardIndex() {
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
-      <div className="w-full flex justify-between items-center">
+      <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <OrganizationSwitcher />
       </div>

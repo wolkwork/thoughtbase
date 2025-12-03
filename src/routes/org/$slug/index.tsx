@@ -1,11 +1,21 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChatsCircleIcon, HeartIcon, LightbulbIcon } from "@phosphor-icons/react";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { createFileRoute, Link, useLoaderData, useRouter } from "@tanstack/react-router";
-import { MessageSquare, Search, ThumbsUp } from "lucide-react";
-import { useState } from "react";
+import { format } from "date-fns";
+import { ArrowDown, ArrowUp, Flame, Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { AuthForm } from "~/components/auth-form";
 import { CreateIdeaDialog } from "~/components/create-idea-dialog";
+import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { ProfileForm } from "~/components/profile-form";
 import { PublicHeader } from "~/components/public-header";
+import { StatusBadge } from "~/components/status-badge";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -14,7 +24,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { $getIdeas, $getPublicCounts, $toggleReaction } from "~/lib/api/ideas";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { $getIdeasFeed, $getPublicCounts, $toggleReaction } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/org/$slug/")({
@@ -25,77 +41,129 @@ function OrganizationIndexPage() {
   const { org, user, profile } = useLoaderData({ from: "/org/$slug" });
   const router = useRouter();
   const queryClient = useQueryClient();
-  
+
   const [loginOpen, setLoginOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<"newest" | "top" | "trending">("newest");
 
-  const { data: ideas } = useQuery({
-    queryKey: ["public-ideas", org.id],
-    queryFn: () => $getIdeas({ data: { organizationId: org.id } }),
+  const {
+    data: ideasData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["public-ideas", org.id, sortBy],
+    queryFn: ({ pageParam }) =>
+      $getIdeasFeed({
+        data: {
+          organizationId: org.id,
+          sort: sortBy,
+          page: pageParam,
+          limit: 20,
+        },
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
-  
+
+  const ideas = ideasData?.pages.flatMap((page) => page.items) || [];
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" },
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const { data: counts } = useQuery({
-      queryKey: ["public-counts", org.id],
-      queryFn: () => $getPublicCounts({ data: { organizationId: org.id } })
-  })
+    queryKey: ["public-counts", org.id],
+    queryFn: () => $getPublicCounts({ data: { organizationId: org.id } }),
+  });
 
   const { mutate: toggleReaction } = useMutation({
     mutationFn: $toggleReaction,
     onMutate: async (newReaction) => {
-        // Optimistic update for list
-        queryClient.setQueryData(["public-ideas", org.id], (old: any[]) => {
-            if (!old) return old;
-            return old.map(idea => {
-                if (idea.id !== newReaction.data.ideaId) return idea;
-                
-                const isExternal = user?.type === "external";
-                const hasReacted = idea.reactions.some((r: any) => {
-                    if (isExternal) return r.externalUserId === user?.id && r.type === "upvote";
-                    return r.userId === user?.id && r.type === "upvote";
-                });
+      // Optimistic update for list
+      await queryClient.cancelQueries({ queryKey: ["public-ideas", org.id, sortBy] });
+      const previousData = queryClient.getQueryData(["public-ideas", org.id, sortBy]);
 
-                let newReactions = [...idea.reactions];
-                
-                if (hasReacted) {
-                    newReactions = newReactions.filter((r: any) => {
-                        if (isExternal) return !(r.externalUserId === user?.id && r.type === "upvote");
-                        return !(r.userId === user?.id && r.type === "upvote");
-                    });
-                } else {
-                    newReactions.push({
-                        id: "optimistic-" + Math.random(),
-                        userId: isExternal ? null : user?.id,
-                        externalUserId: isExternal ? user?.id : null,
-                        type: "upvote",
-                    });
-                }
-                
-                return {
-                    ...idea,
-                    reactions: newReactions,
-                    reactionCount: newReactions.length
-                };
-            });
-        });
+      queryClient.setQueryData(["public-ideas", org.id, sortBy], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            items: page.items.map((idea: any) => {
+              if (idea.id !== newReaction.data.ideaId) return idea;
+
+              const isExternal = user?.type === "external";
+              const hasReacted = idea.reactions.some((r: any) => {
+                if (isExternal)
+                  return r.externalUserId === user?.id && r.type === "upvote";
+                return r.userId === user?.id && r.type === "upvote";
+              });
+
+              let newReactions = [...idea.reactions];
+
+              if (hasReacted) {
+                newReactions = newReactions.filter((r: any) => {
+                  if (isExternal)
+                    return !(r.externalUserId === user?.id && r.type === "upvote");
+                  return !(r.userId === user?.id && r.type === "upvote");
+                });
+              } else {
+                newReactions.push({
+                  id: "optimistic-" + Math.random(),
+                  userId: isExternal ? null : user?.id,
+                  externalUserId: isExternal ? user?.id : null,
+                  type: "upvote",
+                  createdAt: new Date().toISOString(),
+                });
+              }
+
+              return {
+                ...idea,
+                reactions: newReactions,
+                reactionCount: newReactions.length,
+              };
+            }),
+          })),
+        };
+      });
+      return { previousData };
     },
-    onSuccess: () => {
-        router.invalidate();
+    onError: (err, newReaction, context) => {
+      queryClient.setQueryData(["public-ideas", org.id, sortBy], context?.previousData);
+      router.invalidate();
     },
-    onError: () => {
-        router.invalidate();
-    }
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["public-ideas", org.id, sortBy] });
+    },
   });
 
   const handleUpvote = (e: React.MouseEvent, idea: any) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (!user) {
-          setLoginOpen(true);
-          return;
-      }
-      toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      setLoginOpen(true);
+      return;
+    }
+    toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
   };
 
   const handleSubmitClick = () => {
@@ -112,190 +180,206 @@ function OrganizationIndexPage() {
     setLoginOpen(false);
     router.invalidate();
   };
-  
+
   const handleProfileSuccess = () => {
-      setProfileOpen(false);
-      router.invalidate();
-      setCreateOpen(true); // Auto open create after profile setup
-  }
+    setProfileOpen(false);
+    router.invalidate();
+    setCreateOpen(true); // Auto open create after profile setup
+  };
 
   const totalCount = counts ? counts.reduce((acc, curr) => acc + curr.count, 0) : 0;
 
+  const getSortLabel = (sort: typeof sortBy) => {
+    switch (sort) {
+      case "newest":
+        return "Newest";
+      case "top":
+        return "Top";
+      case "trending":
+        return "Trending";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground relative min-h-screen">
       <PublicHeader org={org} user={user} />
 
-      <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="mx-auto grid max-w-4xl grid-cols-1 border-r border-l lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-6">
-           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-               <div className="flex items-center gap-2">
-                   <h1 className="text-2xl font-bold">All Feedback</h1>
-                   <span className="text-muted-foreground">▼</span>
-               </div>
-               
-               <div className="flex items-center gap-3">
-                   <Button variant="outline" className="gap-2">
-                       <span>Top</span>
-                       <span>▼</span>
-                   </Button>
-                   <Button variant="outline" size="icon">
-                       <Search className="h-4 w-4" />
-                   </Button>
-               </div>
-           </div>
+        <div className="space-y-6 border-r py-8 lg:col-span-2">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2 px-6">
+              <h1 className="text-2xl font-bold">All Feedback</h1>
+            </div>
 
-           <div className="space-y-4">
-               {ideas?.map((idea) => {
-                   const isExternal = user?.type === "external";
-                   const hasReacted = user && idea.reactions.some((r: any) => {
-                       if (isExternal) return r.externalUserId === user.id && r.type === "upvote";
-                       return r.userId === user.id && r.type === "upvote";
-                   });
-                   
-                   return (
-                   <Link 
-                     key={idea.id} 
-                     to="/org/$slug/$ideaId"
-                     params={{ slug: org.slug, ideaId: idea.id }} // Fixed: Added slug to params
-                     className="block"
-                   >
-                   <div className="flex items-start gap-4 p-6 rounded-xl border bg-card hover:border-primary/50 transition-colors group">
-                        <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-muted/50">
-                             {idea.author.image ? (
-                                <img src={idea.author.image} alt={idea.author.name} className="w-full h-full object-cover rounded-lg" />
-                             ) : (
-                                <span className="text-lg font-bold">{idea.author.name.charAt(0)}</span>
-                             )}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors">{idea.title}</h3>
-                            <p className="text-muted-foreground mb-3 line-clamp-2">{idea.description}</p>
-                            
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                 <div className="flex items-center gap-2 font-medium text-foreground">
-                                     <span>{idea.author.name}</span>
-                                 </div>
-                                 <span>•</span>
-                                 <span>{new Date(idea.createdAt).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-3">
-                             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-orange-50 text-orange-600 font-medium text-sm border border-orange-100">
-                                 <span className="w-2 h-2 rounded-full bg-orange-500" />
-                             </div>
-                             
-                             <div className="flex items-center gap-1 px-3 py-1.5 rounded-md border bg-background text-muted-foreground">
-                                 <MessageSquare className="w-4 h-4" />
-                                 <span>{idea.commentCount}</span>
-                             </div>
+            <div className="flex items-center gap-3 px-6">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    {sortBy === "trending" && <Flame className="h-4 w-4" />}
+                    {sortBy === "top" && <ArrowUp className="h-4 w-4" />}
+                    {sortBy === "newest" && <ArrowDown className="h-4 w-4" />}
+                    <span>{getSortLabel(sortBy)}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setSortBy("newest")}>
+                    <ArrowDown className="mr-2 h-4 w-4" />
+                    Newest
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("top")}>
+                    <ArrowUp className="mr-2 h-4 w-4" />
+                    Top
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("trending")}>
+                    <Flame className="mr-2 h-4 w-4" />
+                    Trending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-                             <button 
-                                onClick={(e) => handleUpvote(e, idea)}
-                                className={cn(
-                                    "flex items-center gap-1 px-3 py-1.5 rounded-md border transition-colors hover:bg-accent",
-                                    hasReacted ? "bg-primary/10 border-primary text-primary" : "bg-background text-muted-foreground"
-                                )}
-                             >
-                                 <ThumbsUp className={cn("w-4 h-4", hasReacted && "fill-current")} />
-                                 <span>{idea.reactionCount}</span>
-                             </button>
+              <Button variant="outline" size="icon">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="divide-border divide-y">
+            {ideas.map((idea) => {
+              const isExternal = user?.type === "external";
+              const hasReacted =
+                user &&
+                idea.reactions.some((r: any) => {
+                  if (isExternal)
+                    return r.externalUserId === user.id && r.type === "upvote";
+                  return r.userId === user.id && r.type === "upvote";
+                });
+
+              return (
+                <Link
+                  key={idea.id}
+                  to="/org/$slug/$ideaId"
+                  params={{ slug: org.slug, ideaId: idea.id }}
+                  className="block"
+                >
+                  <div className="group flex flex-col items-start gap-4 p-6 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="group-hover:text-primary mb-1 font-medium transition-colors">
+                        {idea.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-3 line-clamp-3 text-sm text-ellipsis">
+                        {idea.description}
+                      </p>
+                    </div>
+
+                    <div className="flex w-full items-center gap-3">
+                      <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
+                        <Avatar className="size-8">
+                          <AvatarImage src={idea.author.image} />
+                          <AvatarFallback>
+                            {idea.author.name?.charAt(0) || "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col gap-0.5">
+                          <div className="text-foreground flex items-center gap-2 font-medium">
+                            <span>{idea.author.name}</span>
+                          </div>
+                          <span className="text-xs">
+                            {format(new Date(idea.createdAt), "MMM d, yyyy")}
+                          </span>
                         </div>
-                   </div>
-                   </Link>
-               )})}
-               
-               {ideas?.length === 0 && (
-                   <div className="text-center py-12 text-muted-foreground">
-                       No feedback yet. Be the first to submit!
-                   </div>
-               )}
-           </div>
+                      </div>
+
+                      <div className="ml-auto flex gap-1.5">
+                        <StatusBadge showLabel={false} status={idea.status} />
+
+                        <CommentBadge count={idea.commentCount} />
+
+                        <LikeBadge
+                          count={idea.reactionCount}
+                          hasReacted={hasReacted}
+                          onClick={(e) => handleUpvote(e, idea)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+
+            {ideas.length === 0 && status === "success" && (
+              <div className="text-muted-foreground py-12 text-center">
+                No feedback yet. Be the first to submit!
+              </div>
+            )}
+            {status === "pending" && (
+              <div className="text-muted-foreground py-12 text-center">
+                Loading ideas...
+              </div>
+            )}
+          </div>
+
+          {/* Infinite Scroll Sentinel */}
+          <div
+            ref={loadMoreRef}
+            className="text-muted-foreground py-4 text-center text-sm"
+          >
+            {isFetchingNextPage ? (
+              <span>Loading more...</span>
+            ) : hasNextPage ? (
+              <span>Load more</span>
+            ) : ideas.length > 0 ? (
+              <span>You've reached the end</span>
+            ) : null}
+          </div>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
-           <div className="rounded-xl border bg-card p-6 space-y-4">
-               <div className="flex items-center gap-3">
-                   <div className="w-5 h-5 text-muted-foreground">
-                       {/* Lightbulb icon */}
-                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                   </div>
-                   <h3 className="font-semibold">Got an idea?</h3>
-               </div>
-               
-               <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSubmitClick}>
-                   Submit a Post
-               </Button>
-           </div>
+        <div className="sticky top-16 h-fit space-y-6 px-6 py-8">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <LightbulbIcon className="size-5" weight="bold" />
+              <h3 className="font-medium">Got an idea?</h3>
+            </div>
 
-           <div className="rounded-xl border bg-card p-6 space-y-4">
-               <div className="flex items-center gap-3 mb-2">
-                    <div className="w-5 h-5 text-muted-foreground">
-                         {/* Board icon */}
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
-                    </div>
-                   <h3 className="font-semibold">Boards</h3>
-               </div>
-
-               <div className="space-y-1">
-                   <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/50 font-medium text-sm">
-                        <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-gray-400" />
-                            <span>All Feedback</span>
-                        </div>
-                        <span className="px-2 py-0.5 rounded-md bg-background text-xs">{totalCount}</span>
-                   </div>
-                   {/* We could list specific boards or statuses here, matching screenshot */}
-                   {counts?.map((board) => {
-                       if (!board.id) return null;
-                       return (
-                       <div key={board.id} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-muted/30 transition-colors text-sm">
-                           <div className="flex items-center gap-2">
-                               <span className="w-2 h-2 rounded-full bg-blue-500" />
-                               <span className="capitalize">{board.name}</span>
-                           </div>
-                           <span className="px-2 py-0.5 rounded-md bg-muted text-xs">{board.count}</span>
-                       </div>
-                   )})}
-               </div>
+            <Button className="w-full" onClick={handleSubmitClick}>
+              Submit an idea
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Submission Flow Dialogs */}
       <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
-         <DialogContent className="sm:max-w-[425px]">
-             <AuthForm 
-                orgName={org.name} 
-                orgId={org.id} 
-                onSuccess={handleLoginSuccess}
-                mode="dialog"
-             />
-         </DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
+          <AuthForm
+            orgName={org.name}
+            orgId={org.id}
+            onSuccess={handleLoginSuccess}
+            mode="dialog"
+          />
+        </DialogContent>
       </Dialog>
 
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-         <DialogContent className="sm:max-w-[425px]">
-             <DialogHeader>
-                 <DialogTitle>Complete Profile</DialogTitle>
-                 <DialogDescription>
-                     Please set your display name to continue.
-                 </DialogDescription>
-             </DialogHeader>
-             <ProfileForm 
-                 orgId={org.id} 
-                 initialName={user?.name || ""} 
-                 onSuccess={handleProfileSuccess} 
-             />
-         </DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Complete Profile</DialogTitle>
+            <DialogDescription>
+              Please set your display name to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <ProfileForm
+            orgId={org.id}
+            initialName={user?.name || ""}
+            onSuccess={handleProfileSuccess}
+          />
+        </DialogContent>
       </Dialog>
-      
-      <CreateIdeaDialog 
-        open={createOpen} 
-        onOpenChange={setCreateOpen} 
+
+      <CreateIdeaDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
         organizationId={org.id}
       />
     </div>

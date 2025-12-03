@@ -17,26 +17,19 @@ function PublicRoadmapPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="bg-background text-foreground flex min-h-screen flex-col">
       <PublicHeader org={org} user={user} />
 
-      <div className="container mx-auto px-4 py-8 flex-1 flex flex-col overflow-hidden">
-         <div className="mb-6">
-             <h1 className="text-2xl font-bold">Roadmap</h1>
-             <p className="text-muted-foreground">See what we are working on.</p>
-         </div>
+      <div className="container mx-auto flex flex-1 flex-col overflow-hidden px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Roadmap</h1>
+          <p className="text-muted-foreground">See what we are working on.</p>
+        </div>
 
-         <div className="flex-1 overflow-x-auto min-h-0">
-             {/* RoadmapBoard currently has DnD enabled. 
-                 For public view, we should probably disable drag/drop or use a read-only version. 
-                 But the prompt said "same kanban board roadmap, except without drag and drop".
-                 
-                 We can add a `readOnly` prop to RoadmapBoard.
-             */}
-             <RoadmapBoard ideas={ideas || []} readOnly publicOrgSlug={org.slug} />
-         </div>
+        <div className="min-h-0 flex-1 overflow-x-auto">
+          <RoadmapBoard ideas={ideas || []} readOnly publicOrgSlug={org.slug} />
+        </div>
       </div>
     </div>
   );
 }
-

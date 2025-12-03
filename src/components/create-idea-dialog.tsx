@@ -21,7 +21,11 @@ interface CreateIdeaDialogProps {
   organizationId?: string;
 }
 
-export function CreateIdeaDialog({ open, onOpenChange, organizationId }: CreateIdeaDialogProps) {
+export function CreateIdeaDialog({
+  open,
+  onOpenChange,
+  organizationId,
+}: CreateIdeaDialogProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [title, setTitle] = useState("");
@@ -34,18 +38,18 @@ export function CreateIdeaDialog({ open, onOpenChange, organizationId }: CreateI
       onOpenChange(false);
       setTitle("");
       setDescription("");
-      
-      // Determine where to navigate based on context. 
+
+      // Determine where to navigate based on context.
       // If public (organizationId provided), stay on public list or go to public detail?
       // Public detail is not implemented yet. Just stay on list and invalidate.
       // If dashboard, go to detail.
       if (organizationId) {
-           router.invalidate();
+        router.invalidate();
       } else {
-          router.navigate({
-            to: "/dashboard/ideas/$ideaId",
-            params: { ideaId: newIdea.id },
-          });
+        router.navigate({
+          to: "/dashboard/ideas/$ideaId",
+          params: { ideaId: newIdea.id },
+        });
       }
     },
     onError: () => {
@@ -62,7 +66,7 @@ export function CreateIdeaDialog({ open, onOpenChange, organizationId }: CreateI
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Request</DialogTitle>
+          <DialogTitle>Create Idea</DialogTitle>
           <DialogDescription>
             Share your idea or feedback with the team.
           </DialogDescription>
@@ -98,4 +102,3 @@ export function CreateIdeaDialog({ open, onOpenChange, organizationId }: CreateI
     </Dialog>
   );
 }
-

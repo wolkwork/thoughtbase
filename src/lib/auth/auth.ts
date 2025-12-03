@@ -7,16 +7,14 @@ import * as schema from "~/lib/db/schema";
 import { env } from "~/env/server";
 import { db } from "~/lib/db";
 
+import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
+import { Polar } from "@polar-sh/sdk";
 import { apiKey, organization } from "better-auth/plugins";
-import { polar, checkout, portal, usage } from "@polar-sh/better-auth";
-import { Polar } from "@polar-sh/sdk"
-
 
 const polarClient = new Polar({
   accessToken: env.POLAR_ACCESS_TOKEN,
   server: "sandbox",
-})
-
+});
 
 const getAuthConfig = createServerOnlyFn(() =>
   betterAuth({
@@ -35,46 +33,49 @@ const getAuthConfig = createServerOnlyFn(() =>
         member: schema.member,
         invitation: schema.invitation,
         apikey: schema.apikey,
-      }
+      },
     }),
     advanced: {
       crossSubDomainCookies: {
         enabled: true,
-        domain: new URL(env.VITE_BASE_URL).hostname
+        domain: new URL(env.VITE_BASE_URL).hostname,
       },
       defaultCookieAttributes: {
         sameSite: "none",
         secure: true,
-        domain: ".thoughtbase.localhost"
+        domain: ".thoughtbase.localhost",
       },
-      trustedOrigins: [
-        env.VITE_BASE_URL,
-      ],
+      trustedOrigins: [env.VITE_BASE_URL],
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
-    plugins: [tanstackStartCookies(), organization(), apiKey(), polar({ 
-      client: polarClient,
-      createCustomerOnSignUp: true,
-      use: [
-        checkout({
-          products: [
-            {
-              productId: env.POLAR_STARTER_ID,
-              slug: "starter"
-            },
-            {
-              productId: env.POLAR_GROWTH_ID,
-              slug: "growth"
-            },
-          ],
-          successUrl: `${env.VITE_BASE_URL}/dashboard/settings?success=true`,
-          authenticatedUsersOnly: true,
-        }),
-        portal(),
-        usage(),
-      ],
-    })],
+    plugins: [
+      tanstackStartCookies(),
+      organization(),
+      apiKey(),
+      polar({
+        client: polarClient,
+        createCustomerOnSignUp: true,
+        use: [
+          checkout({
+            products: [
+              {
+                productId: env.POLAR_STARTER_ID,
+                slug: "starter",
+              },
+              {
+                productId: env.POLAR_GROWTH_ID,
+                slug: "growth",
+              },
+            ],
+            successUrl: `${env.VITE_BASE_URL}/dashboard/settings?success=true`,
+            authenticatedUsersOnly: true,
+          }),
+          portal(),
+          usage(),
+        ],
+      }),
+    ],
 
     // https://www.better-auth.com/docs/concepts/session-management#session-caching
     session: {

@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router";
-import { MessageSquare, ThumbsUp } from "lucide-react";
-import { cn } from "~/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
+import { cn } from "~/lib/utils";
 
 interface RoadmapCardProps {
   idea: any;
@@ -10,14 +10,8 @@ interface RoadmapCardProps {
 }
 
 export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: idea.id, data: { idea } });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: idea.id, data: { idea } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -32,43 +26,29 @@ export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex flex-col gap-2 rounded-md border bg-card p-3 transition-all hover:border-primary/50 cursor-grab active:cursor-grabbing",
-        isDragging && "z-50 ring-2 ring-primary/20"
+        "group bg-card hover:border-primary/50 relative flex cursor-grab flex-col gap-2 rounded-md border p-3 transition-all active:cursor-grabbing",
+        isDragging && "ring-primary/20 z-50 ring-2",
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <h4 className="text-sm font-medium leading-tight line-clamp-2">
-            {idea.title}
-        </h4>
+        <h4 className="line-clamp-2 text-sm leading-tight font-medium">{idea.title}</h4>
       </div>
-      
-      <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
-         <div className="flex items-center gap-2">
-             <div className="flex items-center gap-1">
-                <ThumbsUp className="w-3 h-3" />
-                <span>{idea.reactionCount}</span>
-             </div>
-             <div className="flex items-center gap-1">
-                <MessageSquare className="w-3 h-3" />
-                <span>{idea.commentCount}</span>
-             </div>
-         </div>
-         
-         {idea.author.image ? (
-            <img 
-                src={idea.author.image} 
-                alt={idea.author.name} 
-                className="w-5 h-5 rounded-full object-cover ring-1 ring-border" 
-            />
-        ) : (
-            <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium ring-1 ring-border">
-                {idea.author.name.charAt(0)}
-            </div>
-        )}
+
+      <div className="text-muted-foreground mt-1 flex items-center justify-between text-xs">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <HeartIcon weight="bold" className="size-3.5" />
+            <span>{idea.reactionCount}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <ChatsCircleIcon weight="bold" className="size-3.5" />
+            <span>{idea.commentCount}</span>
+          </div>
+        </div>
       </div>
-      
-       {/* Invisible link overlay for navigation, but allowing drag */}
-       {/* We can't easily have a full overlay link AND drag. 
+
+      {/* Invisible link overlay for navigation, but allowing drag */}
+      {/* We can't easily have a full overlay link AND drag. 
            Best pattern is usually to have a specific handle or make the whole card draggable 
            and have a button/icon for detail view, OR handle click vs drag.
            For now, let's just add a small view button or make the title a link that stops propagation?
@@ -78,21 +58,21 @@ export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
            Let's keep it simple: The whole card is draggable. 
            Maybe a small icon to open? 
        */}
-       
-       {publicOrgSlug ? (
-           <Link 
-             to="/org/$slug/$ideaId" 
-             params={{ slug: publicOrgSlug, ideaId: idea.id }}
-             className="absolute inset-0 z-0"
-           />
-       ) : (
-           <Link 
-             to="/dashboard/ideas/$ideaId" 
-             params={{ ideaId: idea.id }}
-             className="absolute inset-0 z-0"
-           />
-       )}
-       {/* Re-cover with relative content so interactions work? 
+
+      {publicOrgSlug ? (
+        <Link
+          to="/org/$slug/$ideaId"
+          params={{ slug: publicOrgSlug, ideaId: idea.id }}
+          className="absolute inset-0 z-0"
+        />
+      ) : (
+        <Link
+          to="/dashboard/ideas/$ideaId"
+          params={{ ideaId: idea.id }}
+          className="absolute inset-0 z-0"
+        />
+      )}
+      {/* Re-cover with relative content so interactions work? 
            Actually, wrapping everything in Link is tricky with dnd-kit.
            Better to just have a specific "View" area or rely on double click?
            Or just make the title a link.
@@ -100,4 +80,3 @@ export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
     </div>
   );
 }
-

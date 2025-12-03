@@ -35,8 +35,10 @@ export const idea = pgTable(
     boardId: text("board_id").references(() => board.id, { onDelete: "set null" }),
     // Polymorphic author: either standard user or external user
     authorId: text("author_id").notNull(),
-    externalAuthorId: text("external_author_id").references(() => externalUser.id, { onDelete: "set null" }),
-    
+    externalAuthorId: text("external_author_id").references(() => externalUser.id, {
+      onDelete: "set null",
+    }),
+
     title: text("title").notNull(),
     description: text("description"),
     status: text("status").default("open").notNull(), // open, in_progress, completed, closed
@@ -62,7 +64,9 @@ export const comment = pgTable(
       .notNull()
       .references(() => idea.id, { onDelete: "cascade" }),
     authorId: text("author_id").notNull(),
-    externalAuthorId: text("external_author_id").references(() => externalUser.id, { onDelete: "set null" }),
+    externalAuthorId: text("external_author_id").references(() => externalUser.id, {
+      onDelete: "set null",
+    }),
     content: text("content").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -81,7 +85,9 @@ export const reaction = pgTable(
   {
     id: text("id").primaryKey(),
     userId: text("user_id").notNull(),
-    externalUserId: text("external_user_id").references(() => externalUser.id, { onDelete: "cascade" }),
+    externalUserId: text("external_user_id").references(() => externalUser.id, {
+      onDelete: "cascade",
+    }),
     ideaId: text("idea_id").references(() => idea.id, { onDelete: "cascade" }),
     commentId: text("comment_id").references(() => comment.id, { onDelete: "cascade" }),
     type: text("type").notNull(), // e.g., "upvote", "like", etc.
@@ -105,9 +111,7 @@ export const tag = pgTable(
     color: text("color"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [
-    index("tag_organizationId_idx").on(table.organizationId),
-  ],
+  (table) => [index("tag_organizationId_idx").on(table.organizationId)],
 );
 
 export const ideaTag = pgTable(

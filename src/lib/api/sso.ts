@@ -12,7 +12,7 @@ export const $signInWithSSO = createServerFn({ method: "POST" })
     z.object({
       token: z.string(),
       organizationId: z.string(),
-    })
+    }),
   )
   .handler(async ({ data }) => {
     // 1. Fetch Organization Secret
@@ -38,27 +38,27 @@ export const $signInWithSSO = createServerFn({ method: "POST" })
       // Use 'sub' or 'id' from JWT as the stable external ID
       const externalId = (payload.sub || payload.id) as string;
       if (!externalId) {
-          throw new Error("Invalid token payload: sub or id missing");
+        throw new Error("Invalid token payload: sub or id missing");
       }
 
       const email = payload.email;
       const name = (payload.name as string) || email.split("@")[0];
-      const image =
-        (payload.image as string) || (payload.avatarUrl as string) || null;
+      const image = (payload.image as string) || (payload.avatarUrl as string) || null;
 
       // 3. Find or Create External User
       let dbUser = await db.query.externalUser.findFirst({
         where: and(
-            eq(externalUser.organizationId, data.organizationId),
-            eq(externalUser.externalId, externalId)
+          eq(externalUser.organizationId, data.organizationId),
+          eq(externalUser.externalId, externalId),
         ),
       });
 
       if (dbUser) {
-          // Update details if changed
-          await db.update(externalUser)
-            .set({ name, email, avatarUrl: image, updatedAt: new Date() })
-            .where(eq(externalUser.id, dbUser.id));
+        // Update details if changed
+        await db
+          .update(externalUser)
+          .set({ name, email, avatarUrl: image, updatedAt: new Date() })
+          .where(eq(externalUser.id, dbUser.id));
       } else {
         const [newUser] = await db
           .insert(externalUser)
@@ -106,7 +106,7 @@ export const $signInWithSSO = createServerFn({ method: "POST" })
 
       setResponseHeader(
         "Set-Cookie",
-        `feedback_widget_token=${token}; Path=/; HttpOnly; ${cookieAttributes}; Max-Age=${60 * 60 * 24 * 30}`
+        `feedback_widget_token=${token}; Path=/; HttpOnly; ${cookieAttributes}; Max-Age=${60 * 60 * 24 * 30}`,
       );
 
       return { success: true };

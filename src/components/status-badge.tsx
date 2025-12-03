@@ -7,9 +7,16 @@ import {
   XCircle,
   type LucideIcon,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { cn } from "~/lib/utils";
 
-export type IdeaStatus = "pending" | "reviewing" | "planned" | "in_progress" | "completed" | "closed";
+export type IdeaStatus =
+  | "pending"
+  | "reviewing"
+  | "planned"
+  | "in_progress"
+  | "completed"
+  | "closed";
 
 interface StatusConfig {
   label: string;
@@ -33,16 +40,31 @@ interface StatusBadgeProps {
   iconClassName?: string;
 }
 
-export function StatusBadge({ status, showLabel = true, className, iconClassName }: StatusBadgeProps) {
+export function StatusBadge({
+  status,
+  showLabel = true,
+  className,
+  iconClassName,
+}: StatusBadgeProps) {
   const config = STATUSES[status as IdeaStatus] || STATUSES.pending;
-  
+
   const Icon = config.icon;
 
-  return (
+  const content = (
     <div className={cn("flex items-center gap-2.5", className)}>
       <Icon className={cn(config.color, "size-4", iconClassName)} />
       {showLabel && <span>{config.label}</span>}
     </div>
   );
-}
 
+  if (!showLabel) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipContent>{config.label}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return content;
+}
