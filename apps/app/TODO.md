@@ -28,6 +28,7 @@ MVP:
 - Landing page
 - Onboarding
 - Changelog
+- Thank you screen after submission
 
 Future:
 
@@ -41,6 +42,7 @@ Future:
 - Comment "threads"
 - Notifications
 - Deduplication
+- Multi lingual
 
 Paid:
 

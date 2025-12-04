@@ -8,13 +8,69 @@ import Feature2 from "@/components/features/Feature2.astro";
 import Pricing1 from "@/components/pricing/Pricing1.astro";
 import Cta1 from "@/components/ctas/Cta1.astro";
 import Cta2 from "@/components/ctas/Cta2.astro";
+import { SignJWT } from "jose";
+
+const secret = "DLePfZvOs24wxZdn24-Q9AjL7eB7DU0j";
+const secretKey = new TextEncoder().encode(secret);
+
+const token = await new SignJWT({
+  id: "demo-user-123",
+  email: "demo@example.com",
+  name: "Demo User",
+  avatarUrl: "https://ui-avatars.com/api/?name=Demo+User&background=random",
+  metadata: {
+    absolute: "legend",
+    pizzasEaten: 10,
+    nested: {
+      key: "value",
+    },
+    array: [1, 2, 3],
+    boolean: true,
+    number: 123,
+    string: "hello",
+    null: null,
+    undefined: undefined,
+    date: new Date(),
+    object: { key: "value" },
+  },
+  revenue: 29,
+})
+  .setProtectedHeader({ alg: "HS256" })
+  .setIssuedAt()
+  .setExpirationTime("2h")
+  .sign(secretKey);
 ---
 
 <BaseLayout>
   <Hero1 />
+  <div class="flex justify-center py-8">
+    <button
+      id="feedback-trigger"
+      class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+    >
+      Open Feedback Widget
+    </button>
+  </div>
   <Cta2 />
   <Feature4 />
   <Pricing1 />
   <Feature2 />
   <Cta1 />
 </BaseLayout>
+
+<script is:inline src="http://localhost:3000/widget.js"></script>
+<script is:inline define:vars={{ token }}>
+  window.addEventListener("load", () => {
+    if (window.initFeedbackWidget) {
+      window.initFeedbackWidget({
+        organizationId: "Env8PnGzbW7xdSI0NAvoEmHbSZh1aPvr",
+        // selector: "#feedback-trigger" // Uncomment to use target element instead of floating button
+      });
+    }
+
+    // Use the token generated server-side (in Astro frontmatter)
+    if (window.feedbackWidget) {
+      window.feedbackWidget.identify(token);
+    }
+  });
+</script>

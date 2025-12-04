@@ -22,6 +22,7 @@ import { Route as OrgSlugIndexRouteImport } from './routes/org/$slug/index'
 import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authenticated)/dashboard/index'
 import { Route as OrgSlugRoadmapRouteImport } from './routes/org/$slug/roadmap'
 import { Route as OrgSlugIdeaIdRouteImport } from './routes/org/$slug/$ideaId'
+import { Route as ApiWidgetIdeasRouteImport } from './routes/api/widget/ideas'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as authenticatedDashboardSettingsIndexRouteImport } from './routes/(authenticated)/dashboard/settings/index'
 import { Route as authenticatedDashboardRoadmapIndexRouteImport } from './routes/(authenticated)/dashboard/roadmap/index'
@@ -95,6 +96,11 @@ const OrgSlugIdeaIdRoute = OrgSlugIdeaIdRouteImport.update({
   path: '/$ideaId',
   getParentRoute: () => OrgSlugRouteRoute,
 } as any)
+const ApiWidgetIdeasRoute = ApiWidgetIdeasRouteImport.update({
+  id: '/api/widget/ideas',
+  path: '/api/widget/ideas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard/': typeof authenticatedDashboardIndexRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard': typeof authenticatedDashboardIndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
+    | '/api/widget/ideas'
     | '/org/$slug/$ideaId'
     | '/org/$slug/roadmap'
     | '/dashboard/'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
+    | '/api/widget/ideas'
     | '/org/$slug/$ideaId'
     | '/org/$slug/roadmap'
     | '/dashboard'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
+    | '/api/widget/ideas'
     | '/org/$slug/$ideaId'
     | '/org/$slug/roadmap'
     | '/(authenticated)/dashboard/'
@@ -269,6 +281,7 @@ export interface RootRouteChildren {
   ApiUploadRoute: typeof ApiUploadRoute
   ExamplesSsoRoute: typeof ExamplesSsoRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiWidgetIdeasRoute: typeof ApiWidgetIdeasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/org/$slug/$ideaId'
       preLoaderRoute: typeof OrgSlugIdeaIdRouteImport
       parentRoute: typeof OrgSlugRouteRoute
+    }
+    '/api/widget/ideas': {
+      id: '/api/widget/ideas'
+      path: '/api/widget/ideas'
+      fullPath: '/api/widget/ideas'
+      preLoaderRoute: typeof ApiWidgetIdeasRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -498,6 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUploadRoute: ApiUploadRoute,
   ExamplesSsoRoute: ExamplesSsoRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiWidgetIdeasRoute: ApiWidgetIdeasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

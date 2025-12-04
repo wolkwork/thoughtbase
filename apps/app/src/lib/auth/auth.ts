@@ -45,7 +45,7 @@ const getAuthConfig = createServerOnlyFn(() =>
         secure: true,
         domain: ".thoughtbase.localhost",
       },
-      trustedOrigins: [env.VITE_BASE_URL],
+      trustedOrigins: [env.VITE_BASE_URL, "http://localhost:4321"], // Add demo app origin
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips

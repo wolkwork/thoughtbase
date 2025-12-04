@@ -238,12 +238,10 @@ export function IdeasDataTable({ data, initialStatus }: IdeasDataTableProps) {
     }
   }, [initialStatus]);
 
-  // Augment data with placeholder revenue if missing
   // We use useMemo to keep it stable across renders unless data changes
   const tableData = React.useMemo(() => {
     return data.map((item) => ({
       ...item,
-      revenue: item.revenue ?? Math.floor(Math.random() * 10000), // Placeholder random revenue
     }));
   }, [data]);
 

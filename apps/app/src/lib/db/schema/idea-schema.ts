@@ -34,7 +34,7 @@ export const idea = pgTable(
       .references(() => organization.id, { onDelete: "cascade" }),
     boardId: text("board_id").references(() => board.id, { onDelete: "set null" }),
     // Polymorphic author: either standard user or external user
-    authorId: text("author_id").notNull(),
+    authorId: text("author_id").references(() => user.id, { onDelete: "set null" }),
     externalAuthorId: text("external_author_id").references(() => externalUser.id, {
       onDelete: "set null",
     }),

@@ -2,6 +2,7 @@ import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
+import { lowerCase } from "lodash";
 import { ArrowLeftIcon, Check, Smile, ThumbsUp } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -270,7 +271,7 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
                 )}
 
                 {Object.entries(reactionsByType).map(
-                  ([type, reactions]: [string, any[]]) => (
+                  ([type, reactions]: [string, any]) => (
                     <div key={type} className="space-y-3">
                       <h4 className="flex items-center gap-2 text-sm font-semibold capitalize">
                         {type === "upvote" ? (
@@ -370,6 +371,49 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
             <span className="text-sm">{idea.board.name}</span>
           </div>
         )}
+
+        {idea.author.revenue !== null && idea.author.revenue !== undefined && (
+          <div>
+            <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
+              Revenue
+            </h4>
+            <span className="font-mono text-sm">
+              {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(idea.author.revenue)}
+            </span>
+          </div>
+        )}
+
+        {idea.author.metadata &&
+          Object.keys(idea.author.metadata as object).length > 0 && (
+            <div>
+              <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
+                Metadata
+              </h4>
+              <div className="grid gap-3">
+                {Object.entries(idea.author.metadata as object)
+                  .filter(
+                    ([key, value]) =>
+                      value !== undefined && value !== null && typeof value !== "object",
+                  )
+                  .map(([key, value]) => (
+                    <div key={key} className="flex flex-col gap-0.5">
+                      <span className="text-muted-foreground text-xs capitalize">
+                        {lowerCase(key)}
+                      </span>
+                      <span
+                        className="truncate text-sm font-medium"
+                        title={String(value)}
+                      >
+                        {String(value)}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
 
         {idea.tags.length > 0 && (
           <div>

@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { index, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+} from "drizzle-orm/pg-core";
 import { organization } from "./auth-schema";
 
 export const externalUser = pgTable(
@@ -18,6 +26,8 @@ export const externalUser = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    revenue: integer("revenue"),
+    metadata: jsonb("metadata"),
   },
   (table) => [
     index("external_user_org_idx").on(table.organizationId),

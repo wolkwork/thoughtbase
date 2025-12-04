@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
+import { getUnifiedAuthContext, getUserFromToken } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
 import { board, comment, idea, reaction } from "~/lib/db/schema";
 
@@ -70,13 +70,27 @@ export const $getIdeas = createServerFn({ method: "GET" })
         comments: {
           columns: { id: true },
         },
-        reactions: true,
+        reactions: {
+          with: {
+            externalUser: true,
+            user: true,
+          },
+        },
       },
     });
 
     return ideas.map((item) => {
       const author = item.externalAuthor || item.author;
-      const image = "image" in author ? author.image : (author as any).avatarUrl;
+      const image =
+        author && "image" in author ? author.image : (author as any)?.avatarUrl;
+
+      // Calculate total revenue from users who reacted
+      const revenue = item.reactions.reduce((acc, reaction) => {
+        // Prefer external user revenue, fallback to 0 (internal users don't have revenue tracked here usually)
+        const userRevenue = reaction.externalUser?.revenue || 0;
+        return acc + userRevenue;
+      }, 0);
+
       return {
         ...item,
         author: {
@@ -85,6 +99,7 @@ export const $getIdeas = createServerFn({ method: "GET" })
         },
         commentCount: item.comments.length,
         reactionCount: item.reactions.length,
+        revenue,
       };
     });
   });
@@ -201,7 +216,8 @@ export const $getIdeasFeed = createServerFn({ method: "GET" })
 
     const mapped = sortedIdeas.map((item) => {
       const author = item.externalAuthor || item.author;
-      const image = "image" in author ? author.image : (author as any).avatarUrl;
+      const image =
+        author && "image" in author ? author.image : (author as any)?.avatarUrl;
       return {
         ...item,
         author: {
@@ -253,7 +269,7 @@ export const $getIdea = createServerFn({ method: "GET" })
     if (!item) return null;
 
     const author = item.externalAuthor || item.author;
-    const image = "image" in author ? author.image : (author as any).avatarUrl;
+    const image = author && "image" in author ? author.image : (author as any)?.avatarUrl;
 
     return {
       ...item,
@@ -263,7 +279,8 @@ export const $getIdea = createServerFn({ method: "GET" })
       },
       comments: item.comments.map((c) => {
         const cAuthor = c.externalAuthor || c.author;
-        const cImage = "image" in cAuthor ? cAuthor.image : (cAuthor as any).avatarUrl;
+        const cImage =
+          cAuthor && "image" in cAuthor ? cAuthor.image : (cAuthor as any)?.avatarUrl;
         return {
           ...c,
           author: {
@@ -276,7 +293,7 @@ export const $getIdea = createServerFn({ method: "GET" })
         ...r,
         user: r.user ? { ...r.user, image: r.user.image } : undefined,
         externalUser: r.externalUser
-          ? { ...r.externalUser, image: r.externalUser.avatarUrl }
+          ? { ...r.externalUser, image: r.externalUser?.avatarUrl }
           : undefined,
       })),
     };
@@ -290,21 +307,47 @@ export const $createIdea = createServerFn({ method: "POST" })
       boardId: z.string().optional(),
       status: z.string().default("pending"),
       organizationId: z.string().optional(),
+      token: z.string().optional(),
     }),
   )
   .handler(async ({ data }) => {
-    const ctx = await getAuthContext();
-    if (!ctx.user) throw new Error("Unauthorized");
+    // If token is provided, validate it and use it to identify the user
+    let user = null;
+    let type: "internal" | "external" | null = null;
+
+    if (data.token) {
+      if (data.organizationId) {
+        try {
+          const externalUser = await getUserFromToken(data.token, data.organizationId);
+          if (externalUser) {
+            user = externalUser;
+            type = "external";
+          }
+        } catch (e) {
+          console.warn("Invalid SSO token provided for idea creation", e);
+        }
+      }
+    }
+
+    // Fallback to session context if no valid token provided or verification failed
+    if (!user) {
+      const ctx = await getAuthContext();
+      user = ctx.user;
+      type = ctx.type;
+    }
 
     let organizationId = data.organizationId;
 
-    if (ctx.type === "external") {
-      if (organizationId && organizationId !== ctx.organizationId) {
+    if (type === "external") {
+      if (organizationId && user && organizationId !== (user as any).organizationId) {
+        // This check depends on externalUser having organizationId, which it does
         throw new Error("Unauthorized organization scope");
       }
-      organizationId = ctx.organizationId!;
+      organizationId = (user as any)?.organizationId || organizationId; // Prefer user's org
     } else if (!organizationId) {
-      organizationId = ctx.organizationId || undefined;
+      // Try to infer from internal user session if available
+      // But here we might just be guest
+      organizationId = undefined;
     }
 
     if (!organizationId) throw new Error("No organization context");
@@ -314,8 +357,8 @@ export const $createIdea = createServerFn({ method: "POST" })
       .values({
         id: crypto.randomUUID(),
         organizationId: organizationId,
-        authorId: ctx.type === "internal" ? ctx.user.id : "external", // Placeholder/dummy for internal user ID if using external
-        externalAuthorId: ctx.type === "external" ? ctx.user.id : null,
+        authorId: type === "internal" && user ? user.id : null,
+        externalAuthorId: type === "external" && user ? user.id : null,
         title: data.title,
         description: data.description,
         boardId: data.boardId,
