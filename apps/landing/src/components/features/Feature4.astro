@@ -1,0 +1,186 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Link from "@/components/fundations/elements/Link.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Icons
+import List from "@/components/fundations/icons/List.astro";
+import Analytics from "@/components/fundations/icons/Analytics.astro";
+import UsersGroup from "@/components/fundations/icons/UsersGroup.astro";
+---
+
+<section>
+  <Wrapper variant="standard" class="flex flex-col py-12 border-t gap-24">
+    <div class="items-start grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div class="flex flex-col justify-between h-full text-balance gap-4">
+        <div class="inline-flex p-4 rounded-lg bg-sand-100 w-fit">
+          <List size="base" class="text-accent-600" />
+        </div>
+        <div>
+          <Text
+            tag="h2"
+            variant="displaySM"
+            class="font-serif font-medium tracking-tight text-black"
+          >
+            Contact Management That Doesn’t Suck
+          </Text>
+          <Text tag="p" variant="textBase" class="max-w-xl mt-4 text-base-500">
+            Import your entire list in minutes — whether it’s 50 or 50,000. See
+            every contact’s details without clicking through 12 tabs. It’s like
+            a CRM, but without the bloat (or the monthly breakdown).
+          </Text>
+          <div class="flex mt-4">
+            <Link size="sm" variant="accent" href="#_">Learn more</Link>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-hidden="true"
+        class="p-8 pb-0 pr-0 overflow-hidden bg-sand-100 rounded-xl group"
+      >
+        <div
+          class="max-w-md p-4 mx-auto -mb-1 -mr-1 bg-white rounded-tl-xl shadow-sm outline outline-sand-500/10"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="inline-flex p-4 rounded-lg bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2"
+            >
+              <UsersGroup size="sm" />
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Audience</p>
+              <p class="text-base font-medium text-base-900">
+                Newsletter Subscribers
+              </p>
+            </div>
+          </div>
+          <div
+            class="pt-4 mt-4 border-t grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 border-base-100 gap-y-8"
+          >
+            <div>
+              <p class="text-sm text-base-500">All Contacts</p>
+              <p class="text-base font-medium text-base-900">1,034</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Unsubscribed</p>
+              <p class="text-base font-medium text-base-900">5</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Growth</p>
+              <p class="text-base font-medium text-base-900">+1,034 (+10%)</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Open Rate</p>
+              <p class="text-base font-medium text-base-900">42%</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Click Rate</p>
+              <p class="text-base font-medium text-base-900">18%</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Bounce Rate</p>
+              <p class="text-base font-medium text-base-900">1.5%</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Spam Reports</p>
+              <p class="text-base font-medium text-base-900">2</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Avg. Response Time</p>
+              <p class="text-base font-medium text-base-900">4.2s</p>
+            </div>
+            <div>
+              <p class="text-sm text-base-500">Unopened Emails</p>
+              <p class="text-base font-medium text-base-900">612</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="items-center grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div
+        class="flex flex-col justify-between h-full text-balance gap-4 lg:order-last"
+      >
+        <div class="inline-flex p-4 rounded-lg bg-sand-100 w-fit">
+          <Analytics size="base" class="text-accent-600" />
+        </div>
+        <div>
+          <Text
+            tag="h2"
+            variant="displaySM"
+            class="font-serif font-medium tracking-tight text-black"
+          >
+            Broadcast Analytics (Because Guesswork Is for Amateurs)
+          </Text>
+          <Text tag="p" variant="textBase" class="max-w-xl mt-4 text-base-500">
+            See who opened, clicked, ignored, or rage-deleted your email. Real
+            insights, no fluff — so you actually know what’s working (and what’s
+            not).
+          </Text>
+          <div class="flex mt-4">
+            <Link size="sm" variant="accent" href="#_">Learn more</Link>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-hidden="true"
+        class="p-8 pb-0 pl-0 overflow-hidden bg-sand-100 rounded-xl group"
+      >
+        <div class="flex flex-col gap-4">
+          <div
+            class="p-6 bg-white shadow rounded-r-xl outline outline-sand-500/10"
+          >
+            <p class="text-sm text-base-500">Deliverability</p>
+            <p class="mt-2 text-4xl font-medium text-base-900">98%</p>
+            <div class="mt-6 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#5aab69]"
+                  ></span>
+                  <span class="text-sm text-base-600">Delivered</span>
+                </div>
+                <span class="text-sm font-medium text-base-900">3,204</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#ff421e]"
+                  ></span>
+                  <span class="text-sm text-base-600">Bounced</span>
+                </div>
+                <span class="text-sm font-medium text-base-900">60</span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="p-6 -mb-1 bg-white shadow rounded-tr-xl outline outline-sand-500/10"
+          >
+            <p class="text-sm text-base-500">Engagement</p>
+            <p class="mt-2 text-4xl font-medium text-base-900">41%</p>
+            <div class="mt-6 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#60beff]"
+                  ></span>
+                  <span class="text-sm text-base-600">Opened</span>
+                </div>
+                <span class="text-sm font-medium text-base-900">1,350</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#e3962d]"
+                  ></span>
+                  <span class="text-sm text-base-600">Clicked</span>
+                </div>
+                <span class="text-sm font-medium text-base-900">472</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Wrapper>
+</section>

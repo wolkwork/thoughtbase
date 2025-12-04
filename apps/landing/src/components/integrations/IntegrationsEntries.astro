@@ -1,0 +1,35 @@
+---
+// Assets
+import { Image } from "astro:assets";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+// Content
+const { integration, description, url, logo } = {
+  url: "/integrations/" + Astro.props.post.slug,
+  integration: Astro.props.post.data.integration,
+  description: Astro.props.post.data.description,
+  logo: Astro.props.post.data.logo.url,
+};
+---
+
+<div
+  class="relative flex flex-col h-full p-4 bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100"
+>
+  <a
+    class="absolute inset-0 z-10"
+    href={url}
+    title={`View details for ${integration}`}
+    aria-label={`View details for ${integration}`}></a>
+
+  <div
+    class="inline-flex p-4 bg-white rounded-lg group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit"
+  >
+    <Image src={logo} alt={integration} width={300} height={300} class="size-8" />
+  </div>
+  <Text tag="h3" variant="textSM" class="mt-12 font-medium text-base-900">
+    {integration}
+  </Text>
+  <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+    {description}
+  </Text>
+</div>

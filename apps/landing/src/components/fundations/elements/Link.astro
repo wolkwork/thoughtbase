@@ -1,0 +1,88 @@
+---
+const {
+  gap,
+  size,
+  href,
+  variant,
+  onlyIconSize,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const defaultClass = [
+  "bg-black",
+  "text-white",
+  "focus:ring-black",
+  "hover:bg-base-700",
+];
+// Accent button
+const accentClass = [
+  "text-white",
+  "bg-accent-500",
+  "hover:bg-accent-600",
+  "focus:ring-accent-600",
+];
+// Muted button
+const mutedClass = [
+  "text-sand-950",
+  "bg-sand-100",
+  "hover:text-accent-500",
+  "focus:ring-sand-100",
+];
+// Size (only applies if variant is not "link")
+const xxs = ["h-6", "px-6", "py-1.5", "text-xs"];
+const xs = ["h-8", "px-4", "py-2", "text-xs"];
+const sm = ["h-9", "px-4", "py-2", "text-sm"];
+const base = ["h-10", "px-6", "py-3", "text-base"];
+const md = ["h-11", "px-6", "py-3", "text-md"];
+const lg = ["h-12", "px-6", "py-3", "text-lg"];
+const xl = ["h-14", "px-6", "py-3", "text-base"];
+// Gap
+const gapXS = ["gap-2"];
+const gapSM = ["gap-4"];
+const gapBase = ["gap-8"];
+const gapMD = ["gap-10"];
+const gapLG = ["gap-12"];
+const additionalClasses = className ? className.split(" ") : [];
+---
+
+<a
+  href={href}
+  class:list={[
+    ...(variant === "link"
+      ? [...additionalClasses] // Apply custom classes for "link" variant
+      : [
+          "flex",
+          "transition",
+          "text-center",
+          "rounded-full",
+          "items-center",
+          "duration-300",
+          "justify-center",
+          "focus:ring-2",
+          "focus:outline-none",
+          "focus:ring-offset-2",
+          variant === "muted" && mutedClass,
+          variant === "accent" && accentClass,
+          variant === "default" && defaultClass,
+          size === "xxs" && xxs,
+          size === "xs" && xs,
+          size === "sm" && sm,
+          size === "base" && base,
+          size === "md" && md,
+          size === "lg" && lg,
+          size === "xl" && xl,
+          gap === "xs" && gapXS,
+          gap === "sm" && gapSM,
+          gap === "base" && gapBase,
+          gap === "md" && gapMD,
+          gap === "lg" && gapLG,
+          ...additionalClasses,
+        ]),
+  ]}
+  {...rest}
+>
+  <slot name="left-icon" />
+  <slot />
+  <slot name="right-icon" />
+</a>

@@ -1,0 +1,42 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Components
+import ChangelogEntry from "@/components/changelog/ChangelogEntry.astro";
+// Content
+import { getCollection } from "astro:content";
+const allUpdatesUnsorted = await getCollection("changelog");
+// Sort the posts in descending order by publication date (newest to oldest)
+const allUpdates = allUpdatesUnsorted.sort(
+  (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
+);
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl text-balance mx-auto text-center">
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          The stuff we broke (and fixed)
+        </Text>
+        <Text
+          tag="p"
+          variant="textBase"
+          class="max-w-xl mx-auto mt-4 text-base-500"
+        >
+          Release notes, feature drops, and bug banishments — all in one place.
+        </Text>
+      </div>
+
+      <div class="flex flex-col gap-4 mt-8">
+        {allUpdates.map((post) => <ChangelogEntry post={post} />)}
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

@@ -1,0 +1,441 @@
+---
+export const description = "Pricing section with three tiers";
+
+// Components
+import Text from "@/components/fundations/elements/Text.astro";
+import Button from "@/components/fundations/elements/Button.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
+// Icons (import all used ones)
+import Check from "@/components/fundations/icons/Check.astro";
+import X from "@/components/fundations/icons/X.astro";
+import Minus from "@/components/fundations/icons/Minus.astro";
+const pricingOptions = [
+  {
+    id: "Pro",
+    cardClass: "bg-sand-50 ",
+    primaryTextColor: "text-base-900",
+    secondaryTextColor: "text-base-500",
+    featuresBorderColor: "border-base-200",
+    title: "Pro",
+    monthly: "$29.00",
+    annual: "$19.00",
+    description:
+      "For solo devs who just want their emails to work (without rage-quitting).",
+    button: {
+      text: "Get Started",
+      variant: "accent",
+    },
+    features: [
+      { text: "10,000 emails/mo" },
+      { text: "1 custom domain" },
+      { text: "Basic analytics (open & click)" },
+      { text: "API access, no SDK required" },
+      { text: "Developer-friendly docs" },
+      { text: "Basic support (yes, from humans)" },
+      { text: "Markdown, HTML, and MJML" },
+    ],
+  },
+  {
+    id: "Scale",
+    cardClass: "bg-sand-100",
+    primaryTextColor: "text-base-900",
+    secondaryTextColor: "text-base-500",
+    featuresBorderColor: "border-base-200",
+    title: "Scale",
+    monthly: "$49.00",
+    annual: "$39.00",
+    description: "For teams tired of email platforms that require PhDs to use.",
+    button: {
+      text: "Get Started",
+      variant: "accent",
+    },
+    features: [
+      { text: "50,000 emails/mo" },
+      { text: "Multiple custom domains" },
+      { text: "Custom DKIM & SPF" },
+      { text: "Webhook support " },
+      { text: "Inbox previews (even Outlook )" },
+      { text: "Email templating engine" },
+      { text: "Click, open, and bounce tracking" },
+      { text: "Team access + roles" },
+      { text: "Light automation workflows" },
+      { text: "Chat support" },
+    ],
+  },
+  {
+    id: "Enterprise",
+    cardClass: "bg-sand-50 ",
+    primaryTextColor: "text-base-900",
+    secondaryTextColor: "text-base-500",
+    featuresBorderColor: "border-base-200",
+    title: "Enterprise",
+    monthly: "$99.00",
+    annual: "$79.00",
+    description:
+      "For startups and teams that treat email as a core product, not an afterthought.",
+    button: {
+      text: "Upgrade Now",
+      variant: "default",
+    },
+    features: [
+      { text: "100,000+ emails/mo" },
+      { text: "Dedicated IPs (no sharing)" },
+      { text: "SSO & enterprise auth" },
+      { text: "Live log stream + debugging" },
+      { text: "Blocklist monitoring & auto-removal" },
+      { text: "Premium SLA & uptime guarantees" },
+      { text: "VIP onboarding + migration" },
+    ],
+  },
+];
+
+// TAble
+export const pricingFeatures = [
+  {
+    category: "Email Sending",
+    features: [
+      {
+        label: "Daily Limit",
+        values: ["No limit", "No limit", "No limit"],
+      },
+      { label: "RESTful API", values: ["yes"] },
+      { label: "SMTP Relay", values: ["yes"] },
+      { label: "Official SDKs", values: ["yes"] },
+      { label: "Schedule Emails", values: ["yes"] },
+      { label: "Batch Sending", values: ["yes"] },
+      { label: "Open Tracking", values: ["yes"] },
+      { label: "Link Tracking", values: ["yes"] },
+      { label: "React Email", values: ["yes"] },
+    ],
+  },
+  {
+    category: "Deliverability & Reliability",
+    features: [
+      { label: "Custom Domains", values: ["10", "1,000", "Flexible"] },
+      {
+        label: "Dedicated IPs",
+        values: ["no", "With Add-on", "With Add-on"],
+      },
+      { label: "Dedicated IP Warming", values: ["no", "yes", "yes"] },
+      { label: "Pristine Shared IPs", values: ["yes"] },
+      { label: "Automatic Suppression List", values: ["yes"] },
+      { label: "Bounce Details", values: ["yes"] },
+      { label: "Multi-Region", values: ["yes"] },
+      {
+        label: "Data Retention",
+        values: ["3 days", "7 days", "Flexible"],
+      },
+      { label: "Deliverability Insights", values: ["yes"] },
+      { label: "DKIM, SPF, DMARC", values: ["yes"] },
+      { label: "Webhook Endpoints", values: ["10", "10", "Flexible"] },
+      { label: "Webhook Events", values: ["All Events"] },
+    ],
+  },
+  {
+    category: "Security & Privacy",
+    features: [
+      { label: "Single Sign-On", values: ["no", "yes", "yes"] },
+      { label: "Social Login", values: ["yes"] },
+      { label: "Team Members", values: ["5", "100", "Flexible"] },
+      { label: "GDPR Compliance", values: ["yes"] },
+      { label: "SOC 2 Type II", values: ["yes"] },
+      { label: "Penetration Testing", values: ["yes"] },
+      { label: "DDoS Protection", values: ["yes"] },
+      { label: "Automated Backups", values: ["yes"] },
+      { label: "Multi-factor Auth", values: ["yes"] },
+      { label: "API Key Permissions", values: ["yes"] },
+      { label: "Signed Webhooks", values: ["yes"] },
+    ],
+  },
+  {
+    category: "Customer Support",
+    features: [
+      { label: "Ticket Support", values: ["yes"] },
+      { label: "Slack Support", values: ["no", "yes", "yes"] },
+      { label: "Urgent Response SLA", values: ["no", "yes", "yes"] },
+      { label: "Deliverability Expertise", values: ["no", "yes", "yes"] },
+      { label: "In-App Docs", values: ["yes"] },
+      { label: "AI Assistant", values: ["yes"] },
+    ],
+  },
+];
+---
+
+<section
+  id="pricing-section"
+  class="border-t border-base-200 border-dashed border-dashed scroll-mt-24"
+>
+  <Wrapper variant="standard" class="pt-12 pb-4">
+    <div class="text-center text-balance">
+      <Text
+        tag="h2"
+        variant="displayMD"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Plans that grow with your ambition (or chaos)
+      </Text>
+      <Text
+        tag="p"
+        variant="textBase"
+        class="max-w-xl mx-auto mt-4 text-base-500"
+      >
+        Start free. Pay when your side project accidentally turns into a
+        business.
+      </Text>
+
+      <!-- Pricing Toggle -->
+      <div
+        aria-labelledby="pricing-toggle"
+        class="relative z-0 inline-flex justify-center p-1 mx-auto mt-8 overflow-hidden bg-white shadow ring-1 ring-base-200 ring-offset-2 gap-4 lg:mx-0 rounded-md w-fit"
+      >
+        <div
+          id="toggle-slider"
+          class="absolute inset-0 w-1/2 bg-base-50 rounded-md transition-transform duration-200 ease-in-out"
+        >
+        </div>
+
+        <button
+          id="monthly-btn"
+          class="relative z-10 flex items-center justify-center w-full h-6 px-2 text-xs font-medium focus:outline-none transition-colors duration-300 text-base-600"
+          type="button"
+          aria-pressed="true"
+        >
+          Monthly
+        </button>
+
+        <button
+          id="annual-btn"
+          class="relative z-10 flex items-center justify-center w-full h-6 px-2 text-xs font-medium focus:outline-none transition-colors duration-300 focus:text-base-900 hover:text-base-900"
+          type="button"
+          aria-pressed="false"
+        >
+          Annual
+        </button>
+      </div>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        pricingOptions.map((tier) => (
+          <div
+            class={`flex flex-col h-full justify-between p-4 rounded-xl ${tier.cardClass}`}
+          >
+            <div class="flex flex-col">
+              <Text
+                tag="h3"
+                variant="textBase"
+                class={` font-medium text-base-900 ${tier.primaryTextColor}`}
+              >
+                {tier.title}
+              </Text>
+              <Text
+                variant="displaySM"
+                class={`font-medium flex items-baseline tracking-tighter mt-2 font-serif ${tier.primaryTextColor}`}
+              >
+                <span
+                  class="pricing-amount"
+                  data-monthly={tier.monthly}
+                  data-annual={tier.annual}
+                >
+                  {tier.monthly}
+                </span>
+                <span
+                  class={`text-sm font-normal tracking-normal ${tier.secondaryTextColor}`}
+                >
+                  <span class="monthly-text">/month</span>
+                  <span class="annual-text" style="display: none;">
+                    /annually
+                  </span>
+                </span>
+              </Text>
+              <Text
+                tag="p"
+                variant="textSM"
+                class={`mt-2 ${tier.secondaryTextColor}`}
+              >
+                {tier.description}
+              </Text>
+
+              <div class={`mt-4 pt-4 border-t ${tier.featuresBorderColor}  `}>
+                <Text
+                  tag="p"
+                  variant="textXS"
+                  class={`font-medium uppercase ${tier.secondaryTextColor}`}
+                >
+                  {tier.title === "Momentum"
+                    ? "Everything in Core plus:"
+                    : "Core plan includes:"}
+                </Text>
+                <ul
+                  class={`flex flex-col mt-4 text-sm  gap-y-3 ${tier.primaryTextColor}`}
+                  role="list"
+                >
+                  {tier.features.map((feature, index) => (
+                    <li class="flex items-start gap-2">
+                      <Check
+                        size="sm"
+                        class={`shrink-0 ${tier.secondaryTextColor}`}
+                      />
+                      <span>{feature.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div class="w-full mt-8">
+              <Button class="w-full" variant={tier.button.variant} size="sm">
+                {tier.button.text}
+              </Button>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <div class="w-full mt-12 overflow-x-auto">
+      <div
+        class="min-w-[768px] border border-base-200 rounded-xl overflow-hidden"
+      >
+        <table class="w-full text-sm">
+          <thead class="text-center border-b border-base-200">
+            <tr>
+              <th class="px-4 pt-8 pb-2 font-medium text-left text-base-900"
+                >Features</th
+              >
+
+              <th class="px-4 py-2 font-medium text-base-900">Pro</th>
+              <th class="px-4 py-2 font-medium text-base-900">Scale</th>
+              <th class="px-4 py-2 font-medium text-base-900">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              pricingFeatures.map(({ category, features }) => (
+                <>
+                  <tr class="font-semibold bg-sand-100">
+                    <td
+                      colspan="5"
+                      class="px-4 py-8 text-base font-medium border-b text-base-900 border-base-200"
+                    >
+                      {category}
+                    </td>
+                  </tr>
+                  {features.map(({ label, values }) => (
+                    <tr class="border-b border-base-200">
+                      <td class="px-4 py-2 text-base-500">{label}</td>
+                      {values.map((value, i) => (
+                        <td class="px-4 py-4 text-center text-base-500">
+                          {value === "yes" ? (
+                            <X size="sm" class="mx-auto " />
+                          ) : value === "no" ? (
+                            <Minus size="sm" class="mx-auto" />
+                          ) : (
+                            value
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </>
+              ))
+            }
+            <tr>
+              <td></td>
+              <td class="px-4 py-2 text-center text-base-500">
+                <Button class="w-full" variant="accent" size="sm">
+                  Get started
+                </Button>
+              </td>
+              <td class="px-4 py-2 text-center text-base-500">
+                <Button class="w-full" variant="accent" size="sm">
+                  Get started
+                </Button>
+              </td>
+              <td class="px-4 py-2 text-center text-base-500">
+                <Button class="w-full" variant="default" size="sm">
+                  Get started
+                </Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </Wrapper>
+
+  <script type="module">
+    // Initialize vanilla JS pricing toggle functionality
+    document.addEventListener("DOMContentLoaded", function () {
+      const monthlyBtn = document.getElementById("monthly-btn");
+      const annualBtn = document.getElementById("annual-btn");
+      const toggleSlider = document.getElementById("toggle-slider");
+      const pricingAmounts = document.querySelectorAll(".pricing-amount");
+      const monthlyTexts = document.querySelectorAll(".monthly-text");
+      const annualTexts = document.querySelectorAll(".annual-text");
+
+      // accent state is monthly
+      let currentDuration = "monthly";
+
+      // Function to update UI based on selected duration
+      function updatePricingUI(duration) {
+        // Update toggle slider position
+        if (duration === "monthly") {
+          toggleSlider.style.transform = "translateX(0)";
+          monthlyBtn.classList.add("text-base-600");
+          monthlyBtn.classList.remove(
+            "focus:text-base-900",
+            "hover:text-base-900"
+          );
+          annualBtn.classList.remove("text-base-600");
+          annualBtn.classList.add("focus:text-base-900", "hover:text-base-900");
+          monthlyBtn.setAttribute("aria-pressed", "true");
+          annualBtn.setAttribute("aria-pressed", "false");
+        } else {
+          toggleSlider.style.transform = "translateX(100%)";
+          annualBtn.classList.add("text-base-600");
+          annualBtn.classList.remove(
+            "focus:text-base-900",
+            "hover:text-base-900"
+          );
+          monthlyBtn.classList.remove("text-base-600");
+          monthlyBtn.classList.add(
+            "focus:text-base-900",
+            "hover:text-base-900"
+          );
+          monthlyBtn.setAttribute("aria-pressed", "false");
+          annualBtn.setAttribute("aria-pressed", "true");
+        }
+
+        // Update pricing text
+        pricingAmounts.forEach((amount) => {
+          amount.textContent = amount.dataset[duration];
+        });
+
+        // Show/hide appropriate text
+        if (duration === "monthly") {
+          monthlyTexts.forEach((text) => (text.style.display = "inline"));
+          annualTexts.forEach((text) => (text.style.display = "none"));
+        } else {
+          monthlyTexts.forEach((text) => (text.style.display = "none"));
+          annualTexts.forEach((text) => (text.style.display = "inline"));
+        }
+
+        // Update current duration
+        currentDuration = duration;
+      }
+
+      // Add event listeners to buttons
+      monthlyBtn.addEventListener("click", function () {
+        updatePricingUI("monthly");
+      });
+
+      annualBtn.addEventListener("click", function () {
+        updatePricingUI("annual");
+      });
+
+      // Initialize UI
+      updatePricingUI(currentDuration);
+    });
+  </script>
+</section>

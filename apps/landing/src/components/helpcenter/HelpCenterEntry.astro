@@ -1,0 +1,59 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+
+// Icons
+import User from "@/components/fundations/icons/User.astro";
+import Shield from "@/components/fundations/icons/Shield.astro";
+import Settings from "@/components/fundations/icons/Settings.astro";
+import InfoCircle from "@/components/fundations/icons/InfoCircle.astro";
+import CreditCard from "@/components/fundations/icons/CreditCard.astro";
+
+// Content
+const { page, description, url, iconId } = {
+  url: "/helpcenter/" + Astro.props.post.slug,
+  page: Astro.props.post.data.page,
+  description: Astro.props.post.data.description,
+  iconId: Astro.props.post.data.iconId || "info-circle", // Default icon if not provided
+};
+
+// Map iconId values to actual icon components
+const iconMap = {
+  user: User,
+  settings: Settings,
+  shield: Shield,
+  creditCard: CreditCard,
+};
+
+// Select the correct icon component
+const IconComponent = iconMap[iconId] || InfoCircle; // Default to InfoCircle if not found
+---
+
+<div
+  class="relative flex flex-col h-full p-4 bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100"
+>
+  <a
+    title={`Read help article: ${page}`}
+    aria-label={`Read help article: ${page}`}
+    class="absolute inset-0 z-10"
+    title={page}
+    href={url}></a>
+  <div class="relative flex flex-col justify-between h-full gap-8">
+    <div>
+      <div
+        class="inline-flex p-4 bg-white rounded-lg group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit"
+      >
+        <IconComponent size="sm" />
+        <!-- Render dynamic icon here -->
+      </div>
+      <div>
+        <Text tag="h3" variant="textSM" class="mt-12 font-medium text-base-900">
+          {page}
+        </Text>
+        <Text tag="p" variant="textSM" class="mt-2 text-base-500"
+          >{description}</Text
+        >
+      </div>
+    </div>
+  </div>
+</div>

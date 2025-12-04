@@ -1,0 +1,232 @@
+---
+// Assets
+import { Code } from "astro:components";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+const tabs = ["welcome", "reset", "invite", "digest"];
+
+const labelMap = {
+  welcome: "user-welcome.tsx",
+  reset: "reset-password.tsx",
+  invite: "user-invite.tsx",
+  digest: "weekly-digest.tsx",
+};
+
+const codeBlocks = [
+  {
+    id: "welcome",
+    lang: "tsx",
+    code: `import { Html, Head, Body, Container, Text, Heading, Hr, Link } from 'react-email';
+
+export default function WelcomeEmail() {
+  return (
+    <Html>
+      <Head />
+      <Body style={{ backgroundColor: '#f4f4f4', padding: '40px 0' }}>
+        <Container style={{ backgroundColor: '#ffffff', padding: '32px', borderRadius: '8px' }}>
+          <Heading as="h2">👋 Welcome to Our App!</Heading>
+          <Text>Hey there,</Text>
+          <Text>
+            Thanks for signing up! We're absolutely thrilled to have you onboard. Here are a few things you might want to check out to get started:
+          </Text>
+          <ul>
+            <li>Explore your dashboard</li>
+            <li>Set up your profile</li>
+            <li>Invite your teammates</li>
+          </ul>
+          <Text>
+            If you have any questions, just hit reply — we’re always here to help.
+          </Text>
+          <Hr />
+          <Text style={{ fontSize: '12px', color: '#888' }}>
+            Sent with ❤️ by the MyApp Team.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}`,
+  },
+  {
+    id: "reset",
+    lang: "tsx",
+    code: `import { Html, Head, Body, Container, Text, Link, Heading, Hr } from 'react-email';
+
+export default function ResetPasswordEmail({ url }: { url: string }) {
+  return (
+    <Html>
+      <Head />
+      <Body style={{ backgroundColor: '#fff8f1', padding: '32px 0' }}>
+        <Container style={{ backgroundColor: '#ffffff', padding: '32px', borderRadius: '6px' }}>
+          <Heading as="h2">Reset Your Password</Heading>
+          <Text>
+            We received a request to reset your password. If you didn't ask for this, you can safely ignore it.
+          </Text>
+          <Link href={url} style={{ display: 'inline-block', marginTop: '12px', backgroundColor: '#000', color: '#fff', padding: '10px 16px', borderRadius: '4px' }}>
+            Reset Password
+          </Link>
+          <Text>If the button doesn’t work, copy and paste the link below into your browser:</Text>
+          <Text style={{ fontSize: '12px', color: '#555' }}>{url}</Text>
+          <Hr />
+          <Text style={{ fontSize: '12px', color: '#999' }}>
+            This link will expire in 30 minutes.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}`,
+  },
+  {
+    id: "invite",
+    lang: "tsx",
+    code: `import { Html, Head, Body, Container, Text, Link, Heading } from 'react-email';
+
+export default function InviteEmail({ inviter, teamUrl }: { inviter: string; teamUrl: string }) {
+  return (
+    <Html>
+      <Head />
+      <Body style={{ backgroundColor: '#f5faff', padding: '32px 0' }}>
+        <Container style={{ backgroundColor: '#ffffff', padding: '32px', borderRadius: '6px' }}>
+          <Heading as="h2">You’re Invited!</Heading>
+          <Text>
+            {inviter} has invited you to join their workspace on SuperTeam.
+          </Text>
+          <Link href={teamUrl} style={{ display: 'inline-block', marginTop: '16px', backgroundColor: '#2563eb', color: '#ffffff', padding: '10px 20px', borderRadius: '6px' }}>
+            Join the Team
+          </Link>
+          <Text style={{ marginTop: '16px' }}>
+            Don’t recognize this? Just ignore it — no action will be taken.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}`,
+  },
+  {
+    id: "digest",
+    lang: "tsx",
+    code: `import { Html, Head, Body, Container, Text, Heading, Img, Section, Hr } from 'react-email';
+
+export default function WeeklyDigestEmail({ baseUrl, stats }: { baseUrl: string; stats: any }) {
+  return (
+    <Html>
+      <Head />
+      <Body style={{ backgroundColor: '#f9fafb', padding: '32px 0' }}>
+        <Container style={{ backgroundColor: '#ffffff', padding: '32px', borderRadius: '8px' }}>
+          <Section>
+            <Img src={\`\${baseUrl}/static/logo.png\`} width="64" height="64" alt="Logo" />
+          </Section>
+          <Heading as="h2">📊 Your Weekly Digest</Heading>
+          <Text>Here’s what happened this week on your account:</Text>
+          <ul>
+            <li>📬 Emails sent: {stats.sent}</li>
+            <li>📈 Open rate: {stats.openRate}%</li>
+            <li>🔥 Top campaign: {stats.topCampaign}</li>
+          </ul>
+          <Text>
+            Keep an eye on your performance, and we’ll keep everything running smooth in the background.
+          </Text>
+          <Hr />
+          <Text style={{ fontSize: '12px', color: '#999' }}>
+            You’re receiving this email because you opted in to digests from MyApp.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}`,
+  },
+];
+---
+
+<section class="overflow-hidden">
+  <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+    <div class="text-center text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Build emails like it’s 2025 — not 1999
+      </Text>
+      <Text
+        tag="p"
+        variant="textSM"
+        class="max-w-xl mx-auto mt-4 text-base-500"
+      >
+        Ditch the table hellscape. Create sleek, modern emails with React
+        components using <code>react-email</code>, our open-source library that
+        doesn’t make you cry.
+      </Text>
+    </div>
+
+    <div
+      class="flex flex-col mt-8 overflow-hidden divide-y divide-sand-50 bg-sand-100 rounded-xl"
+    >
+      <div class="p-4 bg-sand-100">
+        <div class="flex items-center gap-1">
+          <div class="size-2 rounded-full bg-[#ff421e]"></div>
+          <div class="size-2 rounded-full bg-[#60beff]"></div>
+          <div class="size-2 rounded-full bg-[#e3962d]"></div>
+        </div>
+      </div>
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x lg:divide-sand-50"
+      >
+        <div class="flex flex-col p-4 gap-2">
+          {
+            tabs.map((lang, i) => {
+              return (
+                <button
+                  class="text-xs text-left cursor-pointer text-base-500"
+                  id={`tab-${lang}`}
+                  data-tab={lang}
+                >
+                  {labelMap[lang]}
+                </button>
+              );
+            })
+          }
+        </div>
+        <div class="lg:col-span-2">
+          {
+            codeBlocks.map(({ id, lang, code }, index) => (
+              <div id={`content-${id}`} class={index === 0 ? "" : "hidden"}>
+                <div class="h-full overflow-hidden  divide-y divide-sand-50">
+                  <Code
+                    lang={lang}
+                    theme="css-variables"
+                    class="h-full p-4 pl-2 text-xs scrollbar-hide"
+                    code={code}
+                  />
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      const tabs = ["welcome", "reset", "invite", "digest"];
+
+      tabs.forEach((lang) => {
+        const button = document.getElementById(`tab-${lang}`);
+        button.addEventListener("click", () => {
+          tabs.forEach((l) => {
+            document.getElementById(`tab-${l}`).classList.remove("opacity-100");
+            document.getElementById(`tab-${l}`).classList.add("opacity-50");
+            document.getElementById(`content-${l}`).classList.add("hidden");
+          });
+
+          button.classList.remove("opacity-50");
+          button.classList.add("opacity-100");
+          document.getElementById(`content-${lang}`).classList.remove("hidden");
+        });
+      });
+    </script>
+  </Wrapper>
+</section>

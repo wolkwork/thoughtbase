@@ -1,0 +1,95 @@
+---
+// Assets
+import Logo from "@/components/assets/Logo.astro";
+// Fundatons
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+const footerLinks = [
+  {
+    heading: "Navigation",
+    links: [
+      { label: "Overview", href: "/system/overview" },
+      { label: "Buttons", href: "/system/buttons" },
+      { label: "Links", href: "/system/links" },
+      { label: "Colors", href: "/system/colors" },
+      { label: "Typography", href: "/system/typography" },
+    ],
+  },
+  {
+    heading: "Stay updated",
+    links: [
+      {
+        label: "License",
+        href: "https://www.lexingtonthemes.com/legal/license",
+      },
+      {
+        label: "Documentation",
+        href: "https://www.lexingtonthemes.com/documentation",
+      },
+    ],
+  },
+  {
+    heading: "Socials",
+    links: [
+      {
+        label: "@lexingtonthemes",
+        href: "https://twitter.com/lexingtonthemes",
+      },
+      {
+        label: "@Mike_Andreuzza",
+        href: "https://twitter.com/Mike_Andreuzza",
+      },
+    ],
+  },
+  {
+    heading: "More Themes",
+    links: [
+      {
+        label: "Lexington Themes",
+        href: "https://lexingtonthemes.com/",
+      },
+    ],
+  },
+];
+---
+<footer class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="py-12">
+    <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+      <div class="text-black">
+        <a
+          href="/"
+          class="flex items-center font-serif text-lg gap-2 text-accent-900"
+        >
+          <span class="sr-only">Go to homepage</span>
+          <Logo class="h-4 text-base-900" />
+          Brightlight
+        </a>
+        <p class="mt-1 text-sm font-normal text-base-500 text-balance">
+          Premium multipage themes crafted with Astro and Tailwind CSS
+        </p>
+      </div>
+      <div class="md:grid md:grid-cols-2 xl:grid-cols-4 md:gap-8 xl:col-span-2">
+        {
+          footerLinks.map((section) => (
+            <div class="mt-12 md:mt-0">
+              <h3 class="text-black font-display">{section.heading}</h3>
+              <ul role="list" class="mt-4 text-sm space-y-2 text-base-500">
+                {section.links.map((link) => (
+                  <li>
+                    <a
+                      title="Button to your page"
+                      aria-label="your label"
+                      href={link.href}
+                      class="hover:text-black"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </Wrapper>
+</footer>

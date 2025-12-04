@@ -1,0 +1,41 @@
+---
+// Assets
+import { Image } from "astro:assets";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+const { customer, avatar, url, partnership } = {
+  url: "/customers/" + Astro.props.post.slug,
+  avatar: Astro.props.post.data.avatar.url,
+  customer: Astro.props.post.data.customer,
+  partnership: Astro.props.post.data.partnership,
+};
+---
+
+<div class="relative h-full overflow-hidden rounded-xl group">
+  <Image
+    src={avatar}
+    alt={customer}
+    width={600}
+    height={400}
+    class="absolute inset-0 object-cover w-full h-full"
+  />
+
+  <div class="absolute inset-0 bg-black/40"></div>
+
+  <a
+    href={url}
+    title={customer}
+    aria-label={customer}
+    class="absolute inset-0 z-30"></a>
+
+  <div class="relative z-20 flex flex-col justify-end h-full p-4">
+    <div>
+      <Text tag="p" variant="textLG" class="mt-2 font-serif text-white">
+        "{partnership}"
+      </Text>
+      <Text tag="h3" variant="textSM" class="mt-2 text-white">
+        {customer}
+      </Text>
+    </div>
+  </div>
+</div>

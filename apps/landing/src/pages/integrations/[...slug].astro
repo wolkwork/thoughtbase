@@ -1,0 +1,22 @@
+---
+import { getCollection } from "astro:content";
+import IntegrationsLayout from "../../layouts/IntegrationsLayout.astro";
+export async function getStaticPaths() {
+  const integrations = await getCollection("integrations");
+  const paths = integrations.map((page) => {
+    return {
+      params: { slug: page.slug },
+      props: { page },
+
+      trailingSlash: false,
+    };
+  });
+  return paths;
+}
+const { page } = Astro.props;
+const { Content } = await page.render();
+---
+
+<IntegrationsLayout frontmatter={page.data}>
+  <Content />
+</IntegrationsLayout>

@@ -1,0 +1,91 @@
+---
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+const faqs = [
+  {
+    question: "How do you make sure emails actually land?",
+    answer:
+      "We don’t believe in sending emails into the void. With clean IPs, smart routing, and obsessive deliverability practices, your emails show up where they’re supposed to — not in spam purgatory.",
+  },
+  {
+    question: "What if I forget my login credentials?",
+    answer:
+      "No worries — we’ve got a password reset flow that won’t make you cry. Just click the link, prove you’re not a robot, and we’ll get you back in faster than you can say ‘forgot again?’",
+  },
+  {
+    question: "Can I schedule emails to go out later?",
+    answer:
+      "Absolutely. Queue them up for next week, next month, or when Mercury’s in retrograde. We’ll send them when you say so — no manual midnight sends required.",
+  },
+  {
+    question: "Do you support multiple environments (like dev, staging, prod)?",
+    answer:
+      "Yep. You can keep your test sends from leaking into the wild, and your production emails from hitting staging by mistake. No more ‘Oops, wrong list’ moments.",
+  },
+  {
+    question: "Will you sell my data to shady ad networks?",
+    answer:
+      "Nope. We don’t do that. Your data is yours. We’re not in the business of selling email lists, creepy targeting, or tracking your mom’s click habits.",
+  },
+  {
+    question: "Can I use Brightlight on multiple projects or apps?",
+    answer:
+      "You bet. Use it for your side project, your startup, your startup’s side project — we’re built to scale, no matter how many hats you wear.",
+  },
+  {
+    question: "Is there a limit to how many emails I can send?",
+    answer:
+      "Only if you're on a free plan. Otherwise, we scale with you — up to millions of emails a month. And if you break the system, we’ll be impressed… and then we’ll help you send more.",
+  },
+  {
+    question: "Can I export my data if I decide to leave?",
+    answer:
+      "Yes — and we won’t guilt-trip you about it. Export everything with a click. Your data’s not trapped in a walled garden. We’ll even wave as you go.",
+  },
+];
+---
+
+<section class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="pt-12 pb-4">
+    <div class="max-w-xl mx-auto text-center text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium text-black"
+      >
+        Frequently asked questions
+      </Text>
+
+      <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+        Answers to commonly asked questions about our platform
+      </Text>
+
+      <div class="relative w-full mx-auto mt-12 space-y-4">
+        {
+          faqs.map((faq) => (
+            <details class="text-left cursor-pointer group">
+              <summary class="flex items-center justify-between w-full pb-1 text-left select-none  text-base-600 hover:text-accent-500">
+                {faq.question}
+                <svg
+                  class="w-5 h-5 duration-300 ease-out text-accent-500 transform group-open:-rotate-45"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 6v12m6-6H6"
+                  />
+                </svg>
+              </summary>
+              <div class="py-4 pt-2 text-base-500">{faq.answer}</div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </Wrapper>
+</section>

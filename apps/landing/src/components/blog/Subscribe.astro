@@ -1,0 +1,54 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+import Button from "@/components/fundations/elements/Button.astro";
+---
+
+<section class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="py-4">
+    <div class="p-8 py-24 text-center rounded-xl bg-accsandent-50 bg-sand-100">
+      <div>
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium text-base-900 lg:text-balance"
+        >
+          Email, But Actually Good
+        </Text>
+        <Text
+          tag="p"
+          variant="textBase"
+          class="mt-2 text-base-500 lg:text-balance"
+        >
+          No setup rituals. No DNS sorcery. Just emails that send, land, and
+          look damn good doing it. — Available now. Because why wait?
+        </Text>
+      </div>
+
+      <form class="max-w-md mx-auto mt-10 space-y-4">
+        <div class="w-full">
+          <div class="flex items-baseline justify-between mb-1">
+            <label for="email" class="text-sm font-medium text-base-500"
+              >Email Address</label
+            >
+          </div>
+          <div class="relative z-0 focus-within:z-10">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              class="block w-full px-4 py-2 text-xs leading-tight align-middle bg-white border border-transparent transition duration-300 ease-in-out focus:z-10 h-9 rounded-md text-base-500 ring-1 ring-base-200 placeholder-base-400 focus:border-accent-500 focus:ring-accent-100 focus:ring-2 focus:outline-none shadow-sm"
+              inputmode="email"
+            />
+          </div>
+        </div>
+
+        <Button size="base" variant="accent" gap="sm" type="submit">
+          Send Message
+        </Button>
+      </form>
+    </div>
+  </Wrapper>
+</section>

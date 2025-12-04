@@ -1,0 +1,46 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Components
+import TeamEntry from "@/components/team/TeamEntry.astro";
+// Content
+import { getCollection } from "astro:content";
+const allAuthors = await getCollection("team");
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-12">
+      <div class="max-w-xl mx-auto text-center text-balance">
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Meet the crew brave enough to fix email
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          We’re the misfits who looked at the horror that is HTML email and
+          said, “Yeah, let’s clean that up.” You’re welcome.
+        </Text>
+      </div>
+
+      <div
+        class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+      >
+        {
+          // Sorting authors alphabetically inline
+          allAuthors
+            .sort((a, b) => {
+              const nameA = a.data.name.toLowerCase();
+              const nameB = b.data.name.toLowerCase();
+              return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+            })
+            .map((post) => <TeamEntry post={post} />)
+        }
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

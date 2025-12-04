@@ -1,0 +1,332 @@
+---
+// Assets
+import { Code } from "astro:components";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// icons
+import Node from "@/components/fundations/icons/Node.astro";
+import Serverless from "@/components/fundations/icons/Serverless.astro";
+import Ruby from "@/components/fundations/icons/Ruby.astro";
+import Python from "@/components/fundations/icons/Python.astro";
+import Php from "@/components/fundations/icons/Php.astro";
+import Go from "@/components/fundations/icons/Go.astro";
+import Rust from "@/components/fundations/icons/Rust.astro";
+import Java from "@/components/fundations/icons/Java.astro";
+import Elixir from "@/components/fundations/icons/Elixir.astro";
+import Net from "@/components/fundations/icons/Net.astro";
+import Rest from "@/components/fundations/icons/Rest.astro";
+import Smtp from "@/components/fundations/icons/Smtp.astro";
+
+// Tabs
+const tabs = [
+  "node",
+  "serverless",
+  "ruby",
+  "python",
+  "php",
+  "go",
+  "rust",
+  "java",
+  "elixir",
+  "net",
+  "rest",
+  "smtp",
+];
+
+const labelMap = {
+  node: "Node.js",
+  serverless: "Serverless",
+  ruby: "Ruby",
+  python: "Python",
+  php: "PHP",
+  go: "Go",
+  rust: "Rust",
+  java: "Java",
+  elixir: "Elixir",
+  net: ".NET",
+  rest: "REST",
+  smtp: "SMTP",
+};
+
+const iconMap = {
+  node: Node,
+  serverless: Serverless,
+  ruby: Ruby,
+  python: Python,
+  php: Php,
+  go: Go,
+  rust: Rust,
+  java: Java,
+  elixir: Elixir,
+  net: Net,
+  rest: Rest,
+  smtp: Smtp,
+};
+const codeBlocks = [
+  {
+    id: "node",
+    lang: "js",
+    code: `const sdk = require('email-sdk');
+
+const message = {
+  to: 'user@example.com',
+  from: 'noreply@myapp.com',
+  subject: 'Welcome to MyApp',
+  body: \`Hi there,
+
+Thanks for signing up! We're thrilled to have you on board.
+
+– The MyApp Team\`,
+};
+
+sdk.send(message)
+  .then(() => console.log('Email sent'))
+  .catch(console.error);`,
+  },
+  {
+    id: "serverless",
+    lang: "js",
+    code: `exports.handler = async (event) => {
+  const { sendEmail } = require('email-sdk');
+
+  await sendEmail({
+    to: "user@example.com",
+    subject: "Serverless Email",
+    body: "Dispatched from Lambda with ❤️",
+  });
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Email sent" }),
+  };
+};`,
+  },
+  {
+    id: "ruby",
+    lang: "rb",
+    code: `require 'email_sdk'
+
+EmailSDK.send(
+  to: "user@example.com",
+  from: "team@myapp.com",
+  subject: "Welcome!",
+  body: "Hello from Ruby. Your account has been created successfully."
+)`,
+  },
+  {
+    id: "python",
+    lang: "py",
+    code: `import email_sdk
+
+email_sdk.send(
+  to="user@example.com",
+  from_="noreply@myapp.com",
+  subject="Your Receipt",
+  body="Thanks for your purchase! Here’s your confirmation."
+)`,
+  },
+  {
+    id: "php",
+    lang: "php",
+    code: `<?php
+EmailSDK::send([
+  'to' => 'user@example.com',
+  'from' => 'support@myapp.com',
+  'subject' => 'Password Reset',
+  'body' => "Click the link below to reset your password:\\nhttps://myapp.com/reset"
+]);`,
+  },
+  {
+    id: "go",
+    lang: "go",
+    code: `email := Email{
+  To: "user@example.com",
+  From: "noreply@myapp.com",
+  Subject: "Go Email Example",
+  Body: "This email was sent using Go!",
+}
+
+if err := sdk.Send(email); err != nil {
+  log.Fatal("Failed to send:", err)
+}`,
+  },
+  {
+    id: "rust",
+    lang: "rs",
+    code: `let email = Email::new()
+  .to("user@example.com")
+  .from("noreply@myapp.com")
+  .subject("Hello from Rust")
+  .body("This is a longer Rust example.");
+
+email_sdk::send(email)?;`,
+  },
+  {
+    id: "java",
+    lang: "java",
+    code: `Email message = new Email.Builder()
+  .to("user@example.com")
+  .from("noreply@myapp.com")
+  .subject("Java Email")
+  .body("This email was sent from Java!")
+  .build();
+
+EmailSDK.send(message);`,
+  },
+  {
+    id: "elixir",
+    lang: "elixir",
+    code: `EmailSDK.send(%{
+  to: "user@example.com",
+  from: "noreply@myapp.com",
+  subject: "Elixir Example",
+  body: "This was delivered using Elixir!"
+})`,
+  },
+  {
+    id: "net",
+    lang: "csharp",
+    code: `var email = new Email {
+  To = "user@example.com",
+  From = "noreply@myapp.com",
+  Subject = "Welcome from .NET",
+  Body = "You're all set. Happy coding!"
+};
+
+EmailSDK.Send(email);`,
+  },
+  {
+    id: "rest",
+    lang: "json",
+    code: `POST /send
+Content-Type: application/json
+
+{
+  "to": "user@example.com",
+  "from": "noreply@myapp.com",
+  "subject": "Hello from REST",
+  "body": "Sent using a simple POST request."
+}`,
+  },
+  {
+    id: "smtp",
+    lang: "txt",
+    code: `EHLO smtp.myapp.com
+MAIL FROM:<noreply@myapp.com>
+RCPT TO:<user@example.com>
+DATA
+Subject: SMTP Welcome
+
+Welcome to MyApp via SMTP!
+.
+QUIT`,
+  },
+];
+---
+
+<section class="overflow-hidden">
+  <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+    <div class="text-center text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Plug it in before your coffee gets cold
+      </Text>
+      <Text
+        tag="p"
+        variant="textBase"
+        class="max-w-xl mx-auto mt-4 text-base-500"
+      >
+        Clean, no-BS interface. Set it up in minutes, send emails even faster.
+        SDKs ready for whatever language you’re arguing with today.
+      </Text>
+    </div>
+
+    <!-- Tabs -->
+    <div
+      class="flex items-center justify-between w-full py-2 mt-12 overflow-x-scroll gap-3 scrollbar-hide"
+    >
+      {
+        tabs.map((lang, i) => {
+          const Icon = iconMap[lang];
+          return (
+            <button
+              class="flex flex-col items-center w-full cursor-pointer gap-2"
+              id={`tab-${lang}`}
+              data-tab={lang}
+            >
+              <div
+                class="p-2 bg-sand-100 rounded-xl"
+                class={` ${
+                  i === 0 ? "opacity-100 " : "opacity-50 hover:opacity-100"
+                }`}
+              >
+                <Icon class="mx-auto size-8" />
+              </div>
+              <span class="mt-2 text-xs text-base-500">{labelMap[lang]}</span>
+            </button>
+          );
+        })
+      }
+    </div>
+    <div class="mt-8 -m-4 border-t border-base-200 border-dashed">
+      {
+        codeBlocks.map(({ id, lang, code }, index) => (
+          <div id={`content-${id}`} class={index === 0 ? "" : "hidden"}>
+            <div class="h-full overflow-hidden  divide-y divide-sand-50">
+              <div class="p-4  bg-sand-100">
+                <div class="flex items-center gap-1">
+                  <div class="size-2 rounded-full bg-[#ff421e]" />
+                  <div class="size-2 rounded-full bg-[#60beff]" />
+                  <div class="size-2 rounded-full bg-[#e3962d]" />
+                </div>
+              </div>
+              <Code
+                lang={lang}
+                theme="css-variables"
+                class="h-full p-4 pl-2 text-xs scrollbar-hide"
+                code={code}
+              />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- JS -->
+    <script type="module">
+      const tabs = [
+        "node",
+        "serverless",
+        "ruby",
+        "python",
+        "php",
+        "go",
+        "rust",
+        "java",
+        "elixir",
+        "net",
+        "rest",
+        "smtp",
+      ];
+
+      tabs.forEach((lang) => {
+        const button = document.getElementById(`tab-${lang}`);
+        button.addEventListener("click", () => {
+          tabs.forEach((l) => {
+            document.getElementById(`tab-${l}`).classList.remove("opacity-100");
+            document.getElementById(`tab-${l}`).classList.add("opacity-50");
+            document.getElementById(`content-${l}`).classList.add("hidden");
+          });
+
+          button.classList.remove("opacity-50");
+          button.classList.add("opacity-100");
+          document.getElementById(`content-${lang}`).classList.remove("hidden");
+        });
+      });
+    </script>
+  </Wrapper>
+</section>

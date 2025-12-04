@@ -1,0 +1,100 @@
+---
+// Assets
+import { Image } from "astro:assets";
+
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Icons
+import ChevronRight from "@/components/fundations/icons/ChevronRight.astro";
+const { frontmatter } = Astro.props;
+// Breadcrumbs Data
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: frontmatter.page, href: "#" },
+];
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl mx-auto text-balance">
+        <nav
+          aria-label="Breadcrumb"
+          class="bg-sand-100 p-1.5 rounded-full px-6 w-fit"
+        >
+          <ol class="flex items-center text-sm gap-x-2 text-base-600">
+            {
+              breadcrumbs.map((item, index) => (
+                <>
+                  <li>
+                    {index < breadcrumbs.length - 1 ? (
+                      <a
+                        href={item.href}
+                        class="text-xs font-medium hover:text-accent-500 text-base-800"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <span class="text-xs font-medium text-accent-500">
+                        {item.label}
+                      </span>
+                    )}
+                  </li>
+                  {index < breadcrumbs.length - 1 && (
+                    <li class="text-base-400">
+                      <ChevronRight size="sm" />
+                    </li>
+                  )}
+                </>
+              ))
+            }
+          </ol>
+        </nav>
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="mt-12 font-serif font-medium tracking-tight text-black"
+        >
+          {frontmatter.page}
+        </Text>
+        <Text variant="textBase" class="mt-4 text-base-600">
+          Published on <span>
+            <time
+              datetime={new Date(frontmatter.pubDate).toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "long",
+                }
+              )}
+            >
+              {
+                new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                })
+              }</time
+            ></span
+          >
+        </Text>
+      </div>
+      
+      <Image
+        width={1000}
+        height={800}
+        alt={frontmatter.image.alt}
+        src={frontmatter.image.url}
+        class="object-cover object-center mt-8 size-full max-h-120 lg:col-span-2 rounded-xl"
+      />
+    </Wrapper>
+  </section>
+  <section>
+    <Wrapper variant="standard" class="py-12 border-t border-dashed">
+      <Wrapper variant="prose" class="max-w-xl mx-auto">
+        <slot />
+      </Wrapper>
+    </Wrapper>
+  </section>
+</BaseLayout>

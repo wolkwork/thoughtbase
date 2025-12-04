@@ -1,0 +1,95 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Customers conent
+
+// Card
+import CustomerEntry1 from "@/components/customers/CustomerEntry1.astro";
+// Content
+import { getCollection } from "astro:content";
+const allCustomers = await getCollection("customers");
+---
+
+<section>
+  <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+    <div class="text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Write Like a Human, Not a Hacker
+      </Text>
+      <Text tag="p" variant="textBase" class="max-w-xl mt-4 text-base-500">
+        Finally, an editor that doesn’t fight you. Format, style, and send
+        emails without touching a single . Build visually, tweak freely, and
+        leave the HTML rage-quits behind.
+      </Text>
+    </div>
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div
+        aria-hidden="true"
+        class="p-8 pb-0 overflow-hidden bg-sand-100 lg:col-span-2 lg:p-20 lg:pb-0 rounded-xl"
+      >
+        <div
+          class="h-2 mx-8 bg-white border border-b-0 rounded-t-xl border-sand-500/20"
+        >
+        </div>
+        <div
+          class="h-3 mx-4 bg-white border border-b-0 rounded-t-xl border-sand-500/20"
+        >
+        </div>
+        <div
+          class="bg-white outline outline-sand-500/10 rounded-xl shadow-sm divide-y divide-sand-500/10 -mb-[12%] overflow-hidden"
+        >
+          <div
+            class="flex items-center justify-between px-4 py-2 text-xs bg-sand-50 text-base-600"
+          >
+            <span>Brightlight Newsletter</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-base-400">a day ago</span>
+              <div
+                class="px-3 py-1 text-xs border rounded-full border-base-300 text-base-700 hover:bg-base-100"
+              >
+                Test
+              </div>
+              <div
+                class="px-3 py-1 text-xs text-white rounded-full bg-base-900 hover:bg-accent-600"
+              >
+                Send
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 text-xs space-y-4 text-base-700">
+            <div class="flex justify-between">
+              <span class="font-medium text-base-500">From</span>
+              <span class="text-base-900">your.name@lexingtonthemes.com</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-base-500">To</span>
+              <span
+                class="bg-base-100 text-base-700 text-xs font-medium px-2 py-0.5 rounded-full"
+              >
+                Newsletter Subscribers
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium text-base-500">Subject</span>
+              <span class="text-base-900">Weekly Newsletter</span>
+            </div>
+          </div>
+          <div class="px-6 py-4 bg-white">
+            <div
+              contenteditable="true"
+              class="min-h-[200px] outline-none text-sm text-base-800"
+            >
+              <p class="italic text-base-400">Press '/' for commands</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <CustomerEntry1 post={allCustomers[0]} />
+    </div>
+  </Wrapper>
+</section>

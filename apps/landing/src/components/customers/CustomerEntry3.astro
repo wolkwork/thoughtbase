@@ -1,0 +1,40 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+// Icons
+import ChevronRight from "@/components/fundations/icons/ChevronRight.astro";
+// Content
+const { customer, url, testimonial } = {
+  url: "/customers/" + Astro.props.post.slug,
+  customer: Astro.props.post.data.customer,
+  testimonial: Astro.props.post.data.testimonial,
+};
+---
+
+<article class="relative text-center group">
+  <a
+    href={url}
+    title={customer}
+    aria-label={customer}
+    class="absolute inset-0 z-10"></a>
+
+  <figure class="max-w-xl mx-auto text-balance">
+    <blockquote>
+      <Text
+        tag="p"
+        variant="displayMD"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        "{testimonial}"
+      </Text>
+    </blockquote>
+    <Text
+      tag="p"
+      variant="textBase"
+      class="flex items-center justify-center mt-8 text-base-500 gap-2"
+      >Read {customer}'s case study <ChevronRight
+        class="inline-block size-4"
+      /></Text
+    >
+  </figure>
+</article>

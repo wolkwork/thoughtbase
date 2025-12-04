@@ -1,0 +1,268 @@
+# .pages.yml — Pages CMS config for: team, customers, changelog, infopages,
+
+media:
+  name: images
+  label: Images
+  input: src/images
+  output: src/images
+  path: ""            # start at src/images
+  extensions: [png, jpg, jpeg, webp, svg]
+
+settings:
+  content:
+    merge: true
+
+content:
+  # ---------------------
+  # CUSTOMERS
+  # ---------------------
+  - name: customers
+    label: Customers
+    type: collection
+    path: src/content/customers
+    filename: "{primary}.md"
+    view:
+      primary: customer
+      fields: [customer, partnership]
+      sort: [customer]
+    fields:
+      - { name: customer,    label: Customer, type: string, required: true }
+      - { name: bgColor,     label: BG Color, type: string }
+      - { name: ctaTitle,    label: CTA Title, type: string }
+      - { name: testimonial, label: Testimonial, type: text }
+      - { name: partnership, label: Partnership, type: string }
+
+      - name: avatar
+        label: Avatar
+        type: object
+        fields:
+          - name: url
+            label: Image
+            type: image
+            options: { media: images, path: customers }
+          - { name: alt, label: Alt text, type: string }
+
+      - name: challengesAndSolutions
+        label: Challenges & Solutions
+        type: object
+        list: true
+        fields:
+          - { name: title,   label: Title,   type: string }
+          - { name: content, label: Content, type: text }
+
+      - name: results
+        label: Results
+        type: string
+        list: true
+
+      - { name: about, label: About, type: text }
+
+      # details: record<string,string> → model as key/value list
+      - name: details
+        label: Details (key/value)
+        type: object
+        list: true
+        fields:
+          - { name: key,   label: Key,   type: string }
+          - { name: value, label: Value, type: string }
+
+      - name: logo
+        label: Logo
+        type: object
+        fields:
+          - name: url
+            label: Image
+            type: image
+            options: { media: images, path: brands }
+          - { name: alt, label: Alt text, type: string }
+
+      - { name: body, label: Body, type: rich-text }
+
+  # ---------------------
+  # INTEGRATIONS
+  # ---------------------
+  - name: integrations
+    label: Integrations
+    type: collection
+    path: src/content/integrations
+    filename: "{primary}.md"
+    view:
+      primary: integration
+      fields: [integration, email]
+      sort: [integration]
+    fields:
+      - { name: email,       label: Contact Email, type: string }
+      - { name: integration, label: Integration, type: string, required: true }
+      - { name: description, label: Description, type: text }
+
+      - name: permissions
+        label: Permissions
+        type: string
+        list: true
+
+      - name: details
+        label: Details
+        type: object
+        list: true
+        fields:
+          - { name: title, label: Title, type: string }
+          - { name: value, label: Value, type: string }
+          - { name: url,   label: URL,   type: string }
+
+      - name: logo
+        label: Logo
+        type: object
+        fields:
+          - name: url
+            label: Image
+            type: image
+            options: { media: images, path: integrations }
+          - { name: alt, label: Alt text, type: string }
+
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+
+      - { name: body, label: Body, type: rich-text }
+
+  # ---------------------
+  # HELP CENTER
+  # ---------------------
+  - name: helpcenter
+    label: Help Center
+    type: collection
+    path: src/content/helpcenter
+    filename: "{primary}.md"
+    view:
+      primary: page
+      fields: [page, category]
+      sort: [page]
+    fields:
+      - { name: iconId,     label: Icon ID, type: string }
+      - { name: page,       label: Page, type: string, required: true }
+      - { name: description,label: Description, type: text }
+      - { name: category,   label: Category, type: string }
+      - name: keywords
+        label: Keywords
+        type: string
+        list: true
+      - { name: lastUpdated, label: Last Updated, type: string }
+      - name: faq
+        label: FAQ
+        type: object
+        list: true
+        fields:
+          - { name: question, label: Question, type: string }
+          - { name: answer,   label: Answer,   type: text }
+      - { name: body, label: Body, type: rich-text }
+
+  # ---------------------
+  # CHANGELOG
+  # ---------------------
+  - name: changelog
+    label: Changelog
+    type: collection
+    path: src/content/changelog
+    filename: "{year}{month}{day}-{hour}{minute}{second}.md"
+    view:
+      primary: page
+      fields: [page, pubDate]
+      sort: [pubDate]
+      default: { sort: pubDate, order: desc }
+    fields:
+      - { name: page,        label: Page, type: string, required: true }
+      - { name: description, label: Description, type: text }
+      - { name: pubDate,     label: Publication Date, type: date }
+      - name: image
+        label: Image
+        type: object
+        fields:
+          - name: url
+            label: Image
+            type: image
+            options: { media: images, path: changelog }
+          - { name: alt, label: Alt text, type: string }
+      - { name: body, label: Body, type: rich-text }
+
+  # ---------------------
+  # INFO PAGES
+  # ---------------------
+  - name: infopages
+    label: Info Pages
+    type: collection
+    path: src/content/infopages
+    filename: "{primary}.md"
+    view:
+      primary: page
+      fields: [page, pubDate]
+      sort: [page]
+    fields:
+      - { name: page,    label: Page, type: string, required: true }
+      - { name: pubDate, label: Publication Date, type: date }
+      - { name: body,    label: Body, type: rich-text }
+
+  # ---------------------
+  # TEAM
+  # ---------------------
+  - name: team
+    label: Team
+    type: collection
+    path: src/content/team
+    filename: "{primary}.md"
+    view:
+      primary: name
+      fields: [name, role]
+      sort: [name]
+    fields:
+      - { name: name, label: Name, type: string, required: true }
+      - { name: role, label: Role, type: string }
+      - { name: bio,  label: Bio,  type: text }
+      - name: image
+        label: Image
+        type: object
+        fields:
+          - name: url
+            label: Image
+            type: image
+            options: { media: images, path: team }
+          - { name: alt, label: Alt text, type: string }
+      - name: socials
+        label: Socials
+        type: object
+        fields:
+          - { name: twitter,  label: Twitter,  type: string }
+          - { name: website,  label: Website,  type: string }
+          - { name: linkedin, label: LinkedIn, type: string }
+          - { name: email,    label: Email,    type: string }
+      - { name: body, label: Body, type: rich-text }
+
+  # ---------------------
+  # POSTS
+  # ---------------------
+  - name: posts
+    label: Posts
+    type: collection
+    path: src/content/posts
+    filename: "{year}{month}{day}-{hour}{minute}{second}.md"
+    view:
+      primary: title
+      fields: [title, pubDate, team]
+      sort: [pubDate]
+      default: { sort: pubDate, order: desc }
+    fields:
+      - { name: title,       label: Title, type: string, required: true }
+      - { name: pubDate,     label: Publication Date, type: date }
+      - { name: description, label: Description, type: text }
+      - { name: team,        label: Team (author), type: string }
+      - name: image
+        label: Cover Image
+        type: object
+        fields:
+          - name: url
+            label: Image
+            type: image
+            options: { media: images, path: blog }
+          - { name: alt, label: Alt text, type: string }
+      - { name: tags, label: Tags, type: string, list: true }
+      - { name: body, label: Body, type: rich-text }

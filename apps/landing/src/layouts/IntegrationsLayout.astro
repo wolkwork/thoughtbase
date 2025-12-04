@@ -1,0 +1,265 @@
+---
+// Assets
+import { Image } from "astro:assets";
+
+// Fundations
+import BaseLayout from "./BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Button from "@/components/fundations/elements/Button.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Icons
+import Check from "@/components/fundations/icons/Check.astro";
+import ChevronRight from "@/components/fundations/icons/ChevronRight.astro";
+// Content
+const { frontmatter } = Astro.props;
+// Breadcrumbs Data
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Integrations", href: "/integrations/home" },
+  { label: frontmatter.integration, href: "#" },
+];
+---
+
+<BaseLayout>
+  <!-- Modal -->
+  <div
+    id="modal"
+    style="display: none"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    class="fixed inset-0 z-50 overflow-y-auto top-50"
+  >
+    <!-- Overlay -->
+    <div id="modal-overlay" class="fixed inset-0 bg-sand-950/50"></div>
+    <!-- Panel -->
+    <Wrapper variant="standard">
+      <div
+        id="modal-content"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg p-8 bg-white rounded-xl shadow z-50"
+      >
+        <div class="h-full">
+          <div class="relative flex flex-col justify-between h-full">
+            <div>
+              <div
+                class="inline-flex p-4 rounded-lg bg-sand-100 group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit"
+              >
+                <Image
+                  width={300}
+                  height={300}
+                  src={frontmatter.logo.url}
+                  alt={frontmatter.logo.alt}
+                  class="inline-block size-8"
+                />
+              </div>
+              <Text
+                tag="h3"
+                variant="textXL"
+                id="modal-title"
+                class="mt-12 font-serif font-medium tracking-tight text-black"
+              >
+                Connect {frontmatter.integration} to BrightLight
+              </Text>
+              <Text variant="textSM" class="mt-2 text-base-600 text-balance">
+                Stop guessing what your customers want — prioritize their needs
+                and actually listen for once.
+              </Text>
+            </div>
+
+            <div class="p-4 my-4 bg-sand-100 rounded-xl">
+              <Text
+                tag="p"
+                variant="textBase"
+                class="font-medium text-left text-base-800"
+              >
+                BrightLight would like to
+              </Text>
+              <ul
+                role="list"
+                class="mt-4 text-xs text-left list-none text-base-600"
+              >
+                {
+                  frontmatter.permissions.map((permission) => (
+                    <li class="flex items-center gap-2">
+                      <Check size="sm" />
+                      {permission}
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+            <Text
+              tag="p"
+              variant="textXS"
+              class="max-w-sm text-left text-base-500"
+            >
+              *Don't worry, your secrets are safe with us (seriously). Read our <a
+                class="text-base-500 hover:text-base-800"
+                href="/infopages/privacy">Privacy Policy</a
+              >. By clicking "Allow access," you're officially trusting us not
+              to be shady.
+            </Text>
+
+            <div class="flex flex-wrap mt-12 ml-auto gap-2">
+              <Button size="sm" variant="muted" type="button" id="close-modal">
+                Cancel
+              </Button>
+              <Button size="sm" variant="accent" type="submit">
+                Allow access
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Wrapper>
+  </div>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl mx-auto text-balance">
+        <nav
+          aria-label="Breadcrumb"
+          class="bg-sand-100 p-1.5 rounded-full px-6 w-fit"
+        >
+          <ol class="flex items-center text-xs gap-2 text-base-500">
+            {
+              breadcrumbs.map((item, index) => (
+                <>
+                  <li>
+                    {index < breadcrumbs.length - 1 ? (
+                      <a
+                        href={item.href}
+                        class="text-xs font-medium hover:text-accent-500 text-base-800"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <span class="text-xs font-medium text-accent-500">
+                        {item.label}
+                      </span>
+                    )}
+                  </li>
+                  {index < breadcrumbs.length - 1 && (
+                    <li class="text-base-400">
+                      <ChevronRight size="sm" />
+                    </li>
+                  )}
+                </>
+              ))
+            }
+          </ol>
+        </nav>
+
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="mt-12 font-serif font-medium tracking-tight text-black"
+        >
+          {frontmatter.integration}
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          {frontmatter.description}
+        </Text>
+        <dl class="flex flex-col mt-8 divide-y divide-base-200">
+          {
+            frontmatter.details.map((detail) => (
+              <div class="flex items-center justify-between py-2 gap-2">
+                <dt>
+                  <Text
+                    tag="h4"
+                    variant="textSM"
+                    class="font-medium text-base-800"
+                  >
+                    {detail.title}
+                  </Text>
+                </dt>
+                <dd>
+                  <Text
+                    tag="p"
+                    variant="textSM"
+                    class="capitalize text-base-500 lg:text-balance"
+                  >
+                    {detail.url ? (
+                      <a
+                        class="text-base-800 hover:text-base-500 duration-300 "
+                        href={detail.url}
+                      >
+                        {detail.value}
+                      </a>
+                    ) : (
+                      detail.value
+                    )}
+                  </Text>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <Button size="sm" variant="accent" id="open-modal" class="mt-8 w-fit">
+          Connect {frontmatter.integration}
+        </Button>
+      </div>
+    </Wrapper>
+    <section>
+      <Wrapper variant="standard" class="py-4 border-t">
+        <Wrapper variant="prose" class="max-w-xl mx-auto mt-12"
+          ><slot /></Wrapper
+        >
+      </Wrapper>
+    </section>
+    <script type="module">
+      //
+      // Modal Component Script
+      //
+      // This script handles the functionality of a modal dialog with the following features:
+      // Opens/closes modal with animation
+      // Prevents background scrolling when modal is open
+      // Closes on outside click, escape key, or close button
+      // Handles scrollbar width to prevent layout shift
+      document.addEventListener("DOMContentLoaded", () => {
+        // Store all modal-related DOM elements in a single object for better organization
+        const modal = {
+          element: document.getElementById("modal"), // Main modal container
+          openButton: document.getElementById("open-modal"), // Button to open modal
+          closeButton: document.getElementById("close-modal"), // Button to close modal
+          content: document.getElementById("modal-content"), // Modal content container
+        };
+        // Toggles the modal visibility and handles body scroll
+        // @param {boolean} show - True to show modal, false to hide
+        const toggleModal = (show) => {
+          // Calculate scrollbar width to prevent layout shift when body scroll is disabled
+          const scrollbarWidth =
+            window.innerWidth - document.documentElement.clientWidth;
+          // Toggle body scroll and compensate for scrollbar removal
+          document.body.style.overflow = show ? "hidden" : "";
+          document.body.style.paddingRight = show ? `${scrollbarWidth}px` : "";
+          // Show/hide modal
+          modal.element.style.display = show ? "block" : "none";
+        };
+        // Event Listeners
+        // Opens modal when trigger button is clicked
+        modal.openButton.addEventListener("click", () => toggleModal(true));
+        // Closes modal when close button is clicked
+        modal.closeButton.addEventListener("click", () => toggleModal(false));
+        // Handles clicks on the modal backdrop
+        // Closes modal when clicking outside the modal content area
+        modal.element.addEventListener("click", (event) => {
+          // Check if click occurred outside modal content
+          // contains() checks if the clicked element is inside the modal content
+          if (!modal.content.contains(event.target)) {
+            toggleModal(false);
+          }
+        });
+        // Global keyboard event handler
+        // Closes modal when Escape key is pressed and modal is visible
+        document.addEventListener("keydown", (event) => {
+          if (
+            event.key === "Escape" &&
+            modal.element.style.display === "block"
+          ) {
+            toggleModal(false);
+          }
+        });
+      });
+    </script>
+  </section>
+</BaseLayout>

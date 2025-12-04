@@ -1,0 +1,66 @@
+---
+// Assets
+import { Image } from "astro:assets";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+// Icons
+import ChevronRight from "@/components/fundations/icons/ChevronRight.astro";
+// Content
+const { customer, avatar, url, ctaTitle, testimonial, bgColor } = {
+  url: "/customers/" + Astro.props.post.slug,
+  avatar: Astro.props.post.data.avatar.url,
+  customer: Astro.props.post.data.customer,
+  ctaTitle: Astro.props.post.data.ctaTitle,
+  testimonial: Astro.props.post.data.testimonial,
+  // Pass different  background color to the cards
+  bgColor: Astro.props.post.data.bgColor || "bg-base-50",
+};
+---
+
+<div class="relative p-8 overflow-hidden bg-sand-100 rounded-xl group">
+  <a
+    href={url}
+    title={customer}
+    aria-label={customer}
+    class="absolute inset-0 z-10"></a>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center">
+    <div class="max-w-md mx-auto text-center text-balance">
+      <Text
+        class="span"
+        variant="textXS"
+        class="font-medium text-base-600 gap-2"
+      >
+        {customer}
+      </Text>
+      <Text
+        tag="p"
+        variant="textXL"
+        class="mt-8 font-serif font-medium tracking-tight text-base-900 text-balance"
+      >
+        "{testimonial}"
+      </Text>
+      <Text tag="p" variant="textBase" class="mt-4 text-base text-base-500">
+        {ctaTitle}
+      </Text>
+      <Text
+        tag="p"
+        variant="textSM"
+        class="flex items-center justify-center mt-12 font-medium gap-2 text-base-800"
+      >
+        Read {customer}'s' case study
+        <ChevronRight
+          size="sm"
+          class="duration-300 easy-out-in group-hover:translate-x-2"
+        />
+      </Text>
+    </div>
+
+    <Image
+      class="object-cover size-full rounded-xl aspect-square"
+      src={avatar}
+      alt={customer}
+      width={600}
+      height={600}
+    />
+  </div>
+</div>

@@ -1,0 +1,80 @@
+---
+// Assets
+import { Image } from "astro:assets";
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Content
+import { getCollection } from "astro:content";
+const pageTitle = "Tag Index";
+// Get all posts
+const allPosts = await getCollection("posts");
+// Extract tags from all posts and count occurrences
+const tagCounts = allPosts.reduce((acc, post) => {
+  post.data.tags.forEach((tag) => {
+    acc[tag] = (acc[tag] || 0) + 1; // Count each tag per post
+  });
+  return acc;
+}, {});
+// Extract unique tags for display
+const tags = Object.keys(tagCounts);
+// Function to get the image for a specific tag
+function getTagImage(tag) {
+  const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
+  if (filteredPosts.length > 0) {
+    return filteredPosts[0].data.image.url; // Return the image of the first post with that tag
+  }
+}
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl text-balance">
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Explore all our tags
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          Every post, neatly labeled so you don’t have to guess what’s behind
+          the click. It’s like email, but organized.
+        </Text>
+      </div>
+      <div
+        class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 gap-y-24"
+      >
+        {
+          tags.map((tag) => (
+            <div class="relative flex flex-col group">
+              <a href={`/blog/tags/${tag}`} class="absolute inset-0 z-10" />
+              {/* Display the image next to the tag */}
+              <Image
+                width={800}
+                height={800}
+                src={getTagImage(tag)}
+                alt={`${tag} icon`}
+                class="object-cover w-full aspect-12/8 rounded-xl"
+              />
+              <div class="mt-2">
+                <Text
+                  tag="h3"
+                  variant="textBase"
+                  class="flex items-start justify-between mt-1 font-medium capitalize gap-4 text-base-900 group-hover:underline font-display"
+                >
+                  {tag}
+                  <Text tag="span" variant="textXS" class="text-base-500">
+                    ({tagCounts[tag]})
+                  </Text>
+                </Text>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

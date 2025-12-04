@@ -1,0 +1,44 @@
+---
+// Assets
+import { Image } from "astro:assets";
+import Dashboard from "@/images/assets/dashboard.jpg";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Link from "@/components/fundations/elements/Link.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+---
+
+<section>
+  <Wrapper variant="standard" class="pt-32 pb-4 overflow-hidden">
+    <div class="grid gap-12 grid-cols-1 lg:grid-cols-3">
+      <div class="flex flex-col justify-between h-full">
+        <div class="text-center text-balance">
+          <Text
+            tag="h1"
+            variant="displayMD"
+            class="font-serif font-medium tracking-tight text-black"
+          >
+            Email that actually lands — not lost in some spam void
+          </Text>
+          <Text tag="p" variant="textBase" class="max-w-xl mt-4 text-base-500">
+            No more guessing games. Your emails get delivered, show up where
+            they should, and scale like a champ.
+          </Text>
+        </div>
+
+        <div
+          class="flex flex-wrap items-center justify-center w-full mt-10 just gap-2"
+        >
+          <Link size="sm" variant="accent" href="#_">Get started</Link>
+          <Link size="sm" variant="muted" href="#_">Start free trial</Link
+          >
+        </div>
+      </div>
+      <Image
+        src={Dashboard}
+        alt="Dashboard"
+        class="w-full h-auto rounded-xl lg:col-span-2 lg:-mb-12"
+      />
+    </div>
+  </Wrapper>
+</section>

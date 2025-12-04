@@ -1,0 +1,319 @@
+---
+// Assets
+import { Image } from "astro:assets";
+import Team from "@/images/assets/team.jpeg";
+import Logo from "@/components/assets/Logo.astro";
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Link from "@/components/fundations/elements/Link.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Components
+import BlogEntry from "@/components/blog/BlogEntry.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("posts");
+const values = [
+  {
+    title: "Default to action",
+    body: "Regardless of your role, we’re all makers. And makers don’t wait around for instructions. If something's broken, we fix it. If something’s unclear, we clarify. No committee meetings, just initiative. Pull requests over PowerPoints — every time.",
+  },
+  {
+    title: "No ego",
+    body: "You don’t need to be the smartest person in the Zoom call — just helpful. At Brightlight, asking for help is encouraged, not frowned upon. We're all here to build, not battle.",
+  },
+  {
+    title: "Keep shipping",
+    body: "We don’t worship pixel-perfection. We worship momentum. Ship fast, learn faster, and improve continuously. The best v1 is the one that’s out the door.",
+  },
+  {
+    title: "Do work that inspires",
+    body: "We don’t aim for “fine.” We aim for “damn, that’s cool.” Whether it’s code, design, or copy — details matter. Quality isn’t a bonus; it’s the baseline.",
+  },
+];
+const investors = [
+  {
+    name: "Aria Thorn",
+    title: "Partner at Forge Capital",
+  },
+  {
+    name: "Nico Harlow",
+    title: "Founder of Cloudhaus",
+  },
+  {
+    name: "Sasha Vey",
+    title: "Angel Investor, ex-CTO of Canvasly",
+  },
+  {
+    name: "Lena Corwin",
+    title: "Partner at Atlas Ventures",
+  },
+  {
+    name: "Felix Monroe",
+    title: "AI Strategy Lead at Megacorp",
+  },
+  {
+    name: "Juno Blake",
+    title: "Director at Eastbridge Group",
+  },
+  {
+    name: "Max Keller",
+    title: "Co-Founder of Tracklytics",
+  },
+  {
+    name: "Reese Calder",
+    title: "Engineering at Byteforge",
+  },
+  {
+    name: "Quinn Adler",
+    title: "Founder of Launchstack",
+  },
+  {
+    name: "Mira Fallon",
+    title: "GP at Ember Partners",
+  },
+  {
+    name: "Isaac Redd",
+    title: "Co-Founder of Logflare",
+  },
+  {
+    name: "Clio Zhang",
+    title: "CTO at Streamyard",
+  },
+  {
+    name: "Jasper Lane",
+    title: "Product at Strukture",
+  },
+  {
+    name: "Noa Merrick",
+    title: "Co-Founder of Pixelwave",
+  },
+  {
+    name: "Talon Reese",
+    title: "Founder of Dashloop",
+  },
+  {
+    name: "Ezra Quinn",
+    title: "Developer Advocate at Codex",
+  },
+  {
+    name: "Imani Solis",
+    title: "Head of Growth at Nova",
+  },
+  {
+    name: "Kai Drummond",
+    title: "Co-Founder of Blazebase",
+  },
+  {
+    name: "Rowan Pierce",
+    title: "Partner at Blackoak Capital",
+  },
+  {
+    name: "Siena Wolfe",
+    title: "UX at Portal Labs",
+  },
+  {
+    name: "Ari Wynn",
+    title: "Founder of DevAlchemy",
+  },
+  {
+    name: "Cal Hart",
+    title: "VP of Eng at Loopform",
+  },
+  {
+    name: "Nia Tao",
+    title: "AI Advisor at Omnisight",
+  },
+  {
+    name: "Theo Crane",
+    title: "Founder of TermShift",
+  },
+  {
+    name: "Elio March",
+    title: "Co-Founder of Cosmoset",
+  },
+  {
+    name: "Zane Bell",
+    title: "Growth Partner at Vertex One",
+  },
+  {
+    name: "Mila Den",
+    title: "Infra Lead at Cloudspace",
+  },
+  {
+    name: "Dax Holloway",
+    title: "Co-Founder of Linearbolt",
+  },
+  {
+    name: "Jade Lin",
+    title: "Co-Founder of FormSpark",
+  },
+];
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-12">
+      <div class="max-w-xl mx-auto text-balance">
+        <div class="p-4 bg-sand-100 w-fit rounded-xl">
+          <Logo class="h-8 text-base-900" />
+        </div>
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="mt-12 font-serif font-medium tracking-tight text-black"
+        >
+          Reinventing email for this century
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          The web's evolved — we've got AI art, self-driving cars… and email
+          that still thinks it's 2005. We're over it. No more table hell. No
+          more mystery bounces. Just modern email, built like it belongs in
+          2025.
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-8 text-base-500">
+          Brightlight started as a side project in 2022 after one too many
+          rage-quits over broken email templates. We were tired of wrangling
+          tables, inline styles, and mystery bugs that only appeared in Outlook
+          2010.
+          <br />
+          <br />
+          But that was just the beginning.
+          <br />
+          <br />
+          The deeper we dug, the more we realized: the real nightmare wasn’t the
+          design — it was deliverability. Emails disappearing into spam folders like
+          they were never born? Not on our watch.
+          <br />
+          <br />
+          So in 2023, we launched Brightlight — a fully modern email delivery platform.
+          No duct tape. No black magic. Just clean APIs, fast delivery, and emails
+          that actually show up.
+          <br />
+          <br />
+          We're building Brightlight to make email feel less like a relic, and more
+          like the powerful tool it was always meant to be. Join us — it's about
+          to get good.
+        </Text>
+      </div>
+    </Wrapper>
+    <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+      <div class="max-w-xl mx-auto text-center text-balance">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Meet the humans behind the madness
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          We’re a remote crew hell-bent on fixing email for developers — because
+          someone had to do it, and no one else was volunteering.
+        </Text>
+      </div>
+      <Image
+        src={Team}
+        alt="Team"
+        loading="eager"
+        decoding="async"
+        class="object-cover object-center w-full mt-8 max-h-150 rounded-xl"
+      />
+    </Wrapper>
+    <Wrapper variant="standard" class="py-12 border-t border-dashed">
+      <div class="max-w-xl mx-auto text-balance">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          What Drives Us (Besides Caffeine)
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          These are the non-negotiables—the opinions we’ll die on a hill for.
+          They shape how we work, what we build, and when we say “nope.”
+        </Text>
+        <div class="mt-12 grid grid-cols-2 md:Grid-cols-2 gap-8" role="list">
+          {
+            values.map(({ title, body }) => {
+              const id = title.replace(/\s+/g, "-").toLowerCase();
+
+              return (
+                <article
+                  role="listitem"
+                  class="flex flex-col"
+                  aria-labelledby={`${id}-title`}
+                >
+                  <header>
+                    <Text
+                      tag="h3"
+                      variant="textBase"
+                      id={`${id}-title`}
+                      class="font-medium text-base-900"
+                    >
+                      {title}
+                    </Text>
+                    <p class="mt-2 text-sm text-base-500">{body}</p>
+                  </header>
+                </article>
+              );
+            })
+          }
+        </div>
+      </div>
+    </Wrapper>
+    <Wrapper variant="standard" class="py-12 border-t border-dashed">
+      <div class="max-w-xl mx-auto text-balance">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Bankrolled by the Brains Behind Your Favorite Apps
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          We're lucky (and smart) enough to have investors whose fingerprints
+          are all over the internet. Odds are, you're already using something
+          they helped fund — you're welcome.
+        </Text>
+        <ul role="list" class="flex flex-col mt-8 divide-y divide-base-200">
+          {
+            investors.map(({ name, title }) => (
+              <li class="flex items-center justify-between py-2">
+                <Text
+                  tag="h3"
+                  variant="textSM"
+                  class="text-base font-medium text-base-900"
+                >
+                  {name}
+                </Text>
+                <Text tag="p" variant="textSM" class="mt-1  text-base-500">
+                  {title}
+                </Text>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </Wrapper>
+  </section>
+  <section class="border-t border-base-200 border-dashed">
+    <Wrapper variant="standard" class="py-12">
+      <div class="flex flex-col items-center justify-between md:flex-row">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          We have a boring magazine
+        </Text>
+        <Link href="/blog/home" size="sm" variant="muted" class="md:ml-auto">
+          Read all articles
+          <Link />
+        </Link>
+      </div>
+      <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        {allPosts.slice(0, 3).map((post) => <BlogEntry post={post} />)}
+      </div>
+    </Wrapper>
+  </section></BaseLayout
+>

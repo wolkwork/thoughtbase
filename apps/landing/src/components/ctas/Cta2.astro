@@ -1,0 +1,35 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+import Link from "@/components/fundations/elements/Link.astro";
+---
+
+<section class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="py-4 bg-sand-100">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-end lg:pt-48">
+      <div class="lg:col-span-2">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium text-base-900 lg:text-balance"
+        >
+          Email, But Actually Good
+        </Text>
+        <Text
+          tag="p"
+          variant="textBase"
+          class="mt-2 text-base-500 lg:text-balance"
+        >
+          No setup rituals. No DNS sorcery. Just emails that send, land, and
+          look damn good doing it. — Available now. Because why wait?
+        </Text>
+      </div>
+      <div class="flex lg:ml-auto">
+        <Link gap="sm" size="sm" variant="default" href="#pricing-section">
+          Get started
+        </Link>
+      </div>
+    </div>
+  </Wrapper>
+</section>

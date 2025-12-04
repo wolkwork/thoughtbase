@@ -1,0 +1,154 @@
+---
+import { getCollection } from "astro:content";
+// Icons
+import X from "@/components/fundations/icons/X.astro";
+import Search from "@/components/fundations/icons/Search.astro";
+const posts = await Promise.all(
+  (await getCollection("posts")).map(async (post) => ({
+    title: post.data.title,
+    pubDate: post.data.pubDate,
+    description: post.data.description,
+    slug: post.slug,
+  }))
+);
+---
+
+<div class="relative">
+  <button
+    type="button"
+    id="searchButton"
+    aria-label="Search posts"
+    class="flex items-center justify-center p-2 rounded-full bg-sand-100 hover:bg-accent-500 hover:text-white duration-300"
+  >
+    <Search size="base" />
+  </button>
+  <div
+    id="searchModal"
+    class="fixed inset-0 z-50 hidden overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="min-h-screen px-4 text-center">
+      <div
+        class="fixed inset-0 bg-base-950/50 backdrop-blur transition-opacity"
+        id="modalOverlay"
+      >
+      </div>
+      <div
+        class="relative inline-block w-full max-w-md mt-12 mb-8 text-left align-middle bg-sand-100 lg:mt-48 rounded-xl transition-all transform"
+      >
+        <div class="p-4 pb-2">
+          <div class="hidden">
+            <button
+              type="button"
+              id="closeSearch"
+              class="ml-auto cursor-pointer text-base-400 hover:text-base-500"
+              aria-label="Close search"
+            >
+              <X size="base" />
+            </button>
+          </div>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search posts..."
+            class="block w-full px-4 py-2 text-xs leading-tight align-middle bg-white border border-transparent transition duration-300 ease-in-out focus:z-10 h-9 rounded-md text-base-500 ring-1 ring-base-200 placeholder-base-400 focus:border-accent-500 focus:ring-accent-100 focus:ring-2 focus:outline-none shadow-sm"
+          />
+          <div
+            id="searchResults"
+            class="flex flex-col w-full mt-2 overflow-y-auto bg-white max-h-200 rounded-xl scrollbar-hide focus:outline-none space-y-2 focus:ring-2 focus:ring-accent-500"
+          >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script is:inline define:vars={{ posts }}>
+  window.addEventListener("load", () => {
+    // Get references to necessary DOM elements
+    const searchButton = document.getElementById("searchButton");
+    const searchModal = document.getElementById("searchModal");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const searchInput = document.getElementById("searchInput");
+    const searchResults = document.getElementById("searchResults");
+    const closeSearch = document.getElementById("closeSearch");
+    // Clear the search input field on page load to prevent old values from persisting
+    searchInput.value = "";
+    // Initialize Fuse.js for fuzzy searching
+    const fuse = new Fuse(posts, {
+      keys: ["title", "description", "content"], // Fields to search in
+      threshold: 0.3, // Determines search sensitivity (lower = stricter match)
+      includeMatches: true, // Includes matched text segments in results
+    });
+    // Function to open the search modal
+    function openSearch(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      searchModal.classList.remove("hidden"); // Show the modal
+      document.body.style.overflow = "hidden"; // Prevent scrolling in the background
+      setTimeout(() => searchInput.focus(), 100); // Delay focus to ensure input is ready
+    }
+    // Function to close the search modal
+    function closeSearchModal(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      searchModal.classList.add("hidden"); // Hide the modal
+      document.body.style.overflow = ""; // Restore scrolling functionality
+      searchInput.value = ""; // Clear search input when modal is closed
+      searchResults.innerHTML = ""; // Clear search results
+    }
+    // Function to display search results
+    function renderResults(results) {
+      // If search input is empty, clear results
+      if (!searchInput.value.trim()) {
+        searchResults.innerHTML = "";
+        return;
+      }
+      // If no results are found, display a message
+      if (results.length === 0) {
+        searchResults.innerHTML = `
+                <div class="px-4 py-3 text-sm text-base-500">
+                    No results found
+                </div>
+            `;
+        return;
+      }
+      // Generate HTML for search results and display them
+      searchResults.innerHTML = results
+        .slice(0, 5) // Limit results to top 5 matches
+        .map(
+          (result) => `
+                <a href="/blog/posts/${result.item.slug}"   class="block p-4 text-balance m-1  rounded-lg hover:bg-sand-100 focus:outline-none focus:ring-2 ring-inset focus:ring-accent-500 duration-300">   
+                  <h3 class="font-medium text-base-800 text-sm">${result.item.title}</h3>   
+                  <p class="mt-2 text-sm text-base-500 ">${result.item.description}</p> 
+                </a>
+            `
+        )
+        .join(""); // Convert array of HTML into a single string
+    }
+    // Attach event listeners for opening the search modal (both click and touch)
+    searchButton.addEventListener("click", openSearch);
+    searchButton.addEventListener("touchend", openSearch);
+    // Attach event listeners for closing the search modal (both click and touch)
+    closeSearch.addEventListener("click", closeSearchModal);
+    closeSearch.addEventListener("touchend", closeSearchModal);
+    // Close the modal when clicking outside the search box
+    modalOverlay.addEventListener("click", closeSearchModal);
+    modalOverlay.addEventListener("touchend", closeSearchModal);
+    // Perform search when input changes
+    searchInput.addEventListener("input", (e) => {
+      const value = e.target.value; // Get the input value
+      const results = value.trim() ? fuse.search(value) : []; // Perform search if input isn't empty
+      renderResults(results); // Update the displayed results
+    });
+    // Close the search modal when pressing the "Escape" key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !searchModal.classList.contains("hidden")) {
+        closeSearchModal();
+      }
+    });
+  });
+</script>

@@ -1,0 +1,14 @@
+---
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Card
+import CustomerEntry3 from "@/components/customers/CustomerEntry3.astro";
+// Content
+import { getCollection } from "astro:content";
+const allCustomers = await getCollection("customers");
+---
+
+<section class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="py-12 lg:py-24">
+    <CustomerEntry3 post={allCustomers[0]} />
+  </Wrapper>
+</section>

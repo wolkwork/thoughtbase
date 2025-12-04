@@ -1,0 +1,226 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Data array
+const pageData = [
+  {
+    categoryTitle: "Static",
+    links: [
+      {
+        sectionTitle: "Landing Pages",
+        links: [
+          {
+            title: "Home",
+            url: "/",
+          },
+          {
+            title: "Home 2",
+            url: "/index-two",
+          },
+          {
+            title: "About",
+            url: "/about",
+          },
+          { title: "404", url: "/404" },
+        ],
+      },
+      {
+        sectionTitle: "Forms ",
+        links: [
+          {
+            title: "Contact",
+            url: "/forms/contact",
+          },
+          {
+            title: "Signin",
+            url: "/forms/sign-in",
+          },
+          {
+            title: "Sign up",
+            url: "/forms/sign-up",
+          },
+        ],
+      },
+      {
+        sectionTitle: "System Pages",
+        links: [
+          { title: "Links", url: "/system/links" },
+          { title: "Buttons", url: "/system/buttons" },
+          { title: "Colors", url: "/system/colors" },
+          { title: "Typography", url: "/system/typography" },
+          {
+            title: "License",
+            url: "https://lexingtonthemes.com/legal/license",
+          },
+          {
+            title: "Docs",
+            url: "https://lexingtonthemes.com/documentation",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    categoryTitle: "Content Collection",
+    links: [
+      {
+        sectionTitle: "Blog Pages",
+        links: [
+          {
+            title: "Blog Home",
+            url: "/blog/home",
+          },
+          {
+            title: "Blog Post",
+            url: "/blog/posts/1",
+          },
+          { title: "Tag index", url: "/blog/tags" },
+          {
+            title: "Tag Category",
+            url: "/blog/tags/health",
+          },
+          { title: "RSS", url: "/rss.xml" },
+        ],
+      },
+      {
+        sectionTitle: "Help Center",
+        links: [
+          {
+            title: "Home",
+            url: "/helpcenter/home",
+          },
+          {
+            title: "Details",
+            url: "/helpcenter/1",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Utility Pages",
+        links: [
+          {
+            title: "Terms Of Use",
+            url: "/infopages/terms",
+          },
+          {
+            title: "Privacy Policy",
+            url: "/infopages/privacy",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Integrations",
+        links: [
+          {
+            title: "Home",
+            url: "/integrations/home",
+            ariaLabel: "link to integrations home",
+          },
+          {
+            title: "Details",
+            url: "/integrations/1",
+            ariaLabel: "link to integrations details",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Changelog",
+        links: [
+          {
+            title: "Home",
+            url: "/changelog/home",
+            ariaLabel: "link to changelog home",
+          },
+          {
+            title: "Details",
+            url: "/changelog/1",
+            ariaLabel: "link to changelog details",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Team",
+        links: [
+          {
+            title: "Home",
+            url: "/team/home",
+            ariaLabel: "link to team home",
+          },
+          {
+            title: "Details",
+            url: "/team/jordan-wells",
+            ariaLabel: "link to team details",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Customers",
+        links: [
+          {
+            title: "Home",
+            url: "/customers/home",
+            ariaLabel: "link to customers home",
+          },
+          {
+            title: "Details",
+            url: "/customers/1",
+            ariaLabel: "link to customers details",
+          },
+        ],
+      },
+    ],
+  },
+];
+---
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <Text
+        tag="h1"
+        variant="displayMD"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Overview
+      </Text>
+      <div class="flex flex-col mt-12 gap-12">
+        {
+          pageData.map((category) => (
+            <>
+              <div>
+                <Text
+                  tag="h2"
+                  variant="textLG"
+                  class="font-serif font-medium text-base-900"
+                >
+                  {category.categoryTitle}
+                </Text>
+                <div class="mt-4 gap-y-8 gap-x-4 grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 ">
+                  {category.links.map((section) => (
+                    <div>
+                      <Text tag="h3" variant="textBase" class="text-base-900">
+                        {section.sectionTitle}
+                      </Text>
+                      <div class="flex flex-col mt-4 text-sm gap-1 text-base-500">
+                        {section.links.map((link) => (
+                          <a
+                            class="hover:text-base-900"
+                            title={link.ariaLabel}
+                            href={link.url}
+                          >
+                            {link.title}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ))
+        }
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

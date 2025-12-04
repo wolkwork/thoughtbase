@@ -1,0 +1,141 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Icons
+import User from "@/components/fundations/icons/User.astro";
+import Shield from "@/components/fundations/icons/Shield.astro";
+import Settings from "@/components/fundations/icons/Settings.astro";
+import CreditCard from "@/components/fundations/icons/CreditCard.astro";
+import ChevronRight from "@/components/fundations/icons/ChevronRight.astro";
+import InfoCircle from "@/components/fundations/icons/InfoCircle.astro";
+const { frontmatter } = Astro.props;
+const icons = {
+  user: User,
+  settings: Settings,
+  shield: Shield,
+  creditCard: CreditCard,
+};
+const IconComponent = icons[frontmatter.iconId] || InfoCircle;
+// Breadcrumbs Data
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Help Center", href: "/helpcenter/home" },
+  { label: frontmatter.page, href: "#" }, // Current page (unstyled)
+];
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl mx-auto text-balance">
+        <nav
+          aria-label="Breadcrumb"
+          class="bg-sand-100 p-1.5 rounded-full px-6 w-fit"
+        >
+          <ol class="flex items-center text-sm gap-x-2 text-base-600">
+            {
+              breadcrumbs.map((item, index) => (
+                <>
+                  <li>
+                    {index < breadcrumbs.length - 1 ? (
+                      <a
+                        href={item.href}
+                        class="text-xs font-medium hover:text-accent-500 text-base-800"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <span class="text-xs font-medium text-accent-500">
+                        {item.label}
+                      </span>
+                    )}
+                  </li>
+                  {index < breadcrumbs.length - 1 && (
+                    <li class="text-base-400">
+                      <ChevronRight size="sm" />
+                    </li>
+                  )}
+                </>
+              ))
+            }
+          </ol>
+        </nav>
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="mt-12 font-serif font-medium tracking-tight text-black"
+        >
+          {frontmatter.page}
+        </Text>
+        <Text variant="textBase" class="mt-4 text-base-600">
+          {frontmatter.description}
+        </Text>
+      </div>
+    </Wrapper>
+  </section>
+  <section>
+    <Wrapper variant="standard" class="py-12 border-t border-dashed">
+      <Wrapper variant="prose" class="max-w-xl mx-auto">
+        <Text
+          variant="textBase"
+          class="flex items-center font-medium text-base-500 gap-2"
+        >
+          <IconComponent size="sm" class="text-accent-500" />
+          <span>
+            Last updated on
+            <time datetime="{frontmatter.lastUpdated}">
+              {
+                new Date(frontmatter.lastUpdated).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                })
+              }
+            </time>
+          </span>
+        </Text>
+        <slot />
+      </Wrapper>
+    </Wrapper>
+  </section>
+  <section class="border-t border-base-200 border-dashed">
+    <Wrapper variant="standard" class="py-12">
+      <div class="max-w-xl mx-auto">
+        <div class="text-center">
+          <Text
+            tag="h2"
+            variant="displaySM"
+            class="font-serif font-medium text-black"
+          >
+            Frequently asked questions
+          </Text>
+
+          <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+            Answers to commonly asked questions about our platform
+          </Text>
+        </div>
+        <ul class="mt-12 list-none space-y-4">
+          {
+            frontmatter.faq.map((item) => (
+              <li class="flex">
+                <div>
+                  <Text
+                    tag="h5"
+                    variant="textBase"
+                    class="font-medium text-base-800"
+                  >
+                    {item.question}
+                  </Text>
+                  <Text variant="textBase" class="mt-2 text-base-500">
+                    {item.answer}
+                  </Text>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

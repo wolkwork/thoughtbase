@@ -1,0 +1,132 @@
+---
+// Assets
+import { Image } from "astro:assets";
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Components
+import BlogEntry from "@/components/blog/BlogEntry.astro";
+// Load all posts
+import { getCollection } from "astro:content";
+// Content
+const allPosts = await getCollection("posts");
+// Get the team slug from the URL
+const teamSlug = Astro.url.pathname.split("/").filter(Boolean).pop();
+// Filter posts by this team (based on slug)
+const relatedPosts = allPosts.filter((post) => post.data.team === teamSlug);
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-md mx-auto text-center text-balance">
+        <Text
+          tag="h1"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-base-900"
+        >
+          {frontmatter.name}
+        </Text>
+        {
+          frontmatter.role && (
+            <Text
+              tag="p"
+              variant="textBase"
+              class="max-w-xl mx-auto mt-4 text-base-500"
+            >
+              {frontmatter.role}
+            </Text>
+          )
+        }
+        {
+          frontmatter.socials && (
+            <div class="flex items-center justify-center mt-8 gap-2">
+              {frontmatter.socials.twitter && (
+                <a
+                  href={frontmatter.socials.twitter}
+                  class="text-sm text-base-600 hover:text-base-800 duration-300"
+                  aria-label="X"
+                >
+                  Twitter
+                </a>
+              )}
+              {frontmatter.socials.linkedin && (
+                <a
+                  href={frontmatter.socials.linkedin}
+                  class="text-sm text-base-600 hover:text-base-800 duration-300"
+                  aria-label="LinkedIn"
+                >
+                  Linkedin
+                </a>
+              )}
+              {frontmatter.socials.email && (
+                <a
+                  href={frontmatter.socials.email}
+                  class="text-sm text-base-600 hover:text-base-800 duration-300"
+                  aria-label="Email"
+                >
+                  Email
+                </a>
+              )}
+              {frontmatter.socials.website && (
+                <a
+                  href={frontmatter.socials.website}
+                  class="text-sm text-base-600 hover:text-base-800 duration-300"
+                  aria-label="Website"
+                >
+                  Website
+                </a>
+              )}
+            </div>
+          )
+        }
+      </div>
+      <Image
+        width={1000}
+        height={800}
+        alt={frontmatter.image.alt}
+        src={frontmatter.image.url}
+        class="object-cover object-center mt-8 size-full max-h-120 lg:col-span-2 rounded-xl"
+      />
+      {
+        frontmatter.bio && (
+          <div class="flex flex-col max-w-md mx-auto mt-8 gap-2">
+            {frontmatter.bio.split("\n").map((paragraph) => (
+              <Text tag="p" variant="textSM" class="text-base-500">
+                {paragraph}
+              </Text>
+            ))}
+          </div>
+        )
+      }
+    </Wrapper>
+  </section>
+  <section class="border-t border-base-200 border-dashed">
+    <Wrapper variant="standard" class="py-12">
+      <div class="">
+        {
+          relatedPosts.length > 0 && (
+            <div>
+              <Text
+                tag="h2"
+                variant="displaySM"
+                class="font-serif font-medium tracking-tight text-base-900"
+              >
+                More posts from{" "}
+                <span class="capitalize">{teamSlug.replace(/-/g, " ")}</span>
+              </Text>
+
+              <div class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {relatedPosts.map((post) => (
+                  <BlogEntry post={post} />
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

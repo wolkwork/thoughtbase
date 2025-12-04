@@ -1,0 +1,74 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/components/fundations/elements/Button.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <Text
+        tag="h1"
+        variant="displayMD"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Buttons
+      </Text>
+      <div class="mt-12 grid grid-cols-2 lg:grid-cols-3 gap-12">
+        <div class="py-4">
+          <Text
+            tag="p"
+            variant="textXS"
+            class="font-semibold uppercase text-base-900   "
+          >
+            Default
+          </Text>
+          <div class="flex flex-col mt-4 gap-2">
+            <Button size="xs" variant="default">Default XS</Button>
+            <Button size="sm" variant="default">Default SM</Button>
+            <Button size="base" variant="default">Default Base</Button>
+            <Button size="md" variant="default">Default MD</Button>
+            <Button size="lg" variant="default">Default LG</Button>
+            <Button size="xl" variant="default">Default XL</Button>
+          </div>
+        </div>
+        <div class="py-4">
+          <Text
+            tag="p"
+            variant="textXS"
+            class="font-semibold uppercase text-base-900   "
+          >
+            Accent
+          </Text>
+          <div class="flex flex-col mt-4 gap-2">
+            <Button size="xs" variant="accent">Accent XS</Button>
+            <Button size="sm" variant="accent">Accent SM</Button>
+            <Button size="base" variant="accent">Accent Base</Button>
+            <Button size="md" variant="accent">Accent MD</Button>
+            <Button size="lg" variant="accent">Accent LG</Button>
+            <Button size="xl" variant="accent">Accent XL</Button>
+          </div>
+        </div>
+        <div class="py-4">
+          <Text
+            tag="p"
+            variant="textXS"
+            class="font-semibold uppercase text-base-900   "
+          >
+            Muted
+          </Text>
+          <div class="flex flex-col mt-4 gap-2">
+            <Button size="xs" variant="muted">Muted XS</Button>
+            <Button size="sm" variant="muted">Muted SM</Button>
+            <Button size="base" variant="muted">Muted Base</Button>
+            <Button size="md" variant="muted">Muted MD</Button>
+            <Button size="lg" variant="muted">Muted LG</Button>
+            <Button size="xl" variant="muted">Muted XL</Button>
+          </div>
+        </div>
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

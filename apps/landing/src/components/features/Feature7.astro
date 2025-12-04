@@ -1,0 +1,125 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
+// Icons
+import Code from "@/components/fundations/icons/Code.astro";
+import Brain from "@/components/fundations/icons/Brain.astro";
+import Report from "@/components/fundations/icons/Report.astro";
+import Stacked from "@/components/fundations/icons/Stacked.astro";
+import Persist from "@/components/fundations/icons/Persist.astro";
+import Filters from "@/components/fundations/icons/Filters.astro";
+import Settings from "@/components/fundations/icons/Settings.astro";
+import WaveSquare from "@/components/fundations/icons/WaveSquare.astro";
+
+const features = [
+  {
+    id: "blocklist",
+    title: "Blocklist Radar (No More Surprise Bans)",
+    description:
+      "We’ll tell you if your domain lands on a DNSBL like Spamhaus — before your emails vanish into the void. Bonus: we file the removal request too.",
+    icon: Brain,
+  },
+  {
+    id: "global-delivery",
+    title: "Inbox at Warp Speed",
+    description:
+      "Send from the closest region — North America, South America, Europe. Because waiting 400ms for your email to arrive is so 2012.",
+    icon: WaveSquare,
+  },
+  {
+    id: "bimi",
+    title: "BIMI Badging (Look Legit with a Logo)",
+    description:
+      "Show off that shiny logo in inboxes with BIMI. We’ll even help you get the VMC — basically a verified badge for your domain.",
+    icon: Report,
+  },
+  {
+    id: "dedicated-ip",
+    title: "Dedicated IPs Without the Drama",
+    description:
+      "Managed IPs that warm up and scale themselves. No forms. No waiting. No babysitting. Just VIP treatment for your email.",
+    icon: Persist,
+  },
+  {
+    id: "suppression",
+    title: "Automatic Suppression (Stop Emailing Ghosts)",
+    description:
+      "We auto-suppress contacts who ghost you. Stay compliant, avoid angry unsubscribes, and stop wasting sends on black holes.",
+    icon: Filters,
+  },
+  {
+    id: "monitoring",
+    title: "DNS Monitoring (Catch Chaos Before It Escalates)",
+    description:
+      "We watch your DNS like a hawk. If anything breaks or smells fishy, you'll know before your deliverability tanks.",
+    icon: Code,
+  },
+  {
+    id: "dns-verification",
+    title: "Verify Everything (Because Trust Issues Are Real)",
+    description:
+      "DKIM, SPF — yeah, we check all that. Make sure your emails scream ‘I’m real’ and not ‘Nigerian prince’.",
+    icon: Stacked,
+  },
+  {
+    id: "infrastructure",
+    title: "Deliverability? We've Seen Some Things.",
+    description:
+      "Our infrastructure is built like a tank — with clean IPs, smart routing, and zero BS. It just delivers. Every time.",
+    icon: Settings,
+  },
+  {
+    id: "dmarc",
+    title: "Stop Spoofers with DMARC (aka Email Armor)",
+    description:
+      "Tell inboxes what to do with shady lookalikes. Your brand deserves protection — and DMARC brings the locks.",
+    icon: Settings,
+  },
+];
+---
+
+<section>
+  <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+    <div class="max-w-xl mx-auto text-center text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Land in inboxes, not the abyss
+      </Text>
+      <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+        Your email deserves better than the spam folder. Get delivered, get
+        seen, get results — no black magic required.
+      </Text>
+    </div>
+    <div
+      class="items-center mt-12 text-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12"
+    >
+      {
+        features.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div class="group">
+              <div class="inline-flex p-4 mx-auto rounded-lg bg-sand-100  duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit">
+                <Icon size="base" class=" text-accent-500" />
+              </div>
+              <Text
+                tag="h3"
+                variant="textSM"
+                class="mt-4 font-medium text-base-900"
+              >
+                {feature.title}
+              </Text>
+              <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+                {feature.description}
+              </Text>
+            </div>
+          );
+        })
+      }
+    </div>
+  </Wrapper>
+</section>

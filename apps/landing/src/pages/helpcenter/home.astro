@@ -1,0 +1,41 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Components
+import HelpCenterEntry from "@/components/helpcenter/HelpCenterEntry.astro";
+// Sections
+import Faq1 from "@/components/faqs/Faq1.astro";
+// Content
+import { getCollection } from "astro:content";
+// Content
+const allEntries = await getCollection("helpcenter");
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl mx-auto text-center text-balance">
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Help, but make it helpful
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          Stuck? Confused? Mildly annoyed? Our docs are here to save you from
+          rage-Googling or yelling at your screen.
+        </Text>
+      </div>
+
+      <div
+        class="items-center mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
+      >
+        {allEntries.map((post) => <HelpCenterEntry post={post} />)}
+      </div>
+    </Wrapper>
+  </section>
+  <Faq1 />
+</BaseLayout>

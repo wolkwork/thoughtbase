@@ -1,0 +1,157 @@
+---
+// Assets
+import { Image } from "astro:assets";
+import Avatar from "@/images/assets/signin.jpeg";
+import Logo from "@/components/assets/Logo.astro";
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Button from "@/components/fundations/elements/Button.astro";
+// Sections
+import LogoCloud3 from "@/components/testimonials/LogoCloud3.astro";
+// Icons
+import GoogleColor from "@/components/fundations/icons/GoogleColor.astro";
+---
+
+<BaseLayout hideNav={true} hideFooter={true}>
+  <div class="flex h-screen">
+    <div
+      class="flex items-center justify-center w-full p-8 bg-sand-50 lg:w-2/3"
+    >
+      <div class="w-full max-w-md py-24 lg:py-32">
+        <div class="text-center">
+          <Text
+            tag="h1"
+            variant="displayMD"
+            class="font-serif font-medium tracking-tight text-black"
+          >
+            Sign up
+          </Text>
+          <Text
+            tag="p"
+            variant="textBase"
+            class="max-w-xl mx-auto mt-4 text-base-500"
+          >
+            Create your account below. We promise not to make you confirm your
+            email three times (unless you really want to).
+          </Text>
+        </div>
+
+        <form class="mt-10 space-y-4">
+          <div class="w-full">
+            <div class="flex items-baseline justify-between mb-1">
+              <label for="email" class="text-sm font-medium text-base-500">
+                Email Address
+              </label>
+            </div>
+            <div class="relative z-0 focus-within:z-10">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                class="block w-full px-4 py-2 text-xs leading-tight align-middle bg-white border border-transparent transition duration-300 ease-in-out focus:z-10 h-9 rounded-md text-base-500 ring-1 ring-base-200 placeholder-base-400 focus:border-accent-500 focus:ring-accent-100 focus:ring-2 focus:outline-none shadow-sm"
+                inputmode="email"
+              />
+            </div>
+          </div>
+
+          <div class="w-full">
+            <div class="flex items-baseline justify-between mb-1">
+              <label for="password" class="text-sm font-medium text-base-500">
+                Password
+              </label>
+            </div>
+            <div class="relative z-0 focus-within:z-10">
+              <input
+                required
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                class="block w-full px-4 py-2 text-xs leading-tight align-middle bg-white border border-transparent transition duration-300 ease-in-out focus:z-10 h-9 rounded-md text-base-500 ring-1 ring-base-200 placeholder-base-400 focus:border-accent-500 focus:ring-accent-100 focus:ring-2 focus:outline-none shadow-sm"
+                aria-required="true"
+              />
+            </div>
+          </div>
+
+          <div class="w-full">
+            <div class="flex items-baseline justify-between mb-1">
+              <label
+                for="confirm-password"
+                class="text-sm font-medium text-base-500"
+              >
+                Confirm Password
+              </label>
+            </div>
+            <div class="relative z-0 focus-within:z-10">
+              <input
+                required
+                id="confirm-password"
+                name="confirm-password"
+                type="password"
+                placeholder="••••••••"
+                class="block w-full px-4 py-2 text-xs leading-tight align-middle bg-white border border-transparent transition duration-300 ease-in-out focus:z-10 h-9 rounded-md text-base-500 ring-1 ring-base-200 placeholder-base-400 focus:border-accent-500 focus:ring-accent-100 focus:ring-2 focus:outline-none shadow-sm"
+                aria-required="true"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <Button size="base" variant="accent" gap="sm" type="submit">
+              Create account
+            </Button>
+
+            <Button size="base" variant="muted" gap="sm" type="button">
+              <GoogleColor />
+              Sign up with Google
+            </Button>
+          </div>
+        </form>
+
+        <p class="mt-4 text-xs font-medium text-center text-base-500">
+          Already have an account?
+          <a
+            href="/forms/sign-in"
+            class="font-medium text-accent-500 hover:text-base-500"
+          >
+            Sign in
+          </a>
+        </p>
+      </div>
+    </div>
+    <div class="relative hidden overflow-hidden lg:block lg:w-1/3">
+      <Image
+        src={Avatar}
+        alt="Background"
+        aria-hidden="true"
+        width="1200"
+        height="1200"
+        loading="lazy"
+        decoding="async"
+        class="object-cover object-center w-full h-full bg-base-50"
+      />
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 pointer-events-none bg-accent-700/50"
+      >
+      </div>
+      <div
+        class="absolute inset-0 flex flex-col items-center justify-between p-8 text-center"
+      >
+        <div>
+          <a href="/">
+            <span class="sr-only">Back to home</span>
+            <Logo class="h-4 mx-auto text-white" />
+          </a>
+          <Text tag="p" variant="textXL" class="mt-4 font-medium text-white">
+            First time? <br />
+            Let’s make this official.
+          </Text>
+        </div>
+        <div class="flex items-center justify-center w-full gap-8 invert">
+          <LogoCloud3 />
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

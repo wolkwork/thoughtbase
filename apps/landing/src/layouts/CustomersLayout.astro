@@ -1,0 +1,157 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Icons
+import ChevronRight from "@/components/fundations/icons/ChevronRight.astro";
+import Check from "@/components/fundations/icons/Check.astro";
+
+const { frontmatter } = Astro.props;
+// Breadcrumbs Data
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Customers", href: "/customerss/home" },
+  { label: frontmatter.customer, href: "#" },
+];
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <div class="max-w-xl mx-auto">
+        <nav
+          aria-label="Breadcrumb"
+          class="bg-sand-100 p-1.5 rounded-full px-6 w-fit"
+        >
+          <ol class="flex items-center text-xs gap-2 text-base-500">
+            {
+              breadcrumbs.map((item, index) => (
+                <>
+                  <li>
+                    {index < breadcrumbs.length - 1 ? (
+                      <a
+                        href={item.href}
+                        class="text-xs font-medium hover:text-accent-500 text-base-800"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <span class="text-xs font-medium text-accent-500">
+                        {item.label}
+                      </span>
+                    )}
+                  </li>
+                  {index < breadcrumbs.length - 1 && (
+                    <li class="text-base-400">
+                      <ChevronRight size="sm" />
+                    </li>
+                  )}
+                </>
+              ))
+            }
+          </ol>
+        </nav>
+
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="mt-12 font-serif font-medium tracking-tight text-black"
+        >
+          {frontmatter.customer}
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          {frontmatter.about}
+        </Text>
+        <dl class="flex flex-col mt-8 divide-y divide-base-200">
+          {
+            Object.entries(frontmatter.details).map(([key, value]) => (
+              <div class="flex items-center justify-between py-2 gap-2">
+                <dt>
+                  <Text
+                    tag="h4"
+                    variant="textSM"
+                    class="font-medium text-base-800"
+                  >
+                    {key}
+                  </Text>
+                </dt>
+                <dd>
+                  <Text
+                    tag="p"
+                    variant="textSM"
+                    class="capitalize text-base-500 lg:text-balance"
+                  >
+                    {value}
+                  </Text>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="flex flex-col p-4 mt-8 gap-4 bg-sand-100 rounded-xl">
+          {
+            frontmatter.results.map((result) => (
+              <div class="flex items-center gap-2">
+                <Check size="sm" class="text-accent-500" />
+                <Text tag="p" variant="textSM" class=" text-base-600">
+                  {result}
+                </Text>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </Wrapper>
+  </section>
+  <section>
+    <Wrapper variant="standard" class="py-4 border-t">
+      <figure
+        class="p-8 py-24 text-center text-balance rounded-xl bg-accent-500"
+      >
+        <blockquote>
+          <Text
+            tag="p"
+            variant="displayMD"
+            class="max-w-2xl mx-auto font-serif font-medium tracking-tight text-white"
+          >
+            "{frontmatter.testimonial}"
+          </Text>
+        </blockquote>
+      </figure>
+    </Wrapper>
+  </section>
+  <section>
+    <Wrapper variant="standard" class="py-4 border-t">
+      <div class="max-w-xl mx-auto">
+        <dl class="items-center grid grid-cols-1 md:grid-cols-2 gap-2">
+          {
+            frontmatter.challengesAndSolutions.map((item) => (
+              <div class="relative flex flex-col h-full p-4  bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100">
+                <dt>
+                  <Text
+                    tag="h3"
+                    variant="textBase"
+                    class="font-medium font-base-900"
+                  >
+                    {item.title}
+                  </Text>
+                </dt>
+                <dd>
+                  <Text
+                    tag="p"
+                    variant="textSM"
+                    class="mt-2 capitalize text-base-500 "
+                  >
+                    {item.content}
+                  </Text>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <Wrapper variant="prose" class="mt-12"><slot /></Wrapper>
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

@@ -1,0 +1,119 @@
+---
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
+// Icons
+import Code from "@/components/fundations/icons/Code.astro";
+import Brain from "@/components/fundations/icons/Brain.astro";
+import Report from "@/components/fundations/icons/Report.astro";
+import Stacked from "@/components/fundations/icons/Stacked.astro";
+import Persist from "@/components/fundations/icons/Persist.astro";
+import Filters from "@/components/fundations/icons/Filters.astro";
+import Settings from "@/components/fundations/icons/Settings.astro";
+import WaveSquare from "@/components/fundations/icons/WaveSquare.astro";
+
+const features = [
+  {
+    id: "test-mode",
+    title: "Test Mode (aka Safe Chaos)",
+    description:
+      "Blow things up without consequences. Simulate everything, send nothing. Perfect for testing, debugging, and not losing your job.",
+    icon: Brain,
+  },
+  {
+    id: "webhooks",
+    title: "Webhooks That Actually Work",
+    description:
+      "We ping your server the second something happens — delivery, open, click, bounce, interpretive dance. You’ll know.",
+    icon: WaveSquare,
+  },
+  {
+    id: "logs",
+    title: "Live Logs (Bring Popcorn)",
+    description:
+      "Every request, every response, every oops — logged in real time. It's like tailing your server logs, but less painful.",
+    icon: Report,
+  },
+  {
+    id: "retries",
+    title: "Retry Logic That Babysits for You",
+    description:
+      "Flaky internet? Broken SMTP? We’ve got auto-retries so you don’t have to watch your queue like a hawk on Red Bull.",
+    icon: Persist,
+  },
+  {
+    id: "tracking",
+    title: "Open & Click Tracking (Legally Not Creepy)",
+    description:
+      "Want to know who opened what and clicked where? So do we. Welcome to legally acceptable email surveillance.",
+    icon: Filters,
+  },
+  {
+    id: "templating",
+    title: "Markup Freedom (Build It Your Way)",
+    description:
+      "Markdown, MJML, raw HTML, handwritten calligraphy? Whatever you write, we’ll render it without crying over inline styles.",
+    icon: Code,
+  },
+  {
+    id: "previews",
+    title: "Inbox Previews (For the Control Freak in You)",
+    description:
+      "Preview your masterpiece before it hits the inbox. Yes, even in Outlook. Especially in Outlook.",
+    icon: Stacked,
+  },
+  {
+    id: "domains",
+    title: "Custom Domains (Stop Using Sketchy Emails)",
+    description:
+      "Send from your own domain and stop looking like a scammer. Nobody trusts ‘noreply@fakedomain.biz’.",
+    icon: Settings,
+  },
+];
+---
+
+<section>
+  <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+    <div class="max-w-xl text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Built by developers who were sick of broken email APIs
+      </Text>
+      <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+        We got tired of wrestling with clunky tools, so we built the email
+        platform we always wanted — fast, clean, and actually works without
+        swearing at your terminal.
+      </Text>
+    </div>
+    <div
+      class="items-center mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
+    >
+      {
+        features.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div class="flex flex-col h-full p-4 bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100 ">
+              <div class="inline-flex p-4 bg-white rounded-lg group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit">
+                <Icon size="base" class=" text-accent-500" />
+              </div>
+              <Text
+                tag="h3"
+                variant="textSM"
+                class="mt-12 font-medium text-base-900"
+              >
+                {feature.title}
+              </Text>
+              <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+                {feature.description}
+              </Text>
+            </div>
+          );
+        })
+      }
+    </div>
+  </Wrapper>
+</section>

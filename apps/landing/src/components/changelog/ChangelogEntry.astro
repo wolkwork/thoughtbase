@@ -1,0 +1,65 @@
+---
+// Assets
+import { Image } from "astro:assets";
+// Fundations
+import Text from "@/components/fundations/elements/Text.astro";
+import Link from "@/components/fundations/elements/Link.astro";
+// Content
+const { page, description, pubDate, image, url } = {
+  url: "/changelog/" + Astro.props.post.slug,
+  page: Astro.props.post.data.page,
+  image: Astro.props.post.data.image.url,
+  description: Astro.props.post.data.description,
+  pubDate: new Date(Astro.props.post.data.pubDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  }),
+};
+---
+
+<div class="p-8 bg-sand-100 rounded-xl">
+  <div class="grid gap-12 grid-cols-1 lg:grid-cols-2 items-center">
+    <div class="max-w-md text-balance text-center mx-auto">
+      <div>
+        <Text tag="p" variant="textXS" class="uppercase text-base-500">
+          {pubDate}
+        </Text>
+        <Text
+          tag="h3"
+          variant="displaySM"
+          class="mt-8 font-serif font-medium tracking-tight text-base-900 text-balance"
+        >
+          {page}
+        </Text>
+        <Text
+          tag="p"
+          variant="textSM"
+          class="mt-2 text-base-500 line-clamp-2 lg:text-balance"
+        >
+          {description}
+        </Text>
+
+        <Link
+          size="sm"
+          variant="accent"
+          href={url}
+          title={`Read changelog update: ${page}`}
+          aria-label={`Read changelog update: ${page}`}
+          class="w-fit mt-8 mx-auto"
+        >
+          Read update
+        </Link>
+      </div>
+    </div>
+    <Image
+      width={1000}
+      height={800}
+      alt={page}
+      src={image}
+      loading="eager"
+      decoding="async"
+      class="object-cover object-center size-full rounded-xl"
+    />
+  </div>
+</div>

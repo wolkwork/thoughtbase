@@ -1,0 +1,92 @@
+---
+// Fundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+const colors = [
+  {
+    name: "Accent",
+    shades: [
+      { name: "Accent 50", class: "bg-accent-50" },
+      { name: "Accent 100", class: "bg-accent-100" },
+      { name: "Accent 200", class: "bg-accent-200" },
+      { name: "Accent 300", class: "bg-accent-300" },
+      { name: "Accent 400", class: "bg-accent-400" },
+      { name: "Accent 500", class: "bg-accent-500" },
+      { name: "Accent 600", class: "bg-accent-600" },
+      { name: "Accent 700", class: "bg-accent-700" },
+      { name: "Accent 800", class: "bg-accent-800" },
+      { name: "Accent 900", class: "bg-accent-900" },
+      { name: "Accent 950", class: "bg-accent-950 outline outline-accent-900" },
+    ],
+  },
+  
+  {
+    name: "Sand",
+    shades: [
+      { name: "Sand 50", class: "bg-sand-50" },
+      { name: "Sand 100", class: "bg-sand-100" },
+      { name: "Sand 200", class: "bg-sand-200" },
+      { name: "Sand 300", class: "bg-sand-300" },
+      { name: "Sand 400", class: "bg-sand-400" },
+      { name: "Sand 500", class: "bg-sand-500" },
+      { name: "Sand 600", class: "bg-sand-600" },
+      { name: "Sand 700", class: "bg-sand-700" },
+      { name: "Sand 800", class: "bg-sand-800" },
+      { name: "Sand 900", class: "bg-sand-900" },
+      { name: "Sand 950", class: "bg-sand-950 outline outline-sand-900" },
+    ],
+  },
+  {
+    name: "Base",
+    shades: [
+      { name: "Base 50", class: "bg-base-50" },
+      { name: "Base 100", class: "bg-base-100" },
+      { name: "Base 200", class: "bg-base-200" },
+      { name: "Base 300", class: "bg-base-300" },
+      { name: "Base 400", class: "bg-base-400" },
+      { name: "Base 500", class: "bg-base-500" },
+      { name: "Base 600", class: "bg-base-600" },
+      { name: "Base 700", class: "bg-base-700" },
+      { name: "Base 800", class: "bg-base-800" },
+      { name: "Base 900", class: "bg-base-900" },
+      { name: "Base 950", class: "bg-base-950 outline outline-base-900" },
+    ],
+  },
+];
+---
+
+<BaseLayout>
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-4">
+      <Text
+        tag="h1"
+        variant="displayMD"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Colors
+      </Text>
+      <div class="flex flex-col mt-12 gap-12">
+        {
+          colors.map((color) => (
+            <div class="flex flex-col gap-2">
+              <h3 class="text-xs font-semibold uppercase    text-base-900">
+                {color.name}
+              </h3>
+              <div class="mt-2 grid grid-cols-3 lg:grid-cols-11 gap-1 gap-y-8">
+                {color.shades.map((shade) => (
+                  <div class="flex flex-col gap-2">
+                    <div
+                      class={`size-full aspect-square rounded-md ${shade.class}`}
+                    />
+                    <span class="text-xs text-base-600">{shade.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

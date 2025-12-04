@@ -1,0 +1,18 @@
+---
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Card
+import CustomerEntry2 from "@/components/customers/CustomerEntry2.astro";
+// Content
+import { getCollection } from "astro:content";
+const allCustomers = await getCollection("customers");
+---
+
+<section class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="py-4">
+    {
+      allCustomers
+        .slice(2, 3)
+        .map((customer) => <CustomerEntry2 post={customer} />)
+    }
+  </Wrapper>
+</section>

@@ -1,0 +1,54 @@
+---
+// Fundations
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+// Assets
+import { Image } from "astro:assets";
+// import the logos
+import logo1 from "@/images/brands/1.svg";
+import logo2 from "@/images/brands/2.svg";
+import logo3 from "@/images/brands/3.svg";
+import logo4 from "@/images/brands/4.svg";
+import logo5 from "@/images/brands/5.svg";
+import logo6 from "@/images/brands/6.svg";
+import logo7 from "@/images/brands/7.svg";
+import logo8 from "@/images/brands/8.svg";
+import logo9 from "@/images/brands/9.svg";
+import logo10 from "@/images/brands/10.svg";
+import logo11 from "@/images/brands/11.svg";
+import logo12 from "@/images/brands/12.svg";
+
+const logos = [
+  { src: logo1, alt: "b1 Logo" },
+  { src: logo2, alt: "b2 Logo" },
+  { src: logo3, alt: "b3 Logo" },
+  { src: logo4, alt: "b4 Logo" },
+  { src: logo5, alt: "b5 Logo" },
+  { src: logo6, alt: "b6 Logo" },
+  { src: logo7, alt: "b7 Logo" },
+  { src: logo8, alt: "b8 Logo" },
+  { src: logo9, alt: "b9 Logo" },
+  { src: logo10, alt: "b10 Logo" },
+  { src: logo11, alt: "b11 Logo" },
+  { src: logo12, alt: "b12 Logo" },
+];
+---
+
+<section class="overflow-hidden">
+    <div
+      class="relative flex items-center py-8 animate-marquee gap-12 lg:gap-24 whitespace-nowrap"
+    >
+      {
+        logos.map((logo) => (
+          <Image
+            width={200}
+            height={100}
+            class="h-4"
+            src={logo.src}
+            alt={logo.alt}
+          />
+        ))
+      }
+    </div>
+  
+
+</section>
