@@ -1,0 +1,72 @@
+---
+// Components
+import Text from "@/components/fundations/elements/Text.astro";
+import Button from "@/components/fundations/elements/Button.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
+// Comparison Data
+const comparisonData = [
+  {
+    feature: "Setup",
+    thoughtbase: "30 seconds (copy/paste)",
+    enterprise: `"Let's schedule a demo"`,
+  },
+  {
+    feature: "Pricing",
+    thoughtbase: "Flat rate (Unlimited users)",
+    enterprise: "$$$ per seat",
+  },
+  {
+    feature: "Design",
+    thoughtbase: "Modern, clean",
+    enterprise: "Looks like Jira",
+  },
+  {
+    feature: "Vibe",
+    thoughtbase: "Indie / Builder",
+    enterprise: "Corporate / Sales-y",
+  },
+];
+---
+
+<section class="border-t border-base-200 border-dashed">
+  <Wrapper variant="standard" class="pt-12 pb-4">
+    <!-- Comparison Table -->
+    <div class="w-full overflow-x-auto">
+      <div class="text-center mb-8">
+           <Text
+            tag="h2"
+            variant="displaySM"
+            class="font-serif font-medium tracking-tight text-black"
+          >
+            Comparison
+          </Text>
+      </div>
+      <div
+        class="min-w-[600px] border border-base-200 rounded-xl overflow-hidden"
+      >
+        <table class="w-full text-sm">
+          <thead class="text-center border-b border-base-200 bg-sand-50">
+            <tr>
+              <th class="px-4 py-4 font-medium text-left text-base-900">Feature</th>
+              <th class="px-4 py-4 font-medium text-left text-base-900">ThoughtBase</th>
+              <th class="px-4 py-4 font-medium text-left text-base-900">The "Enterprise" Standard</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              comparisonData.map(({ feature, thoughtbase, enterprise }) => (
+                <tr class="border-b border-base-200 last:border-0">
+                  <td class="px-4 py-4 font-medium text-base-900 bg-white">{feature}</td>
+                  <td class="px-4 py-4 text-base-700 bg-white">{thoughtbase}</td>
+                  <td class="px-4 py-4 text-base-500 bg-sand-50">{enterprise}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </Wrapper>
+</section>
+

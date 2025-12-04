@@ -3,15 +3,16 @@
 import Logo from "@/components/assets/Logo.astro";
 import Link from "@/components/fundations/elements/Link.astro";
 import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
 const navigationLinks = [
-  {
-    title: "Overview",
-    href: "/system/overview",
-  },
-  {
-    title: "Blog",
-    href: "/blog/home",
-  },
+  // {
+  //   title: "Overview",
+  //   href: "/system/overview",
+  // },
+  // {
+  //   title: "Blog",
+  //   href: "/blog/home",
+  // },
 ];
 ---
 
@@ -25,9 +26,10 @@ const navigationLinks = [
       class="relative flex flex-col md:items-center md:justify-between md:flex-row"
     >
       <div class="flex flex-row items-center justify-between">
-        <a href="/">
+        <a href="/" class="flex items-center gap-2">
           <span class="sr-only">Go to homepage</span>
           <Logo class="h-6 text-base-800" />
+          <span class="text-base-800 font-semibold">ThoughtBase</span>
         </a>
         <button
           id="menu-toggle"
@@ -102,13 +104,6 @@ const navigationLinks = [
             }
           </div>
           <div class="flex flex-wrap items-center mt-auto gap-2">
-            <Link
-              size="xs"
-              variant="muted"
-              href="https://buy.polar.sh/polar_cl_OgEFW56DjrF2UgS3VlzxcKfHSgnwIVxUU6xPV_mwOdQ"
-            >
-              Buy Brightlight
-            </Link>
             <Link size="xs" variant="accent" href="/forms/sign-in">
               Sign in
             </Link>

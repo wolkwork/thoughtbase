@@ -89,8 +89,10 @@
         "@astrojs/rss": "^4.0.12",
         "@astrojs/sitemap": "^3.5.1",
         "@astrolib/seo": "^1.0.0-beta.8",
+        "@lucide/astro": "^0.555.0",
         "@tailwindcss/vite": "^4.1.13",
         "astro": "^5.13.7",
+        "lucide-react": "^0.555.0",
         "tailwind-scrollbar-hide": "^4.0.0",
         "tailwindcss": "^4.1.13",
       },
@@ -386,6 +388,8 @@
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
     "@lexington/brightlight": ["@lexington/brightlight@workspace:apps/landing"],
+
+    "@lucide/astro": ["@lucide/astro@0.555.0", "", { "peerDependencies": { "astro": "^4 || ^5" } }, "sha512-8PxaTAT01/yzsI6Y3udGhBLf3JVjB7J9+8NwurliGufJAfxlKtjSO7rk2EQx9fMj60UstCTO9AlD7QAUBNMg1A=="],
 
     "@mapbox/node-pre-gyp": ["@mapbox/node-pre-gyp@2.0.3", "", { "dependencies": { "consola": "^3.2.3", "detect-libc": "^2.0.0", "https-proxy-agent": "^7.0.5", "node-fetch": "^2.6.7", "nopt": "^8.0.0", "semver": "^7.5.3", "tar": "^7.4.0" }, "bin": { "node-pre-gyp": "bin/node-pre-gyp" } }, "sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg=="],
 

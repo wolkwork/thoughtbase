@@ -1,186 +1,219 @@
 ---
 // Fundations
 import Text from "@/components/fundations/elements/Text.astro";
-import Link from "@/components/fundations/elements/Link.astro";
 import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
 // Icons
-import List from "@/components/fundations/icons/List.astro";
+import Heart from "@/components/fundations/icons/Heart.astro";
+import Search from "@/components/fundations/icons/Search.astro";
+import Lock from "@/components/fundations/icons/Lock.astro";
 import Analytics from "@/components/fundations/icons/Analytics.astro";
+import Brain from "@/components/fundations/icons/Brain.astro";
+import Mail from "@/components/fundations/icons/Mail.astro";
+import Apps from "@/components/fundations/icons/Apps.astro";
 import UsersGroup from "@/components/fundations/icons/UsersGroup.astro";
+import Code from "@/components/fundations/icons/Code.astro";
+import User from "@/components/fundations/icons/User.astro";
+import Widget from "@/components/fundations/icons/TemplateLayout.astro";
+import Bell from "@/components/fundations/icons/News.astro";
+
+const feedbackFeatures = [
+  {
+    title: "Voting & Emojis",
+    description: "Empower users to prioritize what matters most.",
+    icon: Heart,
+  },
+  {
+    title: "Semantic Deduplication",
+    description: "`Ctrl+F` for feature requests, automatically.",
+    icon: Search,
+  },
+  {
+    title: "Private Ideas",
+    description: "For internal dogfooding or VIP customers.",
+    icon: Lock,
+  },
+  {
+    title: "Discussion & Comments",
+    description: "Dive deeper into user needs with threaded discussions.",
+    icon: UsersGroup,
+  },
+  {
+    title: "Embeddable Widget",
+    description: "Collect feedback where your users already are.",
+    icon: Code,
+  },
+  {
+    title: "Anonymous Posting",
+    description: "Remove friction by allowing feedback without an account.",
+    icon: User,
+  },
+];
+
+const roadmapFeatures = [
+  {
+    title: "Vote Visibility",
+    description: "Show stakeholders why you're building X instead of Y.",
+    icon: Analytics,
+  },
+  {
+    title: "Roadmap Widget",
+    description: "Embed your roadmap directly where your users are.",
+    icon: Widget,
+  },
+  {
+    title: "Automated Notifications",
+    description: "Alert users automatically when status changes occur.",
+    icon: Bell,
+  },
+];
+
+const changelogFeatures = [
+  {
+    title: "Auto-drafting",
+    description: "We parse your shipped features and write the update.",
+    icon: Brain,
+  },
+  {
+    title: "Notifications",
+    description: "We email everyone who voted for the thing you just shipped.",
+    icon: Mail,
+  },
+  {
+    title: "In-app Widget",
+    description: `Users see the "New" badge and actually read what changed.`,
+    icon: Apps,
+  },
+];
 ---
 
+<!-- Feedback Boards -->
 <section>
-  <Wrapper variant="standard" class="flex flex-col py-12 border-t gap-24">
-    <div class="items-start grid grid-cols-1 md:grid-cols-2 gap-12">
-      <div class="flex flex-col justify-between h-full text-balance gap-4">
-        <div class="inline-flex p-4 rounded-lg bg-sand-100 w-fit">
-          <List size="base" class="text-accent-600" />
-        </div>
-        <div>
-          <Text
-            tag="h2"
-            variant="displaySM"
-            class="font-serif font-medium tracking-tight text-black"
-          >
-            Contact Management That Doesn’t Suck
-          </Text>
-          <Text tag="p" variant="textBase" class="max-w-xl mt-4 text-base-500">
-            Import your entire list in minutes — whether it’s 50 or 50,000. See
-            every contact’s details without clicking through 12 tabs. It’s like
-            a CRM, but without the bloat (or the monthly breakdown).
-          </Text>
-          <div class="flex mt-4">
-            <Link size="sm" variant="accent" href="#_">Learn more</Link>
-          </div>
-        </div>
-      </div>
-      <div
-        aria-hidden="true"
-        class="p-8 pb-0 pr-0 overflow-hidden bg-sand-100 rounded-xl group"
+  <Wrapper variant="standard" class="pt-40 pb-4 border-t">
+    <div class="max-w-xl text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
       >
-        <div
-          class="max-w-md p-4 mx-auto -mb-1 -mr-1 bg-white rounded-tl-xl shadow-sm outline outline-sand-500/10"
-        >
-          <div class="flex items-center gap-4">
-            <div
-              class="inline-flex p-4 rounded-lg bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2"
-            >
-              <UsersGroup size="sm" />
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Audience</p>
-              <p class="text-base font-medium text-base-900">
-                Newsletter Subscribers
-              </p>
-            </div>
-          </div>
-          <div
-            class="pt-4 mt-4 border-t grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 border-base-100 gap-y-8"
-          >
-            <div>
-              <p class="text-sm text-base-500">All Contacts</p>
-              <p class="text-base font-medium text-base-900">1,034</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Unsubscribed</p>
-              <p class="text-base font-medium text-base-900">5</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Growth</p>
-              <p class="text-base font-medium text-base-900">+1,034 (+10%)</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Open Rate</p>
-              <p class="text-base font-medium text-base-900">42%</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Click Rate</p>
-              <p class="text-base font-medium text-base-900">18%</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Bounce Rate</p>
-              <p class="text-base font-medium text-base-900">1.5%</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Spam Reports</p>
-              <p class="text-base font-medium text-base-900">2</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Avg. Response Time</p>
-              <p class="text-base font-medium text-base-900">4.2s</p>
-            </div>
-            <div>
-              <p class="text-sm text-base-500">Unopened Emails</p>
-              <p class="text-base font-medium text-base-900">612</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        Beautiful feedback boards that capture ideas
+      </Text>
+      <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+        Harness the power of customer feedback to improve your product. Gather
+        ideas from your users and watch as the most popular and discussed
+        suggestions rise to the top.
+      </Text>
     </div>
-    <div class="items-center grid grid-cols-1 md:grid-cols-2 gap-12">
-      <div
-        class="flex flex-col justify-between h-full text-balance gap-4 lg:order-last"
-      >
-        <div class="inline-flex p-4 rounded-lg bg-sand-100 w-fit">
-          <Analytics size="base" class="text-accent-600" />
-        </div>
-        <div>
-          <Text
-            tag="h2"
-            variant="displaySM"
-            class="font-serif font-medium tracking-tight text-black"
-          >
-            Broadcast Analytics (Because Guesswork Is for Amateurs)
-          </Text>
-          <Text tag="p" variant="textBase" class="max-w-xl mt-4 text-base-500">
-            See who opened, clicked, ignored, or rage-deleted your email. Real
-            insights, no fluff — so you actually know what’s working (and what’s
-            not).
-          </Text>
-          <div class="flex mt-4">
-            <Link size="sm" variant="accent" href="#_">Learn more</Link>
-          </div>
-        </div>
-      </div>
-      <div
-        aria-hidden="true"
-        class="p-8 pb-0 pl-0 overflow-hidden bg-sand-100 rounded-xl group"
-      >
-        <div class="flex flex-col gap-4">
-          <div
-            class="p-6 bg-white shadow rounded-r-xl outline outline-sand-500/10"
-          >
-            <p class="text-sm text-base-500">Deliverability</p>
-            <p class="mt-2 text-4xl font-medium text-base-900">98%</p>
-            <div class="mt-6 space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#5aab69]"
-                  ></span>
-                  <span class="text-sm text-base-600">Delivered</span>
-                </div>
-                <span class="text-sm font-medium text-base-900">3,204</span>
+    <div class="items-center mt-8 grid grid-cols-1 md:grid-cols-3 gap-2">
+      {
+        feedbackFeatures.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div class="flex flex-col h-full p-4 bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100 ">
+              <div class="inline-flex p-4 bg-white rounded-lg group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit">
+                <Icon size="base" class=" text-accent-500" />
               </div>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#ff421e]"
-                  ></span>
-                  <span class="text-sm text-base-600">Bounced</span>
-                </div>
-                <span class="text-sm font-medium text-base-900">60</span>
-              </div>
+              <Text
+                tag="h3"
+                variant="textSM"
+                class="mt-12 font-medium text-base-900"
+              >
+                {feature.title}
+              </Text>
+              <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+                {feature.description}
+              </Text>
             </div>
-          </div>
-          <div
-            class="p-6 -mb-1 bg-white shadow rounded-tr-xl outline outline-sand-500/10"
-          >
-            <p class="text-sm text-base-500">Engagement</p>
-            <p class="mt-2 text-4xl font-medium text-base-900">41%</p>
-            <div class="mt-6 space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#60beff]"
-                  ></span>
-                  <span class="text-sm text-base-600">Opened</span>
-                </div>
-                <span class="text-sm font-medium text-base-900">1,350</span>
+          );
+        })
+      }
+    </div>
+  </Wrapper>
+</section>
+
+<!-- Roadmap -->
+<section>
+  <Wrapper variant="standard" class="pt-40 pb-4 border-t">
+    <div class="max-w-xl text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Build a public roadmap
+      </Text>
+      <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+        Transform customer feedback into a clear, visual roadmap so everyone
+        knows what's coming next.
+      </Text>
+    </div>
+    <div class="items-center mt-8 grid grid-cols-1 md:grid-cols-3 gap-2">
+      {
+        roadmapFeatures.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div class="flex flex-col h-full p-4 bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100 ">
+              <div class="inline-flex p-4 bg-white rounded-lg group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit">
+                <Icon size="base" class=" text-accent-500 size-5" />
               </div>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="size-3 rounded-full group-hover:-translate-x-2 duration-300 bg-[#e3962d]"
-                  ></span>
-                  <span class="text-sm text-base-600">Clicked</span>
-                </div>
-                <span class="text-sm font-medium text-base-900">472</span>
-              </div>
+              <Text
+                tag="h3"
+                variant="textSM"
+                class="mt-12 font-medium text-base-900"
+              >
+                {feature.title}
+              </Text>
+              <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+                {feature.description}
+              </Text>
             </div>
-          </div>
-        </div>
-      </div>
+          );
+        })
+      }
+    </div>
+  </Wrapper>
+</section>
+
+<!-- Changelog -->
+<section>
+  <Wrapper variant="standard" class="pt-40 pb-4 border-t">
+    <div class="max-w-xl text-balance">
+      <Text
+        tag="h2"
+        variant="displaySM"
+        class="font-serif font-medium tracking-tight text-black"
+      >
+        Announce your shipped features
+      </Text>
+      <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+        Don't let your hard work vanish into the void. Turn your shipped
+        features into beautiful, engaging updates that show you’re constantly
+        improving.
+      </Text>
+    </div>
+    <div class="items-center mt-8 grid grid-cols-1 md:grid-cols-3 gap-2">
+      {
+        changelogFeatures.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div class="flex flex-col h-full p-4 bg-sand-100 rounded-xl group hover:bg-white hover:shadow-2xl duration-300 outline-transparent hover:outline hover:outline-sand-100 ">
+              <div class="inline-flex p-4 bg-white rounded-lg group-hover:bg-sand-100 duration-300 group-hover:-rotate-12 group-hover:-translate-y-2 w-fit">
+                <Icon size="base" class=" text-accent-500" />
+              </div>
+              <Text
+                tag="h3"
+                variant="textSM"
+                class="mt-12 font-medium text-base-900"
+              >
+                {feature.title}
+              </Text>
+              <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+                {feature.description}
+              </Text>
+            </div>
+          );
+        })
+      }
     </div>
   </Wrapper>
 </section>

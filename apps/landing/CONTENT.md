@@ -11,7 +11,10 @@
 Paste this into your `layout.tsx` or `index.html`. It works with React, Vue, Svelte, and whatever framework you're rewriting your app in this week.
 
 ```html
-<script src="https://cdn.thoughtbase.app/widget.js" data-id="YOUR_APP_ID"></script>
+<script
+  src="https://cdn.thoughtbase.app/widget.js"
+  data-id="YOUR_APP_ID"
+></script>
 ```
 
 ## The Feedback OS
@@ -74,4 +77,4 @@ We're a little different from the enterprise behemoths (you know the ones).
 
 If you're building a SaaS, you need feedback. You can build your own form, manage a spreadsheet, and manually email people... or you can just use ThoughtBase.
 
-[**Get started for free**](https://thoughtbase.com/auth/signup) ->
+[**Get started for free**](https://thoughtbase.app/auth/signup) ->

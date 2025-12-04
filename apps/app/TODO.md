@@ -40,6 +40,7 @@ Future:
 - Report
 - Comment "threads"
 - Notifications
+- Deduplication
 
 Paid:
 

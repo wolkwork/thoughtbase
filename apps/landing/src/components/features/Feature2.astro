@@ -4,94 +4,51 @@ import Text from "@/components/fundations/elements/Text.astro";
 import Wrapper from "@/components/fundations/containers/Wrapper.astro";
 
 // Icons
-import Code from "@/components/fundations/icons/Code.astro";
-import Brain from "@/components/fundations/icons/Brain.astro";
-import Report from "@/components/fundations/icons/Report.astro";
-import Stacked from "@/components/fundations/icons/Stacked.astro";
-import Persist from "@/components/fundations/icons/Persist.astro";
-import Filters from "@/components/fundations/icons/Filters.astro";
-import Settings from "@/components/fundations/icons/Settings.astro";
-import WaveSquare from "@/components/fundations/icons/WaveSquare.astro";
+import Heart from "@/components/fundations/icons/Heart.astro";
+import Tools from "@/components/fundations/icons/Tools.astro";
+import ArrowUp from "@/components/fundations/icons/ArrowUp.astro";
 
 const features = [
   {
-    id: "test-mode",
-    title: "Test Mode (aka Safe Chaos)",
+    id: "bootstrapped",
+    title: "Bootstrapped & Independent",
     description:
-      "Blow things up without consequences. Simulate everything, send nothing. Perfect for testing, debugging, and not losing your job.",
-    icon: Brain,
+      "We don't have VCs breathing down our necks demanding 10x growth. We answer to you.",
+    icon: Heart,
   },
   {
-    id: "webhooks",
-    title: "Webhooks That Actually Work",
+    id: "engineers",
+    title: "Built by Engineers",
     description:
-      "We ping your server the second something happens — delivery, open, click, bounce, interpretive dance. You’ll know.",
-    icon: WaveSquare,
+      "We use ThoughtBase to build ThoughtBase. If it sucks, we fix it.",
+    icon: Tools,
   },
   {
-    id: "logs",
-    title: "Live Logs (Bring Popcorn)",
+    id: "speed",
+    title: "Speed",
     description:
-      "Every request, every response, every oops — logged in real time. It's like tailing your server logs, but less painful.",
-    icon: Report,
-  },
-  {
-    id: "retries",
-    title: "Retry Logic That Babysits for You",
-    description:
-      "Flaky internet? Broken SMTP? We’ve got auto-retries so you don’t have to watch your queue like a hawk on Red Bull.",
-    icon: Persist,
-  },
-  {
-    id: "tracking",
-    title: "Open & Click Tracking (Legally Not Creepy)",
-    description:
-      "Want to know who opened what and clicked where? So do we. Welcome to legally acceptable email surveillance.",
-    icon: Filters,
-  },
-  {
-    id: "templating",
-    title: "Markup Freedom (Build It Your Way)",
-    description:
-      "Markdown, MJML, raw HTML, handwritten calligraphy? Whatever you write, we’ll render it without crying over inline styles.",
-    icon: Code,
-  },
-  {
-    id: "previews",
-    title: "Inbox Previews (For the Control Freak in You)",
-    description:
-      "Preview your masterpiece before it hits the inbox. Yes, even in Outlook. Especially in Outlook.",
-    icon: Stacked,
-  },
-  {
-    id: "domains",
-    title: "Custom Domains (Stop Using Sketchy Emails)",
-    description:
-      "Send from your own domain and stop looking like a scammer. Nobody trusts ‘noreply@fakedomain.biz’.",
-    icon: Settings,
+      "The dashboard is fast. The widget is light. No loading spinners.",
+    icon: ArrowUp,
   },
 ];
 ---
 
 <section>
-  <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+  <Wrapper variant="standard" class="pt-40 pb-4 border-t">
     <div class="max-w-xl text-balance">
       <Text
         tag="h2"
         variant="displaySM"
         class="font-serif font-medium tracking-tight text-black"
       >
-        Built by developers who were sick of broken email APIs
+        Why ThoughtBase?
       </Text>
       <Text tag="p" variant="textBase" class="mt-4 text-base-500">
-        We got tired of wrestling with clunky tools, so we built the email
-        platform we always wanted — fast, clean, and actually works without
-        swearing at your terminal.
+        We're a little different from the enterprise behemoths (you know the
+        ones).
       </Text>
     </div>
-    <div
-      class="items-center mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
-    >
+    <div class="items-center mt-8 grid grid-cols-1 md:grid-cols-3 gap-2">
       {
         features.map((feature) => {
           const Icon = feature.icon;
