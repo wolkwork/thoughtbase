@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build:widget": "vite build --config vite.widget.config.ts",
     "build": "vite build",
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
@@ -21,6 +20,7 @@
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
+    "@feedback-tool/widget": "workspace:*",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@phosphor-icons/react": "^2.1.10",

@@ -1,7 +1,6 @@
-import { HeartIcon } from "@phosphor-icons/react";
-import { useQuery } from "@tanstack/react-query";
-import { Clock8 } from "lucide-react";
-import { getWidgetIdeas } from "~/lib/api/widget-client";
+import { Clock8, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getWidgetIdeas, type Idea } from "../../lib/api/widget-client";
 
 interface RoadmapViewProps {
   organizationId: string;
@@ -9,10 +8,13 @@ interface RoadmapViewProps {
 }
 
 export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
-  const { data: ideas } = useQuery({
-    queryKey: ["widget-ideas", organizationId],
-    queryFn: () => getWidgetIdeas(organizationId),
-  });
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  
+  useEffect(() => {
+    getWidgetIdeas(organizationId)
+      .then(setIdeas)
+      .catch((err) => console.error("Failed to load ideas", err));
+  }, [organizationId]);
 
   const inProgressIdeas = ideas?.filter((i) => i.status === "in_progress") || [];
   const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
@@ -59,7 +61,7 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
                       <div className="justify flex items-center justify-between gap-2">
                         <h4 className="text-sm leading-none font-medium">{idea.title}</h4>
                         <div className="text-muted-foreground flex items-center gap-1">
-                          <HeartIcon weight="bold" className="size-3.5" />
+                          <Heart className="size-3.5 fill-current" />
                           <span className="mt-0.5 text-xs">{idea.reactionCount}</span>
                         </div>
                       </div>
@@ -100,7 +102,7 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
                       <div className="justify flex items-center justify-between gap-2">
                         <h4 className="text-sm leading-none font-medium">{idea.title}</h4>
                         <div className="text-muted-foreground flex items-center gap-1">
-                          <HeartIcon weight="bold" className="size-3.5" />
+                          <Heart className="size-3.5 fill-current" />
                           <span className="mt-0.5 text-xs">{idea.reactionCount}</span>
                         </div>
                       </div>

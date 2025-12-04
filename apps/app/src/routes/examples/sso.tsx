@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SignJWT } from "jose";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FeedbackWidget } from "~/components/feedback-widget";
+import { FeedbackWidget } from "@feedback-tool/widget";
 import { Button } from "~/components/ui/button";
 import {
   Card,

@@ -18,7 +18,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { authClient } from "~/lib/auth/auth-client";
 import { CreateIdeaDialog } from "./create-idea-dialog";
-import { FeedbackWidget } from "./feedback-widget";
+import { FeedbackWidget } from "@feedback-tool/widget";
 import { SidebarOrganizationSwitcher } from "./sidebar-organization-switcher";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";

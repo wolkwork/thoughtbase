@@ -1,11 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MessageCircleHeart } from "lucide-react";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { FeedbackWidget } from "~/components/feedback-widget";
-import styles from "~/styles.css?inline";
+import { FeedbackWidget } from "./components/feedback-widget";
+import styles from "./styles.css?inline";
 
-const queryClient = new QueryClient();
 
 interface WidgetProps {
   organizationId: string;
@@ -43,7 +41,7 @@ function WidgetContainer({ organizationId, selector }: WidgetProps) {
   const widgetStyles = styles.replaceAll(":root", ":host").replaceAll("body", ":host");
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <style>{widgetStyles}</style>
       {!selector && !isOpen && (
         <button
@@ -60,7 +58,7 @@ function WidgetContainer({ organizationId, selector }: WidgetProps) {
         onClose={() => setIsOpen(false)}
         ssoToken={token || undefined} // Pass token to widget
       />
-    </QueryClientProvider>
+    </>
   );
 }
 

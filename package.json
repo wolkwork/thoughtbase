@@ -1,6 +1,7 @@
 {
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "packageManager": "bun@1.3.3",
   "devDependencies": {
