@@ -25,14 +25,21 @@ MVP:
 - User revenue
 - Docs
 - Terms & Privacy
-- Landing pge
+- Landing page
+- Onboarding
+- Changelog
 
 Future:
 
 - User metadata
 - Auto approve
 - Ban users
+- Email "subscribers" of issues
 - Integrations (Linear?)
+- AI Assistant
+- Report
+- Comment "threads"
+- Notifications
 
 Paid:
 

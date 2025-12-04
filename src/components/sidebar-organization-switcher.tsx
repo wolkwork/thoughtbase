@@ -50,7 +50,7 @@ export function SidebarOrganizationSwitcher() {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border-none! bg-transparent! ring-0! outline-none"
               >
                 <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   {activeOrganization?.logo ? (
@@ -65,13 +65,15 @@ export function SidebarOrganizationSwitcher() {
                     </span>
                   )}
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
+                <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">
                     {activeOrganization?.name || "Select Organization"}
                   </span>
-                  <span className="truncate text-xs">Free Plan</span>
+                  <span className="text-muted-foreground truncate text-xs">
+                    Free Plan
+                  </span>
                 </div>
-                <ChevronsUpDown className="ml-auto" />
+                <ChevronsUpDown className="ml-auto size-4!" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
