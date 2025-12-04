@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { FeedbackWidget } from "./components/feedback-widget";
 import styles from "./styles.css?inline";
-
+import { Button } from "./components/ui/button";
 
 interface WidgetProps {
   organizationId: string;
@@ -38,19 +38,21 @@ function WidgetContainer({ organizationId, selector }: WidgetProps) {
   }, [selector]);
 
   // Adapt styles for Shadow DOM
-  const widgetStyles = styles.replaceAll(":root", ":host").replaceAll("body", ":host");
+  const widgetStyles = styles
+    .replaceAll(":root", ":host")
+    .replaceAll("body", ":host");
 
   return (
     <>
       <style>{widgetStyles}</style>
       {!selector && !isOpen && (
-        <button
+        <Button
           onClick={() => setIsOpen(true)}
-          className="fixed right-4 bottom-4 z-50 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-black text-white shadow-lg transition-transform hover:scale-105 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none"
-          aria-label="Open feedback"
+          className="fixed right-4 bottom-4 z-50"
         >
           <MessageCircleHeart className="h-7 w-7" />
-        </button>
+          Submit Feedback
+        </Button>
       )}
       <FeedbackWidget
         organizationId={organizationId}
