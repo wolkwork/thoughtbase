@@ -1,14 +1,12 @@
 MVP:
 
-- Redirect on logout
 - Customization (logo, color theme)
 - White label / remove branding
-- Delete ideas
 - Boards --> Topics/tags
 - User can edit ideas
 - Update idea status from idea detail page
 - Reactions styling in details tab
-- Widget styling
+- Widget changelog styling
 - Metadata on users
 - Public facing idea creation dialog styling
 - Settings styling
@@ -17,8 +15,7 @@ MVP:
 - Script for embedding widget
 - Proper subdomain redirects
 - Org switcher styling
-- Guest post
-- Force user to select or create workspace
+- Guest post (enable disable)
 - DNS configs
 - Turn off thoughtbase branding
 - Docs

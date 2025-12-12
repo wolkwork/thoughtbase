@@ -3,11 +3,20 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { format, formatDistanceToNow } from "date-fns";
 import { lowerCase } from "lodash";
-import { ArrowLeftIcon, CalendarIcon, Check, Smile, ThumbsUp, X } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  Check,
+  Smile,
+  ThumbsUp,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
   $createComment,
+  $deleteIdea,
   $toggleReaction,
   $updateIdeaEta,
   $updateIdeaStatus,
@@ -160,6 +169,28 @@ export function IdeaDetail({
     },
   });
 
+  const { mutate: deleteIdea, isPending: isDeleting } = useMutation({
+    mutationFn: $deleteIdea,
+    onSuccess: () => {
+      toast.success("Idea deleted");
+      router.history.back();
+    },
+    onError: () => {
+      toast.error("Failed to delete idea");
+    },
+  });
+
+  const handleDelete = () => {
+    if (!organizationId) return;
+    if (
+      window.confirm(
+        "Are you sure you want to delete this idea? This action cannot be undone.",
+      )
+    ) {
+      deleteIdea({ data: { ideaId: idea.id, organizationId } });
+    }
+  };
+
   const handleUpdateStatus = (status: string) => {
     if (!organizationId) return;
     updateStatus({ data: { ideaId: idea.id, status, organizationId } });
@@ -193,10 +224,20 @@ export function IdeaDetail({
     <div className="flex h-full flex-col lg:flex-row">
       {/* Main Content */}
       <div className="h-full min-w-0 flex-1 py-6 pr-4 lg:border-r lg:border-b-0">
-        <div className="px-8 pb-6">
+        <div className="flex items-center justify-between px-8 pb-6">
           <Button variant="outline" size="icon">
             <ArrowLeftIcon className="size-4" />
           </Button>
+          {organizationId && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
         </div>
         <div className="mx-auto max-w-4xl px-8">
           <h1 className="text-foreground mb-5 text-xl font-medium">{idea.title}</h1>

@@ -502,6 +502,25 @@ export const $getBoards = createServerFn({ method: "GET" })
     });
   });
 
+export const $deleteIdea = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      ideaId: z.string(),
+      organizationId: z.string(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await getAuthContext();
+    if (!ctx.user) throw new Error("Unauthorized");
+
+    // Delete the idea (cascading will handle related records)
+    await db
+      .delete(idea)
+      .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, data.organizationId)));
+
+    return { success: true };
+  });
+
 export const $getPublicCounts = createServerFn({ method: "GET" })
   .inputValidator(z.object({ organizationId: z.string() }))
   .handler(async ({ data }) => {
