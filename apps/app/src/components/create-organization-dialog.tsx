@@ -1,4 +1,4 @@
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "~/lib/auth/auth-client";
@@ -29,7 +29,7 @@ export function CreateOrganizationDialog({
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -41,19 +41,25 @@ export function CreateOrganizationDialog({
     e.preventDefault();
     setLoading(true);
     try {
-      await authClient.organization.create({
+      const result = await authClient.organization.create({
         name,
         slug,
       });
       toast.success("Organization created successfully");
       finalOnOpenChange?.(false);
+
+      // Navigate to the new org's dashboard
+      const newOrgSlug = slug || result.data?.slug;
+      if (newOrgSlug) {
+        navigate({
+          to: "/dashboard/$orgSlug",
+          params: { orgSlug: newOrgSlug },
+        });
+      }
+
       setName("");
       setSlug("");
-      router.invalidate();
     } catch (error: any) {
-      // better-auth usually throws or returns { error }
-      // If it returns, we might need to check the result.
-      // But assuming it might throw or we catch error here.
       console.error(error);
       toast.error(error?.message || "Failed to create organization");
     } finally {

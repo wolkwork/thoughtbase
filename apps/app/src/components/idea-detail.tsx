@@ -30,6 +30,8 @@ import { Textarea } from "./ui/textarea";
 interface IdeaDetailProps {
   idea: any; // Replace with proper type inference if possible
   currentUser: any;
+  orgSlug?: string;
+  organizationId?: string;
 }
 
 const STATUS_OPTIONS = [
@@ -41,7 +43,12 @@ const STATUS_OPTIONS = [
   { slug: "closed", name: "Closed" },
 ];
 
-export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
+export function IdeaDetail({
+  idea,
+  currentUser,
+  orgSlug,
+  organizationId,
+}: IdeaDetailProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [comment, setComment] = useState("");
@@ -152,6 +159,16 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
       router.invalidate();
     },
   });
+
+  const handleUpdateStatus = (status: string) => {
+    if (!organizationId) return;
+    updateStatus({ data: { ideaId: idea.id, status, organizationId } });
+  };
+
+  const handleUpdateEta = (eta: string | null) => {
+    if (!organizationId) return;
+    updateEta({ data: { ideaId: idea.id, eta, organizationId } });
+  };
 
   const handleUpvote = () => {
     toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
@@ -369,9 +386,7 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
               {STATUS_OPTIONS.map((status) => (
                 <DropdownMenuItem
                   key={status.slug}
-                  onClick={() =>
-                    updateStatus({ data: { ideaId: idea.id, status: status.slug } })
-                  }
+                  onClick={() => handleUpdateStatus(status.slug)}
                 >
                   <span
                     className={cn(
@@ -410,20 +425,13 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
                 <Calendar
                   mode="single"
                   selected={idea.eta ? new Date(idea.eta) : undefined}
-                  onSelect={(date) =>
-                    updateEta({
-                      data: {
-                        ideaId: idea.id,
-                        eta: date ? date.toISOString() : null,
-                      },
-                    })
-                  }
+                  onSelect={(date) => handleUpdateEta(date ? date.toISOString() : null)}
                 />
               </PopoverContent>
             </Popover>
             {idea.eta && (
               <button
-                onClick={() => updateEta({ data: { ideaId: idea.id, eta: null } })}
+                onClick={() => handleUpdateEta(null)}
                 className="text-muted-foreground hover:text-foreground hover:bg-accent rounded p-1 transition-colors"
                 title="Clear ETA"
               >

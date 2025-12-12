@@ -3,41 +3,45 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { IdeasDataTable } from "~/components/ideas-data-table";
 import { $getIdeas } from "~/lib/api/ideas";
-import { authClient } from "~/lib/auth/auth-client";
+import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 const ideasSearchSchema = z.object({
   status: z.string().optional(),
   boardId: z.string().optional(),
 });
 
-export const Route = createFileRoute("/(authenticated)/dashboard/ideas/")({
+export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/")({
   validateSearch: ideasSearchSchema,
   loaderDeps: ({ search }) => ({ search }),
-  loader: async ({ deps: { search } }) => {
-    // Fetch all ideas for the table to handle filtering client-side
-    // We ignore status in the fetch so we get all statuses
+  loader: async ({ deps: { search }, params }) => {
+    // Get organization by slug to get the ID
+    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
+    if (!organization) {
+      throw new Error("Organization not found");
+    }
+
     const ideas = await $getIdeas({
       data: {
+        organizationId: organization.id,
         boardId: search.boardId,
-        // We intentionally don't pass status here to fetch all for the client-side table
       },
     });
-    return { ideas };
+    return { ideas, organizationId: organization.id };
   },
   component: IdeasPage,
 });
 
 function IdeasPage() {
-  const { ideas: initialIdeas } = Route.useLoaderData();
+  const { ideas: initialIdeas, organizationId } = Route.useLoaderData();
   const search = Route.useSearch();
-  const { data: session } = authClient.useSession();
+  const { orgSlug } = Route.useParams();
 
-  // We fetch all ideas to allow client-side filtering
   const { data: ideas } = useQuery({
-    queryKey: ["ideas", "all", search.boardId, session?.session?.activeOrganizationId],
+    queryKey: ["ideas", "all", search.boardId, organizationId],
     queryFn: () =>
       $getIdeas({
         data: {
+          organizationId,
           boardId: search.boardId,
         },
       }),
@@ -61,7 +65,11 @@ function IdeasPage() {
       </div>
 
       <div className="space-y-4">
-        <IdeasDataTable data={tableData} initialStatus={search.status} />
+        <IdeasDataTable
+          data={tableData}
+          initialStatus={search.status}
+          orgSlug={orgSlug}
+        />
       </div>
     </div>
   );

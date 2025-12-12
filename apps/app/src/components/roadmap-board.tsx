@@ -21,6 +21,7 @@ interface RoadmapBoardProps {
   ideas: any[];
   readOnly?: boolean;
   publicOrgSlug?: string;
+  organizationId?: string;
 }
 
 const COLUMN_IDS: IdeaStatus[] = [
@@ -40,6 +41,7 @@ export function RoadmapBoard({
   ideas: initialIdeas,
   readOnly = false,
   publicOrgSlug,
+  organizationId,
 }: RoadmapBoardProps) {
   const router = useRouter();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -127,7 +129,11 @@ export function RoadmapBoard({
     );
 
     // Server Update
-    updateStatus({ data: { ideaId: activeIdeaId, status: newStatus } });
+    if (organizationId) {
+      updateStatus({
+        data: { ideaId: activeIdeaId, status: newStatus, organizationId },
+      });
+    }
   };
 
   const activeIdea = activeId ? items.find((i) => i.id === activeId) : null;

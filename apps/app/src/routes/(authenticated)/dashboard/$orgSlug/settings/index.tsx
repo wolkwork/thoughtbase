@@ -17,9 +17,8 @@ import {
 import { Input } from "~/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
-import { authClient } from "~/lib/auth/auth-client";
 
-export const Route = createFileRoute("/(authenticated)/dashboard/settings/")({
+export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/settings/")({
   component: SettingsPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
@@ -29,9 +28,11 @@ export const Route = createFileRoute("/(authenticated)/dashboard/settings/")({
 });
 
 function SettingsPage() {
-  const search = useSearch({ from: "/(authenticated)/dashboard/settings/" });
+  const search = useSearch({
+    from: "/(authenticated)/dashboard/$orgSlug/settings/",
+  });
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(!!search.success);
-  const { data: organization } = authClient.useActiveOrganization();
+  const { organization } = Route.useRouteContext();
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 p-6">
@@ -76,7 +77,7 @@ function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="branding" className="mt-6">
-          <BrandingSettings />
+          <BrandingSettings organizationId={organization.id} />
         </TabsContent>
 
         <TabsContent value="team" className="mt-6">
@@ -91,14 +92,18 @@ function SettingsPage() {
   );
 }
 
-function SSOSettings({ organization }: { organization: any }) {
+function SSOSettings({
+  organization,
+}: {
+  organization: { id: string; name: string; slug: string };
+}) {
   const { data: secretData, refetch } = useQuery({
-    queryKey: ["org-secret", organization?.id],
-    queryFn: () => $getOrgSecret(),
+    queryKey: ["org-secret", organization.id],
+    queryFn: () => $getOrgSecret({ data: { organizationId: organization.id } }),
   });
 
   const { mutate: generateSecret, isPending } = useMutation({
-    mutationFn: $generateOrgSecret,
+    mutationFn: () => $generateOrgSecret({ data: { organizationId: organization.id } }),
     onSuccess: () => {
       toast.success("New secret generated");
       refetch();
@@ -134,7 +139,7 @@ function SSOSettings({ organization }: { organization: any }) {
           <Input
             value={secretData?.secret || "No secret generated"}
             readOnly
-            type="password" // Initially hidden
+            type="password"
             className="font-mono"
           />
           <Button
@@ -150,7 +155,7 @@ function SSOSettings({ organization }: { organization: any }) {
         <div className="flex justify-end">
           <Button
             variant="destructive"
-            onClick={() => generateSecret(undefined)}
+            onClick={() => generateSecret()}
             disabled={isPending}
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`} />

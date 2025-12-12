@@ -90,25 +90,35 @@ const globalSearchFilter: FilterFn<Idea> = (row, columnId, filterValue: string) 
   );
 };
 
-export const columns: ColumnDef<Idea>[] = [
+const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
   {
     accessorKey: "title",
     header: "Title",
     size: 400, // Give this column more space
     minSize: 250,
     maxSize: 600,
-    cell: ({ row }) => (
-      <Link
-        to="/dashboard/ideas/$ideaId"
-        params={{ ideaId: row.original.id }}
-        className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
-        title={row.getValue("title")}
-        style={{ width: "100%" }}
-      >
-        <StatusBadge showLabel={false} status={row.original.status} />
-        <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
-      </Link>
-    ),
+    cell: ({ row }) =>
+      orgSlug ? (
+        <Link
+          to="/dashboard/$orgSlug/ideas/$ideaId"
+          params={{ orgSlug, ideaId: row.original.id }}
+          className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
+          title={row.getValue("title")}
+          style={{ width: "100%" }}
+        >
+          <StatusBadge showLabel={false} status={row.original.status} />
+          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+        </Link>
+      ) : (
+        <div
+          className="flex min-w-0 flex-1 items-center gap-2 font-medium"
+          title={row.getValue("title")}
+          style={{ width: "100%" }}
+        >
+          <StatusBadge showLabel={false} status={row.original.status} />
+          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+        </div>
+      ),
   },
   {
     accessorKey: "status",
@@ -210,12 +220,16 @@ export const columns: ColumnDef<Idea>[] = [
   },
 ];
 
+// Keep backward compatibility - default columns without orgSlug
+export const columns = createColumns();
+
 interface IdeasDataTableProps {
   data: Idea[];
   initialStatus?: string;
+  orgSlug?: string;
 }
 
-export function IdeasDataTable({ data, initialStatus }: IdeasDataTableProps) {
+export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     initialStatus ? [{ id: "status", value: [initialStatus] }] : [],
@@ -254,9 +268,11 @@ export function IdeasDataTable({ data, initialStatus }: IdeasDataTableProps) {
     return Array.from(tags).sort();
   }, [data]);
 
+  const tableColumns = React.useMemo(() => createColumns(orgSlug), [orgSlug]);
+
   const table = useReactTable({
     data: tableData,
-    columns,
+    columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

@@ -1,6 +1,5 @@
 MVP:
 
-- Force org selection
 - Redirect on logout
 - Customization (logo, color theme)
 - White label / remove branding

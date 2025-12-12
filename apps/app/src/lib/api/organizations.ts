@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { z } from "zod";
 import { auth } from "~/lib/auth/auth";
 import { db } from "~/lib/db";
-import { organization } from "~/lib/db/schema";
+import { member, organization } from "~/lib/db/schema";
 
 async function getAuthContext() {
   const session = await auth.api.getSession({
@@ -14,62 +15,98 @@ async function getAuthContext() {
   return {
     user: session?.user || null,
     session: session?.session || null,
-    organizationId: session?.session?.activeOrganizationId || null,
   };
 }
 
-export const $generateOrgSecret = createServerFn({ method: "POST" }).handler(async () => {
-  const ctx = await getAuthContext();
-  if (!ctx.user || !ctx.organizationId) {
-    throw new Error("Unauthorized or no active organization");
-  }
+export const $getOrganizationBySlug = createServerFn({ method: "GET" })
+  .inputValidator(z.string())
+  .handler(async ({ data: slug }) => {
+    // TODO: Maybe use better auth client for this? https://www.better-auth.com/docs/plugins/organization#get-full-organization
+    const org = await db.query.organization.findFirst({
+      where: eq(organization.slug, slug),
+    });
 
-  const member = await db.query.member.findFirst({
-    where: (member, { and, eq }) =>
-      and(
-        eq(member.userId, ctx.user!.id),
-        eq(member.organizationId, ctx.organizationId!),
+    return org;
+  });
+
+// TODO: Potentially this can be cached
+export const $checkMembership = createServerFn({ method: "GET" })
+  .inputValidator(
+    z.object({
+      organizationId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    const memberRecord = await db.query.member.findFirst({
+      where: and(
+        eq(member.organizationId, data.organizationId),
+        eq(member.userId, data.userId),
       ),
+    });
+    return !!memberRecord;
   });
 
-  if (!member || (member.role !== "admin" && member.role !== "owner")) {
-    throw new Error("Insufficient permissions");
-  }
+export const $generateOrgSecret = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ organizationId: z.string() }))
+  .handler(async ({ data }) => {
+    const ctx = await getAuthContext();
+    if (!ctx.user) {
+      throw new Error("Unauthorized");
+    }
 
-  const secret = nanoid(32);
-
-  await db
-    .update(organization)
-    .set({ secret })
-    .where(eq(organization.id, ctx.organizationId));
-
-  return { secret };
-});
-
-export const $getOrgSecret = createServerFn({ method: "GET" }).handler(async () => {
-  const ctx = await getAuthContext();
-  if (!ctx.user || !ctx.organizationId) {
-    throw new Error("Unauthorized or no active organization");
-  }
-
-  const member = await db.query.member.findFirst({
-    where: (member, { and, eq }) =>
-      and(
-        eq(member.userId, ctx.user!.id),
-        eq(member.organizationId, ctx.organizationId!),
+    const memberRecord = await db.query.member.findFirst({
+      where: and(
+        eq(member.userId, ctx.user.id),
+        eq(member.organizationId, data.organizationId),
       ),
+    });
+
+    if (
+      !memberRecord ||
+      (memberRecord.role !== "admin" && memberRecord.role !== "owner")
+    ) {
+      throw new Error("Insufficient permissions");
+    }
+
+    const secret = nanoid(32);
+
+    await db
+      .update(organization)
+      .set({ secret })
+      .where(eq(organization.id, data.organizationId));
+
+    return { secret };
   });
 
-  if (!member || (member.role !== "admin" && member.role !== "owner")) {
-    throw new Error("Insufficient permissions");
-  }
+export const $getOrgSecret = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ organizationId: z.string() }))
+  .handler(async ({ data }) => {
+    const ctx = await getAuthContext();
+    if (!ctx.user) {
+      throw new Error("Unauthorized");
+    }
 
-  const org = await db.query.organization.findFirst({
-    where: eq(organization.id, ctx.organizationId),
-    columns: {
-      secret: true,
-    },
+    const memberRecord = await db.query.member.findFirst({
+      where: and(
+        eq(member.userId, ctx.user.id),
+        eq(member.organizationId, data.organizationId),
+      ),
+    });
+
+    if (
+      !memberRecord ||
+      (memberRecord.role !== "admin" && memberRecord.role !== "owner")
+    ) {
+      throw new Error("Insufficient permissions");
+    }
+
+    const org = await db.query.organization.findFirst({
+      where: eq(organization.id, data.organizationId),
+      columns: {
+        secret: true,
+      },
+    });
+
+    return { secret: org?.secret };
   });
-
-  return { secret: org?.secret };
-});

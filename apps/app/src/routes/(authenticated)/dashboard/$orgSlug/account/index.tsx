@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ProfileTab } from "./profile-tab";
 import { SettingsTab } from "./settings-tab";
 
-export const Route = createFileRoute("/(authenticated)/dashboard/account/")({
+export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/account/")({
   component: AccountPage,
 });
 
@@ -12,9 +12,7 @@ function AccountPage() {
     <div className="mx-auto max-w-6xl space-y-8 p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Account</h1>
-        <p className="text-muted-foreground">
-          Manage your personal account settings.
-        </p>
+        <p className="text-muted-foreground">Manage your personal account settings.</p>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
@@ -34,4 +32,3 @@ function AccountPage() {
     </div>
   );
 }
-

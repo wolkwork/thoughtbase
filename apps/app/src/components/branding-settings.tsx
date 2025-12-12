@@ -15,8 +15,13 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/lib/auth/auth-client";
 
-export function BrandingSettings() {
-  const { data: organization } = authClient.useActiveOrganization();
+interface BrandingSettingsProps {
+  organizationId?: string;
+}
+
+export function BrandingSettings({ organizationId }: BrandingSettingsProps) {
+  const { data: organizations } = authClient.useListOrganizations();
+  const organization = organizations?.find((org) => org.id === organizationId);
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -50,6 +55,8 @@ export function BrandingSettings() {
 
   const { mutate: updateOrg, isPending } = useMutation({
     mutationFn: async (values: { name: string; logo: string; primaryColor: string }) => {
+      if (!organizationId) throw new Error("Organization ID is required");
+
       // Preserve existing metadata
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const currentMetadata = organization?.metadata as any;
@@ -65,6 +72,7 @@ export function BrandingSettings() {
       }
 
       await authClient.organization.update({
+        organizationId,
         data: {
           name: values.name,
           logo: values.logo,

@@ -5,12 +5,13 @@ import { getUnifiedAuthContext, getUserFromToken } from "~/lib/auth/external-aut
 import { db } from "~/lib/db";
 import { board, comment, idea, reaction } from "~/lib/db/schema";
 
-// Updated context helper to support unified auth
+// Context helper for auth - organizationId comes from URL params, not session
 async function getAuthContext() {
   const unifiedCtx = await getUnifiedAuthContext();
   return {
     user: unifiedCtx?.user || null,
     session: unifiedCtx?.session || null,
+    // For external auth, we still need organizationId to validate access
     organizationId: unifiedCtx?.organizationId || null,
     type: unifiedCtx?.type || null,
   };
@@ -18,30 +19,19 @@ async function getAuthContext() {
 
 export const $getIdeas = createServerFn({ method: "GET" })
   .inputValidator(
-    z
-      .object({
-        status: z.string().optional(),
-        boardId: z.string().optional(),
-        organizationId: z.string().optional(),
-      })
-      .optional(),
+    z.object({
+      organizationId: z.string(),
+      status: z.string().optional(),
+      boardId: z.string().optional(),
+    }),
   )
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
+    const organizationId = data.organizationId;
 
-    let organizationId = data?.organizationId;
-
-    if (ctx.type === "external") {
-      if (organizationId && organizationId !== ctx.organizationId) {
-        throw new Error("Unauthorized access to organization data");
-      }
-      organizationId = ctx.organizationId!;
-    } else if (!organizationId) {
-      organizationId = ctx.organizationId || undefined;
-    }
-
-    if (!organizationId) {
-      throw new Error("Organization ID is required");
+    // For external auth, verify organization access
+    if (ctx.type === "external" && ctx.organizationId !== organizationId) {
+      throw new Error("Unauthorized access to organization data");
     }
 
     const whereConditions = [eq(idea.organizationId, organizationId)];
@@ -306,7 +296,7 @@ export const $createIdea = createServerFn({ method: "POST" })
       description: z.string().optional(),
       boardId: z.string().optional(),
       status: z.string().default("pending"),
-      organizationId: z.string().optional(),
+      organizationId: z.string(),
       token: z.string().optional(),
     }),
   )
@@ -316,16 +306,14 @@ export const $createIdea = createServerFn({ method: "POST" })
     let type: "internal" | "external" | null = null;
 
     if (data.token) {
-      if (data.organizationId) {
-        try {
-          const externalUser = await getUserFromToken(data.token, data.organizationId);
-          if (externalUser) {
-            user = externalUser;
-            type = "external";
-          }
-        } catch (e) {
-          console.warn("Invalid SSO token provided for idea creation", e);
+      try {
+        const externalUser = await getUserFromToken(data.token, data.organizationId);
+        if (externalUser) {
+          user = externalUser;
+          type = "external";
         }
+      } catch (e) {
+        console.warn("Invalid SSO token provided for idea creation", e);
       }
     }
 
@@ -336,27 +324,20 @@ export const $createIdea = createServerFn({ method: "POST" })
       type = ctx.type;
     }
 
-    let organizationId = data.organizationId;
-
-    if (type === "external") {
-      if (organizationId && user && organizationId !== (user as any).organizationId) {
-        // This check depends on externalUser having organizationId, which it does
-        throw new Error("Unauthorized organization scope");
-      }
-      organizationId = (user as any)?.organizationId || organizationId; // Prefer user's org
-    } else if (!organizationId) {
-      // Try to infer from internal user session if available
-      // But here we might just be guest
-      organizationId = undefined;
+    // For external auth, verify organization access
+    if (
+      type === "external" &&
+      user &&
+      data.organizationId !== (user as any).organizationId
+    ) {
+      throw new Error("Unauthorized organization scope");
     }
-
-    if (!organizationId) throw new Error("No organization context");
 
     const [newIdea] = await db
       .insert(idea)
       .values({
         id: crypto.randomUUID(),
-        organizationId: organizationId,
+        organizationId: data.organizationId,
         authorId: type === "internal" && user ? user.id : null,
         externalAuthorId: type === "external" && user ? user.id : null,
         title: data.title,
@@ -374,17 +355,17 @@ export const $updateIdeaStatus = createServerFn({ method: "POST" })
     z.object({
       ideaId: z.string(),
       status: z.string(),
+      organizationId: z.string(),
     }),
   )
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
-    if (!ctx.user || !ctx.organizationId)
-      throw new Error("Unauthorized or no active organization");
+    if (!ctx.user) throw new Error("Unauthorized");
 
     const [updatedIdea] = await db
       .update(idea)
       .set({ status: data.status, updatedAt: new Date() })
-      .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, ctx.organizationId)))
+      .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, data.organizationId)))
       .returning();
 
     return updatedIdea;
@@ -395,12 +376,12 @@ export const $updateIdeaEta = createServerFn({ method: "POST" })
     z.object({
       ideaId: z.string(),
       eta: z.string().nullable(),
+      organizationId: z.string(),
     }),
   )
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
-    if (!ctx.user || !ctx.organizationId)
-      throw new Error("Unauthorized or no active organization");
+    if (!ctx.user) throw new Error("Unauthorized");
 
     const [updatedIdea] = await db
       .update(idea)
@@ -408,7 +389,7 @@ export const $updateIdeaEta = createServerFn({ method: "POST" })
         eta: data.eta ? new Date(data.eta) : null,
         updatedAt: new Date(),
       })
-      .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, ctx.organizationId)))
+      .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, data.organizationId)))
       .returning();
 
     return updatedIdea;
@@ -484,53 +465,39 @@ export const $toggleReaction = createServerFn({ method: "POST" })
     }
   });
 
-export const $getSidebarCounts = createServerFn({ method: "GET" }).handler(async () => {
-  const ctx = await getAuthContext();
-  if (!ctx.organizationId) throw new Error("No active organization");
+export const $getSidebarCounts = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ organizationId: z.string() }))
+  .handler(async ({ data }) => {
+    const statusCounts = await db
+      .select({
+        status: idea.status,
+        count: count(),
+      })
+      .from(idea)
+      .where(eq(idea.organizationId, data.organizationId))
+      .groupBy(idea.status);
 
-  const statusCounts = await db
-    .select({
-      status: idea.status,
-      count: count(),
-    })
-    .from(idea)
-    .where(eq(idea.organizationId, ctx.organizationId))
-    .groupBy(idea.status);
-
-  return statusCounts.reduce(
-    (acc, curr) => {
-      acc[curr.status] = curr.count;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
-});
+    return statusCounts.reduce(
+      (acc, curr) => {
+        acc[curr.status] = curr.count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+  });
 
 export const $getBoards = createServerFn({ method: "GET" })
-  .inputValidator(
-    z
-      .object({
-        organizationId: z.string().optional(),
-      })
-      .optional(),
-  )
+  .inputValidator(z.object({ organizationId: z.string() }))
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
 
-    let organizationId = data?.organizationId;
-    if (ctx.type === "external") {
-      if (organizationId && organizationId !== ctx.organizationId) {
-        throw new Error("Unauthorized organization scope");
-      }
-      organizationId = ctx.organizationId!;
-    } else if (!organizationId) {
-      organizationId = ctx.organizationId || undefined;
+    // For external auth, verify organization access
+    if (ctx.type === "external" && ctx.organizationId !== data.organizationId) {
+      throw new Error("Unauthorized organization scope");
     }
 
-    if (!organizationId) throw new Error("No organization context");
-
     return db.query.board.findMany({
-      where: eq(board.organizationId, organizationId),
+      where: eq(board.organizationId, data.organizationId),
       orderBy: desc(board.createdAt),
     });
   });

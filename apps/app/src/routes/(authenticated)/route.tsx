@@ -3,7 +3,7 @@ import { authQueryOptions } from "~/lib/auth/queries";
 
 export const Route = createFileRoute("/(authenticated)")({
   component: Outlet,
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: async ({ context }) => {
     const sessionData = await context.queryClient.ensureQueryData({
       ...authQueryOptions(),
       revalidateIfStale: true,
@@ -12,14 +12,8 @@ export const Route = createFileRoute("/(authenticated)")({
       throw redirect({ to: "/login" });
     }
 
-    if (
-      !sessionData.session.activeOrganizationId &&
-      !location.pathname.startsWith("/onboarding")
-    ) {
-      throw redirect({ to: "/onboarding" });
-    }
-
-    // re-return to update type as non-null for child routes
+    // Organization context now comes from URL ($orgSlug param)
+    // The $orgSlug route handles membership validation
     return { user: sessionData.user, session: sessionData.session };
   },
 });

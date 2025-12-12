@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { $createIdea } from "~/lib/api/ideas";
@@ -19,15 +19,16 @@ interface CreateIdeaDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   organizationId?: string;
+  orgSlug?: string;
 }
 
 export function CreateIdeaDialog({
   open,
   onOpenChange,
   organizationId,
+  orgSlug,
 }: CreateIdeaDialogProps) {
-  const queryClient = useQueryClient();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -39,16 +40,11 @@ export function CreateIdeaDialog({
       setTitle("");
       setDescription("");
 
-      // Determine where to navigate based on context.
-      // If public (organizationId provided), stay on public list or go to public detail?
-      // Public detail is not implemented yet. Just stay on list and invalidate.
-      // If dashboard, go to detail.
-      if (organizationId) {
-        router.invalidate();
-      } else {
-        router.navigate({
-          to: "/dashboard/ideas/$ideaId",
-          params: { ideaId: newIdea.id },
+      // Navigate to the new idea's detail page
+      if (orgSlug && organizationId) {
+        navigate({
+          to: "/dashboard/$orgSlug/ideas/$ideaId",
+          params: { orgSlug, ideaId: newIdea.id },
         });
       }
     },
@@ -59,6 +55,10 @@ export function CreateIdeaDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("Organization ID is required");
+      return;
+    }
     createIdea({ data: { title, description, organizationId } });
   };
 

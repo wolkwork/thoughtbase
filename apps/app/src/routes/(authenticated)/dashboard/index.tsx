@@ -1,34 +1,78 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { OrganizationSwitcher } from "~/components/organization-switcher";
-import { SignOutButton } from "~/components/sign-out-button";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Building2, Plus } from "lucide-react";
+import { useState } from "react";
+import { CreateOrganizationDialog } from "~/components/create-organization-dialog";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { authClient } from "~/lib/auth/auth-client";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/")({
   component: DashboardIndex,
 });
 
 function DashboardIndex() {
-  const { user } = Route.useRouteContext();
+  const { data: organizations, isPending: isLoading } = authClient.useListOrganizations();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <OrganizationSwitcher />
-      </div>
+    <div className="bg-muted/50 flex min-h-screen flex-col items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle>Select Organization</CardTitle>
+          <CardDescription>
+            Choose an organization to continue to your dashboard.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {isLoading ? (
+            <div className="text-muted-foreground text-center text-sm">
+              Loading organizations...
+            </div>
+          ) : (
+            <div className="grid gap-2">
+              {organizations?.map((org) => (
+                <Button
+                  key={org.id}
+                  variant="outline"
+                  className="h-auto w-full justify-start px-4 py-4"
+                  asChild
+                >
+                  <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
+                    <Building2 className="text-muted-foreground mr-3 h-5 w-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{org.name}</span>
+                      <span className="text-muted-foreground text-xs">{org.slug}</span>
+                    </div>
+                  </Link>
+                </Button>
+              ))}
+              {organizations?.length === 0 && (
+                <div className="text-muted-foreground py-4 text-center text-sm">
+                  You don't have any organizations yet.
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full" onClick={() => setShowCreateDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create New Organization
+          </Button>
+        </CardFooter>
+      </Card>
 
-      <div className="flex flex-col items-center gap-1">
-        Dashboard index page
-        <pre className="bg-card text-card-foreground rounded-md border p-1 text-xs">
-          routes/(authenticated)dashboard/index.tsx
-        </pre>
-        <div className="mt-2 text-center text-xs sm:text-sm">
-          User data from route context:
-          <pre className="max-w-screen overflow-x-auto px-2 text-start">
-            {JSON.stringify(user, null, 2)}
-          </pre>
-        </div>
-        <SignOutButton />
-      </div>
+      <CreateOrganizationDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+      />
     </div>
   );
 }

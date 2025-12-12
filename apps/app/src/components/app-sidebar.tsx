@@ -1,12 +1,18 @@
+import { FeedbackWidget } from "@feedback-tool/widget";
 import {
   BrowserIcon,
-  FileIcon,
   GearSixIcon,
   KanbanIcon,
   SparkleIcon,
   UserCircleIcon,
 } from "@phosphor-icons/react";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useRouteContext,
+  useRouter,
+} from "@tanstack/react-router";
 import { ChevronsUpDown, CircleDashed, LogOut, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { StatusBadge, STATUSES } from "~/components/status-badge";
@@ -18,7 +24,6 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { authClient } from "~/lib/auth/auth-client";
 import { CreateIdeaDialog } from "./create-idea-dialog";
-import { FeedbackWidget } from "@feedback-tool/widget";
 import { SidebarOrganizationSwitcher } from "./sidebar-organization-switcher";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
@@ -39,39 +44,27 @@ import {
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   counts?: Record<string, number>;
+  orgSlug: string;
 }
 
-export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
+export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) {
+  const { user } = useRouteContext({ from: "/(authenticated)" });
+
   const navigate = useNavigate();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [widgetOpen, setWidgetOpen] = useState(false);
-  const { data: session } = authClient.useSession();
   const { data: organizations } = authClient.useListOrganizations();
-  const organizationId = session?.session?.activeOrganizationId;
-  const user = session?.user;
 
-  const activeOrg = organizations?.find((org) => org.id === organizationId);
-  const orgSlug = activeOrg?.slug;
+  const activeOrg = organizations?.find((org) => org.slug === orgSlug);
+  const organizationId = activeOrg?.id;
 
   const location = useLocation();
-
-  const workspaceItems = [
-    { name: "Roadmap", href: "/dashboard/roadmap", icon: KanbanIcon },
-    { name: "Changelog", href: "/dashboard/changelog", icon: FileIcon },
-    { name: "Members", href: "/dashboard/members", icon: UserCircleIcon },
-    { name: "Settings", href: "/dashboard/settings", icon: GearSixIcon },
-    {
-      name: "My Board",
-      href: orgSlug ? `/org/${orgSlug}` : "#",
-      icon: BrowserIcon,
-      external: true,
-    },
-  ];
+  const router = useRouter();
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarOrganizationSwitcher />
+        <SidebarOrganizationSwitcher currentOrgSlug={orgSlug} />
       </SidebarHeader>
 
       <SidebarContent className="px-1">
@@ -91,21 +84,25 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {Object.entries(STATUSES).map(([slug, config]) => {
-                const isStatusActive = location.search?.status === slug;
+              {Object.entries(STATUSES).map(([statusSlug, config]) => {
+                const isStatusActive = location.search?.status === statusSlug;
                 return (
                   <SidebarMenuItem
-                    key={slug}
+                    key={statusSlug}
                     className="flex items-center gap-2 text-black/70"
                   >
                     <SidebarMenuButton asChild isActive={isStatusActive}>
-                      <Link to="/dashboard/ideas" search={{ status: slug }}>
-                        <StatusBadge status={slug} iconClassName="size-5" />
+                      <Link
+                        to="/dashboard/$orgSlug/ideas"
+                        params={{ orgSlug }}
+                        search={{ status: statusSlug }}
+                      >
+                        <StatusBadge status={statusSlug} iconClassName="size-5" />
                       </Link>
                     </SidebarMenuButton>
-                    {counts[slug] > 0 && (
+                    {counts[statusSlug] > 0 && (
                       <SidebarMenuBadge className="mr-0.5">
-                        {counts[slug]}
+                        {counts[statusSlug]}
                       </SidebarMenuBadge>
                     )}
                   </SidebarMenuItem>
@@ -115,10 +112,14 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
                 <SidebarMenuButton
                   asChild
                   isActive={
-                    location.pathname === "/dashboard/ideas" && !location.search?.status
+                    location.pathname.includes("/ideas") && !location.search?.status
                   }
                 >
-                  <Link to="/dashboard/ideas" search={{ status: undefined }}>
+                  <Link
+                    to="/dashboard/$orgSlug/ideas"
+                    params={{ orgSlug }}
+                    search={{ status: undefined }}
+                  >
                     <CircleDashed className="size-5 text-gray-400" />
                     <span>All Ideas</span>
                   </Link>
@@ -137,21 +138,68 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {workspaceItems.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.href}>
-                    <Link
-                      to={item.href}
-                      target={item.external ? "_blank" : undefined}
-                      rel={item.external ? "noopener noreferrer" : undefined}
-                      className="flex gap-2.5 text-black/70"
-                    >
-                      <item.icon className="size-5.5!" weight="duotone" color="#7d7d7d" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname.includes("/roadmap")}
+                >
+                  <Link
+                    to="/dashboard/$orgSlug/roadmap"
+                    params={{ orgSlug }}
+                    className="flex gap-2.5 text-black/70"
+                  >
+                    <KanbanIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
+                    <span>Roadmap</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname.includes("/members")}
+                >
+                  <Link
+                    to="/dashboard/$orgSlug/members"
+                    params={{ orgSlug }}
+                    className="flex gap-2.5 text-black/70"
+                  >
+                    <UserCircleIcon
+                      className="size-5.5!"
+                      weight="duotone"
+                      color="#7d7d7d"
+                    />
+                    <span>Members</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname.includes("/settings")}
+                >
+                  <Link
+                    to="/dashboard/$orgSlug/settings"
+                    params={{ orgSlug }}
+                    className="flex gap-2.5 text-black/70"
+                  >
+                    <GearSixIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
+                    <span>Settings</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a
+                    href={`/org/${orgSlug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex gap-2.5 text-black/70"
+                  >
+                    <BrowserIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
+                    <span>My Board</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -198,11 +246,27 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
                 align="end"
                 sideOffset={4}
               >
-                <DropdownMenuItem onClick={() => navigate({ to: "/dashboard/account" })}>
-                  <Settings className="mr-2 size-4" />
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/dashboard/$orgSlug/account"
+                    params={{ orgSlug }}
+                    className="flex items-center"
+                  >
+                    <Settings className="mr-2 size-4" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => authClient.signOut()}>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await authClient.signOut({
+                      fetchOptions: {
+                        onSuccess() {
+                          navigate({ to: "/login" });
+                        },
+                      },
+                    });
+                  }}
+                >
                   <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>
@@ -213,7 +277,12 @@ export function AppSidebar({ counts = {}, ...props }: AppSidebarProps) {
       </SidebarFooter>
       <SidebarRail />
 
-      <CreateIdeaDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
+      <CreateIdeaDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        orgSlug={orgSlug}
+        organizationId={organizationId}
+      />
       {organizationId && (
         <FeedbackWidget
           isOpen={widgetOpen}
