@@ -6,11 +6,11 @@ export const Route = createFileRoute("/(auth-pages)")({
   beforeLoad: async ({ context }) => {
     const REDIRECT_URL = "/dashboard";
 
-    const user = await context.queryClient.ensureQueryData({
+    const sessionData = await context.queryClient.ensureQueryData({
       ...authQueryOptions(),
       revalidateIfStale: true,
     });
-    if (user) {
+    if (sessionData?.user) {
       throw redirect({
         to: REDIRECT_URL,
       });

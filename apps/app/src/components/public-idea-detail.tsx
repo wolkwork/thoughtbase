@@ -1,7 +1,7 @@
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { $createComment, $toggleReaction } from "~/lib/api/ideas";
@@ -255,6 +255,15 @@ export function PublicIdeaDetail({
             className="text-muted-foreground text-sm font-medium"
           />
         </div>
+
+        {idea.eta && (
+          <div>
+            <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
+              ETA
+            </h4>
+            <span className="text-sm">{format(new Date(idea.eta), "MMMM d, yyyy")}</span>
+          </div>
+        )}
 
         {idea.board && (
           <div>

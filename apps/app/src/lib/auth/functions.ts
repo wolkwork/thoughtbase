@@ -6,7 +6,7 @@ import { auth } from "~/lib/auth/auth";
 import { db } from "~/lib/db";
 import { profile } from "~/lib/db/schema";
 
-export const $getUser = createServerFn({ method: "GET" }).handler(async () => {
+export const $getSession = createServerFn({ method: "GET" }).handler(async () => {
   const session = await auth.api.getSession({
     headers: getRequest().headers,
     returnHeaders: true,
@@ -18,18 +18,18 @@ export const $getUser = createServerFn({ method: "GET" }).handler(async () => {
     setResponseHeader("Set-Cookie", cookies);
   }
 
-  return session.response?.user || null;
+  return session.response || null;
 });
 
 export const $getOrgProfile = createServerFn({ method: "GET" })
   .inputValidator(z.object({ organizationId: z.string() }))
   .handler(async ({ data }) => {
-    const user = await $getUser();
-    if (!user) return null;
+    const session = await $getSession();
+    if (!session?.user) return null;
 
     const userProfile = await db.query.profile.findFirst({
       where: and(
-        eq(profile.userId, user.id),
+        eq(profile.userId, session.user.id),
         eq(profile.organizationId, data.organizationId),
       ),
     });
@@ -45,14 +45,14 @@ export const $upsertOrgProfile = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    const user = await $getUser();
-    if (!user) throw new Error("Not authenticated");
+    const session = await $getSession();
+    if (!session?.user) throw new Error("Not authenticated");
 
     const [newProfile] = await db
       .insert(profile)
       .values({
         id: crypto.randomUUID(),
-        userId: user.id,
+        userId: session.user.id,
         organizationId: data.organizationId,
         name: data.name,
       })

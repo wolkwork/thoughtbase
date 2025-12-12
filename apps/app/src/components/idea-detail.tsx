@@ -1,22 +1,29 @@
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { lowerCase } from "lodash";
-import { ArrowLeftIcon, Check, Smile, ThumbsUp } from "lucide-react";
+import { ArrowLeftIcon, CalendarIcon, Check, Smile, ThumbsUp, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { $createComment, $toggleReaction, $updateIdeaStatus } from "~/lib/api/ideas";
+import {
+  $createComment,
+  $toggleReaction,
+  $updateIdeaEta,
+  $updateIdeaStatus,
+} from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 import { StatusBadge } from "./status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
 
@@ -124,6 +131,24 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
     },
     onError: () => {
       toast.error("Failed to update status");
+      router.invalidate();
+    },
+  });
+
+  const { mutate: updateEta } = useMutation({
+    mutationFn: $updateIdeaEta,
+    onMutate: async (newData) => {
+      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
+        ...old,
+        eta: newData.data.eta ? new Date(newData.data.eta) : null,
+      }));
+    },
+    onSuccess: () => {
+      toast.success("ETA updated");
+      router.invalidate();
+    },
+    onError: () => {
+      toast.error("Failed to update ETA");
       router.invalidate();
     },
   });
@@ -361,6 +386,51 @@ export function IdeaDetail({ idea, currentUser }: IdeaDetailProps) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        <div>
+          <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
+            ETA
+          </h4>
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full shrink justify-start text-left font-normal",
+                    !idea.eta && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={idea.eta ? new Date(idea.eta) : undefined}
+                  onSelect={(date) =>
+                    updateEta({
+                      data: {
+                        ideaId: idea.id,
+                        eta: date ? date.toISOString() : null,
+                      },
+                    })
+                  }
+                />
+              </PopoverContent>
+            </Popover>
+            {idea.eta && (
+              <button
+                onClick={() => updateEta({ data: { ideaId: idea.id, eta: null } })}
+                className="text-muted-foreground hover:text-foreground hover:bg-accent rounded p-1 transition-colors"
+                title="Clear ETA"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {idea.board && (

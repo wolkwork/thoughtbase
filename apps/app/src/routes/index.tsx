@@ -61,7 +61,8 @@ function HomePage() {
 }
 
 function UserAction() {
-  const { data: user } = useSuspenseQuery(authQueryOptions());
+  const { data: sessionData } = useSuspenseQuery(authQueryOptions());
+  const user = sessionData?.user;
 
   return user ? (
     <div className="flex flex-col items-center gap-2">

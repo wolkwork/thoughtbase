@@ -1,11 +1,11 @@
 MVP:
 
-- Boards --> Topics/tags
-- ETA
-- Revenue data for customer
+- Force org selection
+- Redirect on logout
 - Customization (logo, color theme)
 - White label / remove branding
 - Delete ideas
+- Boards --> Topics/tags
 - User can edit ideas
 - Update idea status from idea detail page
 - Reactions styling in details tab
@@ -22,17 +22,17 @@ MVP:
 - Force user to select or create workspace
 - DNS configs
 - Turn off thoughtbase branding
-- User revenue
 - Docs
 - Terms & Privacy
 - Landing page
 - Onboarding
 - Changelog
 - Thank you screen after submission
+- Clickable logo in public facing
+- Login form styling
 
 Future:
 
-- User metadata
 - Auto approve
 - Ban users
 - Email "subscribers" of issues

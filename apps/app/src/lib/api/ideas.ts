@@ -390,6 +390,30 @@ export const $updateIdeaStatus = createServerFn({ method: "POST" })
     return updatedIdea;
   });
 
+export const $updateIdeaEta = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      ideaId: z.string(),
+      eta: z.string().nullable(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await getAuthContext();
+    if (!ctx.user || !ctx.organizationId)
+      throw new Error("Unauthorized or no active organization");
+
+    const [updatedIdea] = await db
+      .update(idea)
+      .set({
+        eta: data.eta ? new Date(data.eta) : null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, ctx.organizationId)))
+      .returning();
+
+    return updatedIdea;
+  });
+
 export const $createComment = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({

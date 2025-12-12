@@ -17,6 +17,7 @@ import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
 import { Route as authPagesLoginRouteImport } from './routes/(auth-pages)/login'
 import { Route as OrgSlugRouteRouteImport } from './routes/org/$slug/route'
+import { Route as authenticatedOnboardingRouteRouteImport } from './routes/(authenticated)/onboarding/route'
 import { Route as authenticatedDashboardRouteRouteImport } from './routes/(authenticated)/dashboard/route'
 import { Route as OrgSlugIndexRouteImport } from './routes/org/$slug/index'
 import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authenticated)/dashboard/index'
@@ -69,6 +70,12 @@ const OrgSlugRouteRoute = OrgSlugRouteRouteImport.update({
   path: '/org/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authenticatedOnboardingRouteRoute =
+  authenticatedOnboardingRouteRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => authenticatedRouteRoute,
+  } as any)
 const authenticatedDashboardRouteRoute =
   authenticatedDashboardRouteRouteImport.update({
     id: '/dashboard',
@@ -146,6 +153,7 @@ const authenticatedDashboardIdeasIdeaIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof authenticatedDashboardRouteRouteWithChildren
+  '/onboarding': typeof authenticatedOnboardingRouteRoute
   '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
@@ -166,6 +174,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/onboarding': typeof authenticatedOnboardingRouteRoute
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
   '/api/upload': typeof ApiUploadRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/(auth-pages)': typeof authPagesRouteRouteWithChildren
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/(authenticated)/dashboard': typeof authenticatedDashboardRouteRouteWithChildren
+  '/(authenticated)/onboarding': typeof authenticatedOnboardingRouteRoute
   '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/(auth-pages)/login': typeof authPagesLoginRoute
   '/(auth-pages)/signup': typeof authPagesSignupRoute
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/onboarding'
     | '/org/$slug'
     | '/login'
     | '/signup'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/onboarding'
     | '/login'
     | '/signup'
     | '/api/upload'
@@ -254,6 +266,7 @@ export interface FileRouteTypes {
     | '/(auth-pages)'
     | '/(authenticated)'
     | '/(authenticated)/dashboard'
+    | '/(authenticated)/onboarding'
     | '/org/$slug'
     | '/(auth-pages)/login'
     | '/(auth-pages)/signup'
@@ -341,6 +354,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/org/$slug'
       preLoaderRoute: typeof OrgSlugRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/(authenticated)/onboarding': {
+      id: '/(authenticated)/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof authenticatedOnboardingRouteRouteImport
+      parentRoute: typeof authenticatedRouteRoute
     }
     '/(authenticated)/dashboard': {
       id: '/(authenticated)/dashboard'
@@ -484,11 +504,13 @@ const authenticatedDashboardRouteRouteWithChildren =
 
 interface authenticatedRouteRouteChildren {
   authenticatedDashboardRouteRoute: typeof authenticatedDashboardRouteRouteWithChildren
+  authenticatedOnboardingRouteRoute: typeof authenticatedOnboardingRouteRoute
 }
 
 const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
   authenticatedDashboardRouteRoute:
     authenticatedDashboardRouteRouteWithChildren,
+  authenticatedOnboardingRouteRoute: authenticatedOnboardingRouteRoute,
 }
 
 const authenticatedRouteRouteWithChildren =

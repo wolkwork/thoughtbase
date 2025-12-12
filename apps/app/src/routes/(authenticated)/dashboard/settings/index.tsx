@@ -30,9 +30,7 @@ export const Route = createFileRoute("/(authenticated)/dashboard/settings/")({
 
 function SettingsPage() {
   const search = useSearch({ from: "/(authenticated)/dashboard/settings/" });
-  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(
-    !!search.success,
-  );
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(!!search.success);
   const { data: organization } = authClient.useActiveOrganization();
 
   return (
@@ -51,7 +49,7 @@ function SettingsPage() {
           <TabsTrigger value="branding">Branding</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="billing" className="mt-6">
           <Card>
             <CardHeader>
@@ -155,9 +153,7 @@ function SSOSettings({ organization }: { organization: any }) {
             onClick={() => generateSecret(undefined)}
             disabled={isPending}
           >
-            <RefreshCw
-              className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
             {secretData?.secret ? "Rotate Secret" : "Generate Secret"}
           </Button>
         </div>

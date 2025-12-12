@@ -35,6 +35,18 @@ export function getRouter() {
           const subdomain = parts[0];
 
           url.pathname = `/org/${subdomain}${url.pathname}`;
+        } else {
+          // TODO: Idk if this redirect is correct
+          const pathParts = url.pathname.split("/");
+          if (pathParts[1] === "org" && pathParts[2]) {
+            const subdomain = pathParts[2];
+            if (typeof window !== "undefined") {
+              const newUrl = new URL(url.href);
+              newUrl.hostname = `${subdomain}.${url.hostname}`;
+              newUrl.pathname = url.pathname.replace(`/org/${subdomain}`, "") || "/";
+              window.location.replace(newUrl.href);
+            }
+          }
         }
 
         return url;
@@ -45,6 +57,13 @@ export function getRouter() {
           const subdomain = parts[0];
 
           url.pathname = url.pathname.replace(`/org/${subdomain}`, "");
+        } else {
+          const pathParts = url.pathname.split("/");
+          if (pathParts[1] === "org" && pathParts[2]) {
+            const subdomain = pathParts[2];
+            url.hostname = `${subdomain}.${url.hostname}`;
+            url.pathname = url.pathname.replace(`/org/${subdomain}`, "") || "/";
+          }
         }
 
         return url;

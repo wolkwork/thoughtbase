@@ -47,6 +47,7 @@ export const idea = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    eta: timestamp("eta"),
   },
   (table) => [
     index("idea_organizationId_idx").on(table.organizationId),
