@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { RoadmapBoard } from "~/components/roadmap-board";
 import { $getIdeas } from "~/lib/api/ideas";
+import { authClient } from "~/lib/auth/auth-client";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/roadmap/")({
   loader: async () => {
@@ -13,9 +14,10 @@ export const Route = createFileRoute("/(authenticated)/dashboard/roadmap/")({
 
 function RoadmapPage() {
   const { ideas: initialIdeas } = Route.useLoaderData();
+  const { data: session } = authClient.useSession();
 
   const { data: ideas } = useQuery({
-    queryKey: ["ideas", "all"],
+    queryKey: ["ideas", "all", session?.session?.activeOrganizationId],
     queryFn: () => $getIdeas(),
     initialData: initialIdeas,
   });

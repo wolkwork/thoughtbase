@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { IdeasDataTable } from "~/components/ideas-data-table";
 import { $getIdeas } from "~/lib/api/ideas";
+import { authClient } from "~/lib/auth/auth-client";
 
 const ideasSearchSchema = z.object({
   status: z.string().optional(),
@@ -29,10 +30,11 @@ export const Route = createFileRoute("/(authenticated)/dashboard/ideas/")({
 function IdeasPage() {
   const { ideas: initialIdeas } = Route.useLoaderData();
   const search = Route.useSearch();
+  const { data: session } = authClient.useSession();
 
   // We fetch all ideas to allow client-side filtering
   const { data: ideas } = useQuery({
-    queryKey: ["ideas", "all", search.boardId],
+    queryKey: ["ideas", "all", search.boardId, session?.session?.activeOrganizationId],
     queryFn: () =>
       $getIdeas({
         data: {

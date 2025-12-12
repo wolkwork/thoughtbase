@@ -1,4 +1,5 @@
 import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import {
 export function OrganizationSwitcher() {
   const { data: organizations } = authClient.useListOrganizations();
   const { data: session } = authClient.useSession();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const router = useRouter();
@@ -33,7 +35,8 @@ export function OrganizationSwitcher() {
       });
       toast.success("Organization switched");
       setOpen(false);
-      router.invalidate();
+      await queryClient.invalidateQueries();
+      await router.invalidate();
     } catch (error) {
       toast.error("Failed to switch organization");
     }

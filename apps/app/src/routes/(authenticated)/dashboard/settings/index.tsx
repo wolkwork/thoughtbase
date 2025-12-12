@@ -95,7 +95,7 @@ function SettingsPage() {
 
 function SSOSettings({ organization }: { organization: any }) {
   const { data: secretData, refetch } = useQuery({
-    queryKey: ["org-secret"],
+    queryKey: ["org-secret", organization?.id],
     queryFn: () => $getOrgSecret(),
   });
 
