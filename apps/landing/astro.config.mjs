@@ -1,6 +1,6 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
-
+import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 
@@ -9,6 +9,9 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  adapter: vercel({
+    webAnalytics: true,
+  }),
   markdown: {
     drafts: true,
     shikiConfig: {
