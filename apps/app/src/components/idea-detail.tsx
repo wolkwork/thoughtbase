@@ -1,6 +1,6 @@
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { format, formatDistanceToNow } from "date-fns";
 import { lowerCase } from "lodash";
 import {
@@ -225,8 +225,10 @@ export function IdeaDetail({
       {/* Main Content */}
       <div className="h-full min-w-0 flex-1 py-6 pr-4 lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between px-8 pb-6">
-          <Button variant="outline" size="icon">
-            <ArrowLeftIcon className="size-4" />
+          <Button variant="outline" size="icon" asChild>
+            <Link to="../">
+              <ArrowLeftIcon className="size-4" />
+            </Link>
           </Button>
           {organizationId && (
             <Button

@@ -27,6 +27,7 @@ MVP:
 - Thank you screen after submission (styling)
 - Clickable logo in public facing
 - Login form styling
+- Add screenshots to ideas
 
 Future:
 

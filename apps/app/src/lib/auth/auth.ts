@@ -43,6 +43,7 @@ const getAuthConfig = createServerOnlyFn(() =>
       defaultCookieAttributes: {
         sameSite: "none",
         secure: true,
+        // TODO: Fix
         domain: ".thoughtbase.localhost",
       },
       trustedOrigins: [env.VITE_BASE_URL, "http://localhost:4321"], // Add demo app origin
