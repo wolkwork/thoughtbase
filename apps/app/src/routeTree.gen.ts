@@ -21,8 +21,10 @@ import { Route as authenticatedDashboardRouteRouteImport } from './routes/(authe
 import { Route as OrgSlugIndexRouteImport } from './routes/org/$slug/index'
 import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authenticated)/dashboard/index'
 import { Route as OrgSlugRoadmapRouteImport } from './routes/org/$slug/roadmap'
+import { Route as OrgSlugChangelogRouteImport } from './routes/org/$slug/changelog'
 import { Route as OrgSlugIdeaIdRouteImport } from './routes/org/$slug/$ideaId'
 import { Route as ApiWidgetIdeasRouteImport } from './routes/api/widget/ideas'
+import { Route as ApiWidgetChangelogRouteImport } from './routes/api/widget/changelog'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as authenticatedDashboardOrgSlugRouteRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/route'
 import { Route as authenticatedDashboardOrgSlugIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/index'
@@ -30,8 +32,11 @@ import { Route as authenticatedDashboardOrgSlugSettingsIndexRouteImport } from '
 import { Route as authenticatedDashboardOrgSlugRoadmapIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/roadmap/index'
 import { Route as authenticatedDashboardOrgSlugMembersIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/members/index'
 import { Route as authenticatedDashboardOrgSlugIdeasIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/ideas/index'
+import { Route as authenticatedDashboardOrgSlugChangelogIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/changelog/index'
 import { Route as authenticatedDashboardOrgSlugAccountIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/account/index'
 import { Route as authenticatedDashboardOrgSlugIdeasIdeaIdRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/ideas/$ideaId'
+import { Route as authenticatedDashboardOrgSlugChangelogNewRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/changelog/new'
+import { Route as authenticatedDashboardOrgSlugChangelogChangelogIdRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
 
 const authenticatedRouteRoute = authenticatedRouteRouteImport.update({
   id: '/(authenticated)',
@@ -93,6 +98,11 @@ const OrgSlugRoadmapRoute = OrgSlugRoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => OrgSlugRouteRoute,
 } as any)
+const OrgSlugChangelogRoute = OrgSlugChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => OrgSlugRouteRoute,
+} as any)
 const OrgSlugIdeaIdRoute = OrgSlugIdeaIdRouteImport.update({
   id: '/$ideaId',
   path: '/$ideaId',
@@ -101,6 +111,11 @@ const OrgSlugIdeaIdRoute = OrgSlugIdeaIdRouteImport.update({
 const ApiWidgetIdeasRoute = ApiWidgetIdeasRouteImport.update({
   id: '/api/widget/ideas',
   path: '/api/widget/ideas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWidgetChangelogRoute = ApiWidgetChangelogRouteImport.update({
+  id: '/api/widget/changelog',
+  path: '/api/widget/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -144,6 +159,12 @@ const authenticatedDashboardOrgSlugIdeasIndexRoute =
     path: '/ideas/',
     getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
   } as any)
+const authenticatedDashboardOrgSlugChangelogIndexRoute =
+  authenticatedDashboardOrgSlugChangelogIndexRouteImport.update({
+    id: '/changelog/',
+    path: '/changelog/',
+    getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
+  } as any)
 const authenticatedDashboardOrgSlugAccountIndexRoute =
   authenticatedDashboardOrgSlugAccountIndexRouteImport.update({
     id: '/account/',
@@ -154,6 +175,18 @@ const authenticatedDashboardOrgSlugIdeasIdeaIdRoute =
   authenticatedDashboardOrgSlugIdeasIdeaIdRouteImport.update({
     id: '/ideas/$ideaId',
     path: '/ideas/$ideaId',
+    getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
+  } as any)
+const authenticatedDashboardOrgSlugChangelogNewRoute =
+  authenticatedDashboardOrgSlugChangelogNewRouteImport.update({
+    id: '/changelog/new',
+    path: '/changelog/new',
+    getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
+  } as any)
+const authenticatedDashboardOrgSlugChangelogChangelogIdRoute =
+  authenticatedDashboardOrgSlugChangelogChangelogIdRouteImport.update({
+    id: '/changelog/$changelogId',
+    path: '/changelog/$changelogId',
     getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
   } as any)
 
@@ -167,14 +200,19 @@ export interface FileRoutesByFullPath {
   '/examples/sso': typeof ExamplesSsoRoute
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
+  '/org/$slug/changelog': typeof OrgSlugChangelogRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard/': typeof authenticatedDashboardIndexRoute
   '/org/$slug/': typeof OrgSlugIndexRoute
   '/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
+  '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
+  '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
   '/dashboard/$orgSlug/account': typeof authenticatedDashboardOrgSlugAccountIndexRoute
+  '/dashboard/$orgSlug/changelog': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   '/dashboard/$orgSlug/ideas': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
   '/dashboard/$orgSlug/members': typeof authenticatedDashboardOrgSlugMembersIndexRoute
   '/dashboard/$orgSlug/roadmap': typeof authenticatedDashboardOrgSlugRoadmapIndexRoute
@@ -187,14 +225,19 @@ export interface FileRoutesByTo {
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
+  '/org/$slug/changelog': typeof OrgSlugChangelogRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard': typeof authenticatedDashboardIndexRoute
   '/org/$slug': typeof OrgSlugIndexRoute
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugIndexRoute
+  '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
+  '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
   '/dashboard/$orgSlug/account': typeof authenticatedDashboardOrgSlugAccountIndexRoute
+  '/dashboard/$orgSlug/changelog': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   '/dashboard/$orgSlug/ideas': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
   '/dashboard/$orgSlug/members': typeof authenticatedDashboardOrgSlugMembersIndexRoute
   '/dashboard/$orgSlug/roadmap': typeof authenticatedDashboardOrgSlugRoadmapIndexRoute
@@ -213,14 +256,19 @@ export interface FileRoutesById {
   '/examples/sso': typeof ExamplesSsoRoute
   '/(authenticated)/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
+  '/org/$slug/changelog': typeof OrgSlugChangelogRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
   '/org/$slug/': typeof OrgSlugIndexRoute
   '/(authenticated)/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
+  '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
+  '/(authenticated)/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/(authenticated)/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
   '/(authenticated)/dashboard/$orgSlug/account/': typeof authenticatedDashboardOrgSlugAccountIndexRoute
+  '/(authenticated)/dashboard/$orgSlug/changelog/': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   '/(authenticated)/dashboard/$orgSlug/ideas/': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
   '/(authenticated)/dashboard/$orgSlug/members/': typeof authenticatedDashboardOrgSlugMembersIndexRoute
   '/(authenticated)/dashboard/$orgSlug/roadmap/': typeof authenticatedDashboardOrgSlugRoadmapIndexRoute
@@ -238,14 +286,19 @@ export interface FileRouteTypes {
     | '/examples/sso'
     | '/dashboard/$orgSlug'
     | '/api/auth/$'
+    | '/api/widget/changelog'
     | '/api/widget/ideas'
     | '/org/$slug/$ideaId'
+    | '/org/$slug/changelog'
     | '/org/$slug/roadmap'
     | '/dashboard/'
     | '/org/$slug/'
     | '/dashboard/$orgSlug/'
+    | '/dashboard/$orgSlug/changelog/$changelogId'
+    | '/dashboard/$orgSlug/changelog/new'
     | '/dashboard/$orgSlug/ideas/$ideaId'
     | '/dashboard/$orgSlug/account'
+    | '/dashboard/$orgSlug/changelog'
     | '/dashboard/$orgSlug/ideas'
     | '/dashboard/$orgSlug/members'
     | '/dashboard/$orgSlug/roadmap'
@@ -258,14 +311,19 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
+    | '/api/widget/changelog'
     | '/api/widget/ideas'
     | '/org/$slug/$ideaId'
+    | '/org/$slug/changelog'
     | '/org/$slug/roadmap'
     | '/dashboard'
     | '/org/$slug'
     | '/dashboard/$orgSlug'
+    | '/dashboard/$orgSlug/changelog/$changelogId'
+    | '/dashboard/$orgSlug/changelog/new'
     | '/dashboard/$orgSlug/ideas/$ideaId'
     | '/dashboard/$orgSlug/account'
+    | '/dashboard/$orgSlug/changelog'
     | '/dashboard/$orgSlug/ideas'
     | '/dashboard/$orgSlug/members'
     | '/dashboard/$orgSlug/roadmap'
@@ -283,14 +341,19 @@ export interface FileRouteTypes {
     | '/examples/sso'
     | '/(authenticated)/dashboard/$orgSlug'
     | '/api/auth/$'
+    | '/api/widget/changelog'
     | '/api/widget/ideas'
     | '/org/$slug/$ideaId'
+    | '/org/$slug/changelog'
     | '/org/$slug/roadmap'
     | '/(authenticated)/dashboard/'
     | '/org/$slug/'
     | '/(authenticated)/dashboard/$orgSlug/'
+    | '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
+    | '/(authenticated)/dashboard/$orgSlug/changelog/new'
     | '/(authenticated)/dashboard/$orgSlug/ideas/$ideaId'
     | '/(authenticated)/dashboard/$orgSlug/account/'
+    | '/(authenticated)/dashboard/$orgSlug/changelog/'
     | '/(authenticated)/dashboard/$orgSlug/ideas/'
     | '/(authenticated)/dashboard/$orgSlug/members/'
     | '/(authenticated)/dashboard/$orgSlug/roadmap/'
@@ -305,6 +368,7 @@ export interface RootRouteChildren {
   ApiUploadRoute: typeof ApiUploadRoute
   ExamplesSsoRoute: typeof ExamplesSsoRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiWidgetChangelogRoute: typeof ApiWidgetChangelogRoute
   ApiWidgetIdeasRoute: typeof ApiWidgetIdeasRoute
 }
 
@@ -394,6 +458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrgSlugRoadmapRouteImport
       parentRoute: typeof OrgSlugRouteRoute
     }
+    '/org/$slug/changelog': {
+      id: '/org/$slug/changelog'
+      path: '/changelog'
+      fullPath: '/org/$slug/changelog'
+      preLoaderRoute: typeof OrgSlugChangelogRouteImport
+      parentRoute: typeof OrgSlugRouteRoute
+    }
     '/org/$slug/$ideaId': {
       id: '/org/$slug/$ideaId'
       path: '/$ideaId'
@@ -406,6 +477,13 @@ declare module '@tanstack/react-router' {
       path: '/api/widget/ideas'
       fullPath: '/api/widget/ideas'
       preLoaderRoute: typeof ApiWidgetIdeasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/widget/changelog': {
+      id: '/api/widget/changelog'
+      path: '/api/widget/changelog'
+      fullPath: '/api/widget/changelog'
+      preLoaderRoute: typeof ApiWidgetChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -457,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedDashboardOrgSlugIdeasIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
+    '/(authenticated)/dashboard/$orgSlug/changelog/': {
+      id: '/(authenticated)/dashboard/$orgSlug/changelog/'
+      path: '/changelog'
+      fullPath: '/dashboard/$orgSlug/changelog'
+      preLoaderRoute: typeof authenticatedDashboardOrgSlugChangelogIndexRouteImport
+      parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
+    }
     '/(authenticated)/dashboard/$orgSlug/account/': {
       id: '/(authenticated)/dashboard/$orgSlug/account/'
       path: '/account'
@@ -469,6 +554,20 @@ declare module '@tanstack/react-router' {
       path: '/ideas/$ideaId'
       fullPath: '/dashboard/$orgSlug/ideas/$ideaId'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugIdeasIdeaIdRouteImport
+      parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
+    }
+    '/(authenticated)/dashboard/$orgSlug/changelog/new': {
+      id: '/(authenticated)/dashboard/$orgSlug/changelog/new'
+      path: '/changelog/new'
+      fullPath: '/dashboard/$orgSlug/changelog/new'
+      preLoaderRoute: typeof authenticatedDashboardOrgSlugChangelogNewRouteImport
+      parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
+    }
+    '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId': {
+      id: '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
+      path: '/changelog/$changelogId'
+      fullPath: '/dashboard/$orgSlug/changelog/$changelogId'
+      preLoaderRoute: typeof authenticatedDashboardOrgSlugChangelogChangelogIdRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
   }
@@ -490,8 +589,11 @@ const authPagesRouteRouteWithChildren = authPagesRouteRoute._addFileChildren(
 
 interface authenticatedDashboardOrgSlugRouteRouteChildren {
   authenticatedDashboardOrgSlugIndexRoute: typeof authenticatedDashboardOrgSlugIndexRoute
+  authenticatedDashboardOrgSlugChangelogChangelogIdRoute: typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
+  authenticatedDashboardOrgSlugChangelogNewRoute: typeof authenticatedDashboardOrgSlugChangelogNewRoute
   authenticatedDashboardOrgSlugIdeasIdeaIdRoute: typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
   authenticatedDashboardOrgSlugAccountIndexRoute: typeof authenticatedDashboardOrgSlugAccountIndexRoute
+  authenticatedDashboardOrgSlugChangelogIndexRoute: typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   authenticatedDashboardOrgSlugIdeasIndexRoute: typeof authenticatedDashboardOrgSlugIdeasIndexRoute
   authenticatedDashboardOrgSlugMembersIndexRoute: typeof authenticatedDashboardOrgSlugMembersIndexRoute
   authenticatedDashboardOrgSlugRoadmapIndexRoute: typeof authenticatedDashboardOrgSlugRoadmapIndexRoute
@@ -502,10 +604,16 @@ const authenticatedDashboardOrgSlugRouteRouteChildren: authenticatedDashboardOrg
   {
     authenticatedDashboardOrgSlugIndexRoute:
       authenticatedDashboardOrgSlugIndexRoute,
+    authenticatedDashboardOrgSlugChangelogChangelogIdRoute:
+      authenticatedDashboardOrgSlugChangelogChangelogIdRoute,
+    authenticatedDashboardOrgSlugChangelogNewRoute:
+      authenticatedDashboardOrgSlugChangelogNewRoute,
     authenticatedDashboardOrgSlugIdeasIdeaIdRoute:
       authenticatedDashboardOrgSlugIdeasIdeaIdRoute,
     authenticatedDashboardOrgSlugAccountIndexRoute:
       authenticatedDashboardOrgSlugAccountIndexRoute,
+    authenticatedDashboardOrgSlugChangelogIndexRoute:
+      authenticatedDashboardOrgSlugChangelogIndexRoute,
     authenticatedDashboardOrgSlugIdeasIndexRoute:
       authenticatedDashboardOrgSlugIdeasIndexRoute,
     authenticatedDashboardOrgSlugMembersIndexRoute:
@@ -552,12 +660,14 @@ const authenticatedRouteRouteWithChildren =
 
 interface OrgSlugRouteRouteChildren {
   OrgSlugIdeaIdRoute: typeof OrgSlugIdeaIdRoute
+  OrgSlugChangelogRoute: typeof OrgSlugChangelogRoute
   OrgSlugRoadmapRoute: typeof OrgSlugRoadmapRoute
   OrgSlugIndexRoute: typeof OrgSlugIndexRoute
 }
 
 const OrgSlugRouteRouteChildren: OrgSlugRouteRouteChildren = {
   OrgSlugIdeaIdRoute: OrgSlugIdeaIdRoute,
+  OrgSlugChangelogRoute: OrgSlugChangelogRoute,
   OrgSlugRoadmapRoute: OrgSlugRoadmapRoute,
   OrgSlugIndexRoute: OrgSlugIndexRoute,
 }
@@ -574,6 +684,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUploadRoute: ApiUploadRoute,
   ExamplesSsoRoute: ExamplesSsoRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiWidgetChangelogRoute: ApiWidgetChangelogRoute,
   ApiWidgetIdeasRoute: ApiWidgetIdeasRoute,
 }
 export const routeTree = rootRouteImport

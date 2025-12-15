@@ -28,18 +28,25 @@ import Wrapper from "@/components/fundations/containers/Wrapper.astro";
       </Text>
     </div>
     <div
-      class="flex flex-wrap items-center justify-center w-full mt-10 just gap-2"
+      class="flex flex-wrap items-center justify-center w-full mt-10 just gap-2 pb-16"
     >
       <Link
         size="sm"
         variant="accent"
-        href="https://thoughtbase.app/auth/signup">Get started for free</Link
+        href="#"
+        class="opacity-70 relative group"
       >
-    </div>
-    <Image
+        Get started for free
+        <span
+          class="pointer-events-none absolute inset-0 flex items-center justify-center z-10 px-3 py-1.5 rounded-full bg-black text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity"
+          >Coming soon!
+        </span>
+      </Link>
+      <!-- <Image
       src={Dashboard}
       alt="Dashboard"
       class="w-full h-auto mt-8 rounded-xl"
-    />
+    /> -->
+    </div>
   </Wrapper>
 </section>

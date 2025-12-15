@@ -22,14 +22,20 @@ export function FeedbackWidget({
   if (!isOpen) return null;
 
   return (
-    <WidgetLayout activeTab={activeTab} onTabChange={setActiveTab} onClose={onClose}>
+    <WidgetLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      onClose={onClose}
+    >
       {activeTab === "feedback" && (
         <SubmitView organizationId={organizationId} ssoToken={ssoToken} />
       )}
       {activeTab === "roadmap" && (
         <RoadmapView organizationId={organizationId} ssoToken={ssoToken} />
       )}
-      {activeTab === "updates" && <ChangelogView />}
+      {activeTab === "updates" && (
+        <ChangelogView organizationId={organizationId} />
+      )}
     </WidgetLayout>
   );
 }

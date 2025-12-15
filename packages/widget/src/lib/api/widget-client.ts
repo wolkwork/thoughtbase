@@ -13,10 +13,25 @@ export interface Idea {
   };
 }
 
+export interface Changelog {
+  id: string;
+  title: string;
+  content: string | null;
+  featuredImage: string | null;
+  publishedAt: string | null;
+  status: string;
+  organizationId: string;
+  createdAt: string;
+  ideas: Idea[];
+}
+
 export async function getWidgetIdeas(organizationId: string): Promise<Idea[]> {
-  const res = await fetch(`${BASE_URL}/api/widget/ideas?organizationId=${organizationId}`, {
-    mode: "cors",
-  });
+  const res = await fetch(
+    `${BASE_URL}/api/widget/ideas?organizationId=${organizationId}`,
+    {
+      mode: "cors",
+    }
+  );
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Failed to fetch ideas: ${text}`);
@@ -44,3 +59,18 @@ export async function createWidgetIdea(data: {
   return res.json();
 }
 
+export async function getWidgetChangelogs(
+  organizationId: string
+): Promise<Changelog[]> {
+  const res = await fetch(
+    `${BASE_URL}/api/widget/changelog?organizationId=${organizationId}`,
+    {
+      mode: "cors",
+    }
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch changelogs: ${text}`);
+  }
+  return res.json();
+}

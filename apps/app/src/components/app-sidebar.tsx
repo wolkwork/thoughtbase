@@ -3,6 +3,7 @@ import {
   BrowserIcon,
   GearSixIcon,
   KanbanIcon,
+  NewspaperIcon,
   SparkleIcon,
   UserCircleIcon,
 } from "@phosphor-icons/react";
@@ -150,6 +151,25 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                   >
                     <KanbanIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
                     <span>Roadmap</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname.includes("/changelog")}
+                >
+                  <Link
+                    to="/dashboard/$orgSlug/changelog"
+                    params={{ orgSlug }}
+                    className="flex gap-2.5 text-black/70"
+                  >
+                    <NewspaperIcon
+                      className="size-5.5!"
+                      weight="duotone"
+                      color="#7d7d7d"
+                    />
+                    <span>Changelog</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -12,18 +12,19 @@ MVP:
 - Settings styling
 - Backoffice roadmap styling
 - Frontoffice roadmap styling
-- Script for embedding widget
 - Proper subdomain redirects
+- React component for widget
 - Org switcher styling
 - Guest post (enable disable)
 - DNS configs
-- Turn off thoughtbase branding
+- Add thoughtbase branding
+- Option for turning off thoughtbase branding
 - Docs
 - Terms & Privacy
 - Landing page
 - Onboarding
 - Changelog
-- Thank you screen after submission
+- Thank you screen after submission (styling)
 - Clickable logo in public facing
 - Login form styling
 

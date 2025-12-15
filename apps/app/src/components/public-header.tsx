@@ -56,9 +56,14 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
             >
               Roadmap
             </Link>
-            <span className="text-muted-foreground cursor-not-allowed opacity-50">
+            <Link
+              to="/org/$slug/changelog"
+              params={{ slug: org.slug }}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              activeProps={{ className: "text-primary" }}
+            >
               Updates
-            </span>
+            </Link>
           </nav>
         </div>
 
