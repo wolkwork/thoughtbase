@@ -31,15 +31,17 @@ function MembersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button asChild>
-            <Link
-              to="/dashboard/$orgSlug/settings"
-              params={{ orgSlug }}
-              search={{ success: false }}
-            >
-              Go to Settings
-            </Link>
-          </Button>
+          <Button
+            render={
+              <Link
+                to="/dashboard/$orgSlug/settings"
+                params={{ orgSlug }}
+                search={{ success: false }}
+              >
+                Go to Settings
+              </Link>
+            }
+          />
         </CardContent>
       </Card>
     </div>

@@ -69,7 +69,7 @@ export function CreateOrganizationDialog({
 
   return (
     <Dialog open={finalOpen} onOpenChange={finalOnOpenChange}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      {trigger && <DialogTrigger render={trigger as React.ReactElement} />}
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleCreate}>
           <DialogHeader>

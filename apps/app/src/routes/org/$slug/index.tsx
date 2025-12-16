@@ -1,4 +1,4 @@
-import { ChatsCircleIcon, HeartIcon, LightbulbIcon } from "@phosphor-icons/react";
+import { LightbulbIcon } from "@phosphor-icons/react";
 import {
   useInfiniteQuery,
   useMutation,
@@ -31,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { $getIdeasFeed, $getPublicCounts, $toggleReaction } from "~/lib/api/ideas";
-import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/org/$slug/")({
   component: OrganizationIndexPage,
@@ -214,14 +213,17 @@ function OrganizationIndexPage() {
 
             <div className="flex items-center gap-3 px-6">
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    {sortBy === "trending" && <Flame className="h-4 w-4" />}
-                    {sortBy === "top" && <ArrowUp className="h-4 w-4" />}
-                    {sortBy === "newest" && <ArrowDown className="h-4 w-4" />}
-                    <span>{getSortLabel(sortBy)}</span>
-                  </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="outline" className="gap-2">
+                      {sortBy === "trending" && <Flame className="h-4 w-4" />}
+                      {sortBy === "top" && <ArrowUp className="h-4 w-4" />}
+                      {sortBy === "newest" && <ArrowDown className="h-4 w-4" />}
+                      <span>{getSortLabel(sortBy)}</span>
+                    </Button>
+                  }
+                />
+
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => setSortBy("newest")}>
                     <ArrowDown className="mr-2 h-4 w-4" />
@@ -345,6 +347,10 @@ function OrganizationIndexPage() {
             <Button className="w-full" onClick={handleSubmitClick}>
               Submit an idea
             </Button>
+          </div>
+
+          <div className="text-muted-foreground bg-muted/20 border-t py-3 text-center text-xs">
+            Powered by <span className="font-medium">Thoughtbase</span>
           </div>
         </div>
       </div>

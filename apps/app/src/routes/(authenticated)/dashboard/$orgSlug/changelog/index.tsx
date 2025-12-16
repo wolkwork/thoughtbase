@@ -54,24 +54,28 @@ function ChangelogListPage() {
             Keep your users informed about updates and new features
           </p>
         </div>
-        <Button asChild>
-          <Link to="/dashboard/$orgSlug/changelog/new" params={{ orgSlug }}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Entry
-          </Link>
-        </Button>
+        <Button
+          render={
+            <Link to="/dashboard/$orgSlug/changelog/new" params={{ orgSlug }}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Entry
+            </Link>
+          }
+        />
       </div>
 
       {changelogs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">No changelog entries yet</p>
-            <Button asChild>
-              <Link to="/dashboard/$orgSlug/changelog/new" params={{ orgSlug }}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create your first entry
-              </Link>
-            </Button>
+            <Button
+              render={
+                <Link to="/dashboard/$orgSlug/changelog/new" params={{ orgSlug }}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create your first entry
+                </Link>
+              }
+            />
           </CardContent>
         </Card>
       ) : (

@@ -176,22 +176,27 @@ const createColumns = (
     cell: ({ row }) => {
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            }
+          />
+
           <DropdownMenuContent align="end">
             {orgSlug && (
-              <DropdownMenuItem asChild>
-                <Link
-                  to="/dashboard/$orgSlug/changelog/$changelogId"
-                  params={{ orgSlug, changelogId: row.original.id }}
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edit
-                </Link>
-              </DropdownMenuItem>
+              <DropdownMenuItem
+                render={
+                  <Link
+                    to="/dashboard/$orgSlug/changelog/$changelogId"
+                    params={{ orgSlug, changelogId: row.original.id }}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                }
+              />
             )}
             {onDelete && (
               <DropdownMenuItem
@@ -276,7 +281,7 @@ export function ChangelogDataTable({
     },
   });
 
-  const handleSortChange = (value: string) => {
+  const handleSortChange = (value: string | null) => {
     switch (value) {
       case "newest":
         setSorting([{ id: "createdAt", desc: true }]);
@@ -308,18 +313,21 @@ export function ChangelogDataTable({
 
           {/* Status Filter */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="relative border-dashed">
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Status
-                {(table.getColumn("status")?.getFilterValue() as string[])?.length >
-                  0 && (
-                  <div className="bg-primary absolute top-0 right-0 flex size-4 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[11px] font-medium text-white">
-                    {(table.getColumn("status")?.getFilterValue() as string[])?.length}
-                  </div>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className="relative border-dashed">
+                  <SlidersHorizontal className="mr-2 h-4 w-4" />
+                  Status
+                  {(table.getColumn("status")?.getFilterValue() as string[])?.length >
+                    0 && (
+                    <div className="bg-primary absolute top-0 right-0 flex size-4 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[11px] font-medium text-white">
+                      {(table.getColumn("status")?.getFilterValue() as string[])?.length}
+                    </div>
+                  )}
+                </Button>
+              }
+            />
+
             <DropdownMenuContent align="start" className="w-[200px]">
               <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -355,7 +363,7 @@ export function ChangelogDataTable({
           <Select onValueChange={handleSortChange} defaultValue="newest">
             <SelectTrigger className="w-[130px]">
               <ArrowDown01 />
-              <SelectValue placeholder="Sort by" />
+              <SelectValue data-placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">Newest</SelectItem>

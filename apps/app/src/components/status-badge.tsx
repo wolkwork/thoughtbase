@@ -60,7 +60,7 @@ export function StatusBadge({
   if (!showLabel) {
     return (
       <Tooltip>
-        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipTrigger render={content} />
         <TooltipContent>{config.label}</TooltipContent>
       </Tooltip>
     );

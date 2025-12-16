@@ -42,16 +42,16 @@ function DashboardIndex() {
                   key={org.id}
                   variant="outline"
                   className="h-auto w-full justify-start px-4 py-4"
-                  asChild
-                >
-                  <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
-                    <Building2 className="text-muted-foreground mr-3 h-5 w-5" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{org.name}</span>
-                      <span className="text-muted-foreground text-xs">{org.slug}</span>
-                    </div>
-                  </Link>
-                </Button>
+                  render={
+                    <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
+                      <Building2 className="text-muted-foreground mr-3 h-5 w-5" />
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium">{org.name}</span>
+                        <span className="text-muted-foreground text-xs">{org.slug}</span>
+                      </div>
+                    </Link>
+                  }
+                />
               ))}
               {organizations?.length === 0 && (
                 <div className="text-muted-foreground py-4 text-center text-sm">

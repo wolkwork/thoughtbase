@@ -75,11 +75,14 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
           {user ? (
             <div className="flex items-center gap-3">
               {user.type === "internal" && (
-                <Button variant="ghost" asChild>
-                  <Link to="/dashboard/ideas" search={{}}>
-                    Dashboard
-                  </Link>
-                </Button>
+                <Button
+                  variant="ghost"
+                  render={
+                    <Link to="/dashboard/$orgSlug/ideas" params={{ orgSlug: org.slug }}>
+                      Dashboard
+                    </Link>
+                  }
+                />
               )}
               <div className="bg-muted flex h-8 w-8 items-center justify-center overflow-hidden rounded-full text-xs">
                 {user.image ? (
@@ -95,9 +98,7 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
             </div>
           ) : (
             <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">Login</Button>
-              </DialogTrigger>
+              <DialogTrigger render={<Button variant="outline">Login</Button>} />
               <DialogContent className="sm:max-w-[425px]">
                 <AuthForm
                   orgName={org.name}

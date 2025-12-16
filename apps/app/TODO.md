@@ -1,7 +1,5 @@
 MVP:
 
-- Customization (logo, color theme)
-- White label / remove branding
 - Boards --> Topics/tags
 - User can edit ideas
 - Update idea status from idea detail page
@@ -23,7 +21,7 @@ MVP:
 - Terms & Privacy
 - Landing page
 - Onboarding
-- Changelog
+- Changelog styling
 - Thank you screen after submission (styling)
 - Clickable logo in public facing
 - Login form styling
@@ -32,6 +30,7 @@ MVP:
 Future:
 
 - Auto approve
+- Customization (color theme)
 - Ban users
 - Email "subscribers" of issues
 - Integrations (Linear?)
@@ -49,7 +48,7 @@ Paid:
 - SSO
 - Private boards
 - Integrations
-- White label / no thoughtbase branding
+- no thoughtbase branding
 
 Enterprise:
 

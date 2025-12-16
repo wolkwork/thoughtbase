@@ -233,20 +233,23 @@ export function ChangelogEditor({
         </div>
 
         <Popover open={ideaSelectOpen} onOpenChange={setIdeaSelectOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              type="button"
-              variant="outline"
-              role="combobox"
-              aria-expanded={ideaSelectOpen}
-              className="w-full justify-between"
-            >
-              {selectedIdeaIds.length > 0
-                ? `${selectedIdeaIds.length} idea${selectedIdeaIds.length > 1 ? "s" : ""} selected`
-                : "Select ideas to include..."}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
+          <PopoverTrigger
+            render={
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                aria-expanded={ideaSelectOpen}
+                className="w-full justify-between"
+              >
+                {selectedIdeaIds.length > 0
+                  ? `${selectedIdeaIds.length} idea${selectedIdeaIds.length > 1 ? "s" : ""} selected`
+                  : "Select ideas to include..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            }
+          />
+
           <PopoverContent className="w-[400px] p-0" align="start">
             <Command>
               <CommandInput placeholder="Search ideas..." />
@@ -323,19 +326,22 @@ export function ChangelogEditor({
         <div className="flex-1 space-y-2">
           <Label>Publishing Date</Label>
           <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !publishedAt && "text-muted-foreground",
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {publishedAt ? format(publishedAt, "PPP") : "Pick a date"}
-              </Button>
-            </PopoverTrigger>
+            <PopoverTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !publishedAt && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {publishedAt ? format(publishedAt, "PPP") : "Pick a date"}
+                </Button>
+              }
+            />
+
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"

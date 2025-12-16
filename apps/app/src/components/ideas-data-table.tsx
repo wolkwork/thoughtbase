@@ -293,7 +293,7 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
   });
 
   // Handlers for custom sort select
-  const handleSortChange = (value: string) => {
+  const handleSortChange = (value: string | null) => {
     switch (value) {
       case "newest":
         setSorting([{ id: "createdAt", desc: true }]);
@@ -340,18 +340,20 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
 
           {/* Status Filter */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="relative border-dashed">
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Status
-                {(table.getColumn("status")?.getFilterValue() as string[])?.length >
-                  0 && (
-                  <div className="bg-primary absolute top-0 right-0 flex size-4 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[11px] font-medium text-white">
-                    {(table.getColumn("status")?.getFilterValue() as string[])?.length}
-                  </div>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className="relative border-dashed">
+                  <SlidersHorizontal className="mr-2 h-4 w-4" />
+                  Status
+                  {(table.getColumn("status")?.getFilterValue() as string[])?.length >
+                    0 && (
+                    <div className="bg-primary absolute top-0 right-0 flex size-4 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[11px] font-medium text-white">
+                      {(table.getColumn("status")?.getFilterValue() as string[])?.length}
+                    </div>
+                  )}
+                </Button>
+              }
+            />
             <DropdownMenuContent align="start" className="w-[200px]">
               <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -387,12 +389,15 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
           {/* Tags Filter */}
           {allTags.length > 0 && (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-dashed">
-                  <SlidersHorizontal className="mr-2 h-4 w-4" />
-                  Tags
-                </Button>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="outline" className="border-dashed">
+                    <SlidersHorizontal className="mr-2 h-4 w-4" />
+                    Tags
+                  </Button>
+                }
+              />
+
               <DropdownMenuContent align="start" className="w-[200px]">
                 <DropdownMenuLabel>Filter by Tag</DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -424,7 +429,7 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
           <Select onValueChange={handleSortChange} defaultValue="newest">
             <SelectTrigger className="w-[130px]">
               <ArrowDown01 />
-              <SelectValue placeholder="Sort by" />
+              <SelectValue data-placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">Newest</SelectItem>

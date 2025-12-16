@@ -57,6 +57,7 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
   const isPending = isLoginPending || isSignUpPending;
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("handleLogin");
     e.preventDefault();
     if (isPending) return;
     const formData = new FormData(e.currentTarget);
@@ -140,7 +141,7 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
                 required
               />
             </div>
-            <Button disabled={isPending}>
+            <Button type="submit" disabled={isPending}>
               {isPending && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
               {isSignUp ? "Sign Up" : "Sign In"}
             </Button>

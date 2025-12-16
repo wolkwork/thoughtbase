@@ -1,6 +1,13 @@
-import { Gift, Map as MapIcon, MessageCircleHeart, X } from "lucide-react";
+import {
+  Gift,
+  HeartIcon,
+  Map as MapIcon,
+  MessageCircleHeart,
+  X,
+} from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+import { AnimatedShinyText } from "../ui/animated-shiny-text";
 
 export type Tab = "feedback" | "roadmap" | "updates";
 
@@ -22,7 +29,12 @@ export function WidgetLayout({
       {/* Content */}
       <div className="flex flex-1 grow flex-col overflow-hidden">
         <div className="flex items-center justify-end px-4 py-4">
-          <Button variant="outline" size="icon" className="size-7" onClick={onClose}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-7"
+            onClick={onClose}
+          >
             <X />
           </Button>
         </div>
@@ -36,7 +48,9 @@ export function WidgetLayout({
             onClick={() => onTabChange("feedback")}
             className={cn(
               "hover:bg-muted flex flex-col items-center gap-1 rounded-lg p-2 text-xs font-medium transition-colors",
-              activeTab === "feedback" ? "text-foreground" : "text-muted-foreground",
+              activeTab === "feedback"
+                ? "text-foreground"
+                : "text-muted-foreground"
             )}
           >
             <MessageCircleHeart className="size-5" />
@@ -46,7 +60,9 @@ export function WidgetLayout({
             onClick={() => onTabChange("roadmap")}
             className={cn(
               "hover:bg-muted flex flex-col items-center gap-1 rounded-lg p-2 text-xs font-medium transition-colors",
-              activeTab === "roadmap" ? "text-foreground" : "text-muted-foreground",
+              activeTab === "roadmap"
+                ? "text-foreground"
+                : "text-muted-foreground"
             )}
           >
             <MapIcon className="h-5 w-5" />
@@ -56,7 +72,9 @@ export function WidgetLayout({
             onClick={() => onTabChange("updates")}
             className={cn(
               "hover:bg-muted flex flex-col items-center gap-1 rounded-lg p-2 text-xs font-medium transition-colors",
-              activeTab === "updates" ? "text-foreground" : "text-muted-foreground",
+              activeTab === "updates"
+                ? "text-foreground"
+                : "text-muted-foreground"
             )}
           >
             <Gift className="h-5 w-5" />
@@ -64,7 +82,10 @@ export function WidgetLayout({
           </button>
         </div>
       </div>
+
+      <div className="text-xs text-muted-foreground text-center py-2 bg-muted/20 border-t">
+        Powered by <AnimatedShinyText>Thoughtbase</AnimatedShinyText>
+      </div>
     </div>
   );
 }
-

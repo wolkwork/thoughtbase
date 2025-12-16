@@ -32,35 +32,37 @@ export function SidebarOrganizationSwitcher({
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border-none! bg-transparent! ring-0! outline-none"
-              >
-                <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  {activeOrganization?.logo ? (
-                    <img
-                      src={activeOrganization.logo}
-                      alt={activeOrganization.name}
-                      className="size-8 rounded-lg"
-                    />
-                  ) : (
-                    <span className="font-semibold">
-                      {activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}
+            <DropdownMenuTrigger
+              render={
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border-none! bg-transparent! ring-0! outline-none"
+                >
+                  <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                    {activeOrganization?.logo ? (
+                      <img
+                        src={activeOrganization.logo}
+                        alt={activeOrganization.name}
+                        className="size-8 rounded-lg"
+                      />
+                    ) : (
+                      <span className="font-semibold">
+                        {activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">
+                      {activeOrganization?.name || "Select Organization"}
                     </span>
-                  )}
-                </div>
-                <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {activeOrganization?.name || "Select Organization"}
-                  </span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    Free Plan
-                  </span>
-                </div>
-                <ChevronsUpDown className="ml-auto size-4!" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
+                    <span className="text-muted-foreground truncate text-xs">
+                      Free Plan
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4!" />
+                </SidebarMenuButton>
+              }
+            />
             <DropdownMenuContent
               className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
               align="start"
@@ -70,25 +72,31 @@ export function SidebarOrganizationSwitcher({
                 Organizations
               </DropdownMenuLabel>
               {organizations?.map((org) => (
-                <DropdownMenuItem key={org.id} className="gap-2 p-2" asChild>
-                  <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
-                    <div className="flex size-6 items-center justify-center rounded-sm border">
-                      {org.logo ? (
-                        <img
-                          src={org.logo}
-                          alt={org.name}
-                          className="size-6 rounded-sm"
-                        />
-                      ) : (
-                        <span className="text-xs font-medium">
-                          {org.name.substring(0, 2).toUpperCase()}
-                        </span>
+                <DropdownMenuItem
+                  key={org.id}
+                  className="gap-2 p-2"
+                  render={
+                    <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
+                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                        {org.logo ? (
+                          <img
+                            src={org.logo}
+                            alt={org.name}
+                            className="size-6 rounded-sm"
+                          />
+                        ) : (
+                          <span className="text-xs font-medium">
+                            {org.name.substring(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      {org.name}
+                      {org.slug === currentOrgSlug && (
+                        <Check className="ml-auto h-4 w-4" />
                       )}
-                    </div>
-                    {org.name}
-                    {org.slug === currentOrgSlug && <Check className="ml-auto h-4 w-4" />}
-                  </Link>
-                </DropdownMenuItem>
+                    </Link>
+                  }
+                />
               ))}
               {organizations?.length === 0 && (
                 <div className="text-muted-foreground p-2 text-center text-sm">

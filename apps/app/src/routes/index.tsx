@@ -67,9 +67,13 @@ function UserAction() {
   return user ? (
     <div className="flex flex-col items-center gap-2">
       <p>Welcome back, {user.name}!</p>
-      <Button type="button" asChild className="mb-2 w-fit" size="lg">
-        <Link to="/dashboard">Go to Dashboard</Link>
-      </Button>
+      <Button
+        type="button"
+        render={<Link to="/dashboard">Go to Dashboard</Link>}
+        className="mb-2 w-fit"
+        size="lg"
+      />
+
       <div className="text-center text-xs sm:text-sm">
         Session user:
         <pre className="max-w-screen overflow-x-auto px-2 text-start">
@@ -82,9 +86,12 @@ function UserAction() {
   ) : (
     <div className="flex flex-col items-center gap-2">
       <p>You are not signed in.</p>
-      <Button type="button" asChild className="w-fit" size="lg">
-        <Link to="/login">Log in</Link>
-      </Button>
+      <Button
+        type="button"
+        render={<Link to="/login">Log in</Link>}
+        className="w-fit"
+        size="lg"
+      />
     </div>
   );
 }

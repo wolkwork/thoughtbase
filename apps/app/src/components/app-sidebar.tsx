@@ -1,4 +1,3 @@
-import { FeedbackWidget } from "@feedback-tool/widget";
 import {
   BrowserIcon,
   GearSixIcon,
@@ -14,6 +13,7 @@ import {
   useRouteContext,
   useRouter,
 } from "@tanstack/react-router";
+import { FeedbackWidget } from "@thoughtbase/widget";
 import { ChevronsUpDown, CircleDashed, LogOut, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { StatusBadge, STATUSES } from "~/components/status-badge";
@@ -92,15 +92,18 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                     key={statusSlug}
                     className="flex items-center gap-2 text-black/70"
                   >
-                    <SidebarMenuButton asChild isActive={isStatusActive}>
-                      <Link
-                        to="/dashboard/$orgSlug/ideas"
-                        params={{ orgSlug }}
-                        search={{ status: statusSlug }}
-                      >
-                        <StatusBadge status={statusSlug} iconClassName="size-5" />
-                      </Link>
-                    </SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={isStatusActive}
+                      render={
+                        <Link
+                          to="/dashboard/$orgSlug/ideas"
+                          params={{ orgSlug }}
+                          search={{ status: statusSlug }}
+                        >
+                          <StatusBadge status={statusSlug} iconClassName="size-5" />
+                        </Link>
+                      }
+                    />
                     {counts[statusSlug] > 0 && (
                       <SidebarMenuBadge className="mr-0.5">
                         {counts[statusSlug]}
@@ -111,20 +114,21 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
               })}
               <SidebarMenuItem className="flex items-center">
                 <SidebarMenuButton
-                  asChild
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/ideas"
+                      params={{ orgSlug }}
+                      search={{ status: undefined }}
+                    >
+                      <CircleDashed className="size-5 text-gray-400" />
+                      <span>All Ideas</span>
+                    </Link>
+                  }
                   isActive={
                     location.pathname.includes("/ideas") && !location.search?.status
                   }
-                >
-                  <Link
-                    to="/dashboard/$orgSlug/ideas"
-                    params={{ orgSlug }}
-                    search={{ status: undefined }}
-                  >
-                    <CircleDashed className="size-5 text-gray-400" />
-                    <span>All Ideas</span>
-                  </Link>
-                </SidebarMenuButton>
+                />
+
                 <SidebarMenuBadge className="mr-0.5">
                   {Object.values(counts).reduce((a, b) => a + b, 0)}
                 </SidebarMenuBadge>
@@ -141,84 +145,99 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  asChild
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/roadmap"
+                      params={{ orgSlug }}
+                      className="flex gap-2.5 text-black/70"
+                    >
+                      <KanbanIcon
+                        className="size-5.5!"
+                        weight="duotone"
+                        color="#7d7d7d"
+                      />
+                      <span>Roadmap</span>
+                    </Link>
+                  }
                   isActive={location.pathname.includes("/roadmap")}
-                >
-                  <Link
-                    to="/dashboard/$orgSlug/roadmap"
-                    params={{ orgSlug }}
-                    className="flex gap-2.5 text-black/70"
-                  >
-                    <KanbanIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
-                    <span>Roadmap</span>
-                  </Link>
-                </SidebarMenuButton>
+                />
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  asChild
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/changelog"
+                      params={{ orgSlug }}
+                      className="flex gap-2.5 text-black/70"
+                    >
+                      <NewspaperIcon
+                        className="size-5.5!"
+                        weight="duotone"
+                        color="#7d7d7d"
+                      />
+                      <span>Changelog</span>
+                    </Link>
+                  }
                   isActive={location.pathname.includes("/changelog")}
-                >
-                  <Link
-                    to="/dashboard/$orgSlug/changelog"
-                    params={{ orgSlug }}
-                    className="flex gap-2.5 text-black/70"
-                  >
-                    <NewspaperIcon
-                      className="size-5.5!"
-                      weight="duotone"
-                      color="#7d7d7d"
-                    />
-                    <span>Changelog</span>
-                  </Link>
-                </SidebarMenuButton>
+                />
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  asChild
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/members"
+                      params={{ orgSlug }}
+                      className="flex gap-2.5 text-black/70"
+                    >
+                      <UserCircleIcon
+                        className="size-5.5!"
+                        weight="duotone"
+                        color="#7d7d7d"
+                      />
+                      <span>Members</span>
+                    </Link>
+                  }
                   isActive={location.pathname.includes("/members")}
-                >
-                  <Link
-                    to="/dashboard/$orgSlug/members"
-                    params={{ orgSlug }}
-                    className="flex gap-2.5 text-black/70"
-                  >
-                    <UserCircleIcon
-                      className="size-5.5!"
-                      weight="duotone"
-                      color="#7d7d7d"
-                    />
-                    <span>Members</span>
-                  </Link>
-                </SidebarMenuButton>
+                />
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  asChild
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/settings"
+                      params={{ orgSlug }}
+                      className="flex gap-2.5 text-black/70"
+                      search={{ success: false }}
+                    >
+                      <GearSixIcon
+                        className="size-5.5!"
+                        weight="duotone"
+                        color="#7d7d7d"
+                      />
+                      <span>Settings</span>
+                    </Link>
+                  }
                   isActive={location.pathname.includes("/settings")}
-                >
-                  <Link
-                    to="/dashboard/$orgSlug/settings"
-                    params={{ orgSlug }}
-                    className="flex gap-2.5 text-black/70"
-                  >
-                    <GearSixIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
+                />
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a
-                    href={`/org/${orgSlug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex gap-2.5 text-black/70"
-                  >
-                    <BrowserIcon className="size-5.5!" weight="duotone" color="#7d7d7d" />
-                    <span>My Board</span>
-                  </a>
-                </SidebarMenuButton>
+                <SidebarMenuButton
+                  render={
+                    <a
+                      href={`/org/${orgSlug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex gap-2.5 text-black/70"
+                    >
+                      <BrowserIcon
+                        className="size-5.5!"
+                        weight="duotone"
+                        color="#7d7d7d"
+                      />
+                      <span>My Board</span>
+                    </a>
+                  }
+                />
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
@@ -228,54 +247,73 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild onClick={() => setWidgetOpen(true)}>
-              <Button
-                variant="outline"
-                className="border-border justify-start rounded-lg border bg-white text-start"
-              >
-                <SparkleIcon weight="bold" />
-                <span>Got Ideas? Tell Us!</span>
-              </Button>
-            </SidebarMenuButton>
+            <SidebarMenuButton
+              onClick={() => setWidgetOpen(true)}
+              render={
+                <Button
+                  variant="outline"
+                  className="border-border w-full justify-start rounded-lg border bg-white text-start"
+                >
+                  <SparkleIcon weight="bold" />
+                  <span>Got Ideas? Tell Us!</span>
+                </Button>
+              }
+            />
           </SidebarMenuItem>
           <SidebarMenuItem className="mt-3">
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                    <AvatarFallback className="rounded-lg">
-                      {user?.name?.slice(0, 2)?.toUpperCase() || "CN"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user?.name}</span>
-                    <span className="text-muted-foreground truncate text-xs">
-                      {user?.email}
-                    </span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4!" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger
+                render={
+                  <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  >
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                      <AvatarFallback className="rounded-lg">
+                        {user?.name?.slice(0, 2)?.toUpperCase() || "CN"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">{user?.name}</span>
+                      <span className="text-muted-foreground truncate text-xs">
+                        {user?.email}
+                      </span>
+                    </div>
+                    <ChevronsUpDown className="ml-auto size-4!" />
+                  </SidebarMenuButton>
+                }
+              />
               <DropdownMenuContent
                 className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                 side="bottom"
                 align="end"
                 sideOffset={4}
               >
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/dashboard/$orgSlug/account"
-                    params={{ orgSlug }}
-                    className="flex items-center"
-                  >
-                    <Settings className="mr-2 size-4" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
+                <DropdownMenuItem
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/account"
+                      params={{ orgSlug }}
+                      className="flex items-center"
+                    >
+                      <Settings className="mr-2 size-4" />
+                      Settings
+                    </Link>
+                  }
+                />
+                <DropdownMenuItem
+                  render={
+                    <Link
+                      to="/dashboard/$orgSlug/account"
+                      params={{ orgSlug }}
+                      className="flex items-center"
+                    >
+                      <Settings className="mr-2 size-4" />
+                      Settings
+                    </Link>
+                  }
+                />
                 <DropdownMenuItem
                   onClick={async () => {
                     await authClient.signOut({

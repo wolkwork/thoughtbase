@@ -225,11 +225,16 @@ export function IdeaDetail({
       {/* Main Content */}
       <div className="h-full min-w-0 flex-1 py-6 pr-4 lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between px-8 pb-6">
-          <Button variant="outline" size="icon" asChild>
-            <Link to="../">
-              <ArrowLeftIcon className="size-4" />
-            </Link>
-          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            render={
+              <Link to="..">
+                <ArrowLeftIcon className="size-4" />
+              </Link>
+            }
+          />
+
           {organizationId && (
             <Button
               variant="outline"
@@ -417,14 +422,17 @@ export function IdeaDetail({
 
         <div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="hover:bg-accent -ml-2 flex cursor-pointer items-center rounded-lg p-2 transition-colors focus:outline-none">
-                <StatusBadge
-                  status={idea.status}
-                  className="text-muted-foreground text-sm font-medium"
-                />
-              </button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <button className="hover:bg-accent -ml-2 flex cursor-pointer items-center rounded-lg p-2 transition-colors focus:outline-none">
+                  <StatusBadge
+                    status={idea.status}
+                    className="text-muted-foreground text-sm font-medium"
+                  />
+                </button>
+              }
+            />
+
             <DropdownMenuContent align="start">
               {STATUS_OPTIONS.map((status) => (
                 <DropdownMenuItem
@@ -452,18 +460,20 @@ export function IdeaDetail({
           </h4>
           <div className="flex items-center gap-2">
             <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full shrink justify-start text-left font-normal",
-                    !idea.eta && "text-muted-foreground",
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
-                </Button>
-              </PopoverTrigger>
+              <PopoverTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full shrink justify-start text-left font-normal",
+                      !idea.eta && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
+                  </Button>
+                }
+              />
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
