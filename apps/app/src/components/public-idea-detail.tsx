@@ -1,15 +1,18 @@
-import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
+import { ChatsCircleIcon, CheckIcon, HeartIcon, XIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { format, formatDistanceToNow } from "date-fns";
+import { PencilIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { $createComment, $toggleReaction } from "~/lib/api/ideas";
+import { $createComment, $toggleReaction, $updateIdea } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 import { StatusBadge } from "./status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface PublicIdeaDetailProps {
   idea: any;
@@ -35,6 +38,15 @@ export function PublicIdeaDetail({
   const queryClient = useQueryClient();
   const router = useRouter();
   const [comment, setComment] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(idea.title);
+  const [editDescription, setEditDescription] = useState(idea.description || "");
+
+  // Check if current user is the author
+  const isAuthor =
+    currentUser &&
+    ((currentUser.type === "external" && idea.externalAuthorId === currentUser.id) ||
+      (currentUser.type !== "external" && idea.authorId === currentUser.id));
 
   const { mutate: addComment, isPending: isCommentPending } = useMutation({
     mutationFn: $createComment,
@@ -116,6 +128,47 @@ export function PublicIdeaDetail({
     },
   });
 
+  const { mutate: updateIdea, isPending: isUpdatePending } = useMutation({
+    mutationFn: $updateIdea,
+    onMutate: async (updated) => {
+      // Optimistically update
+      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
+        ...old,
+        title: updated.data.title,
+        description: updated.data.description,
+      }));
+    },
+    onSuccess: () => {
+      setIsEditing(false);
+      toast.success("Idea updated");
+      router.invalidate();
+    },
+    onError: () => {
+      toast.error("Failed to update idea");
+      router.invalidate();
+    },
+  });
+
+  const handleSaveEdit = () => {
+    if (!editTitle.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    updateIdea({
+      data: {
+        ideaId: idea.id,
+        title: editTitle,
+        description: editDescription,
+      },
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditTitle(idea.title);
+    setEditDescription(idea.description || "");
+    setIsEditing(false);
+  };
+
   // We generally don't allow public users to change status unless they are admins,
   // but for this implementation we'll assume read-only status for public detail.
 
@@ -145,14 +198,72 @@ export function PublicIdeaDetail({
     });
 
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex flex-1 flex-col lg:flex-row">
       {/* Main Content */}
       <div className="min-w-0 flex-1 border-r py-8 pr-4">
-        <h1 className="text-foreground mb-2 text-2xl font-bold">{idea.title}</h1>
+        {isEditing ? (
+          <div className="mb-8 space-y-4">
+            <Input
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder="Idea title"
+              className="text-lg font-bold"
+              autoFocus
+            />
+            <Textarea
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              placeholder="Idea description"
+              className="field-sizing-content min-h-[100px] resize-none"
+            />
+            <div className="flex items-center gap-1.5">
+              <Button
+                size="sm"
+                onClick={handleSaveEdit}
+                disabled={isUpdatePending || !editTitle.trim()}
+              >
+                <CheckIcon />
+                Save
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleCancelEdit}
+                disabled={isUpdatePending}
+              >
+                <XIcon />
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mb-2 flex items-center gap-2">
+              <h1 className="text-foreground text-2xl font-bold">{idea.title}</h1>
+              {isAuthor && (
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsEditing(true)}
+                        className="ml-auto size-7"
+                      >
+                        <PencilIcon className="size-3.5" />
+                      </Button>
+                    }
+                  />
+                  <TooltipContent>Edit idea</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
 
-        <div className="prose prose-sm text-muted-foreground mb-8 max-w-none text-sm font-medium">
-          <p>{idea.description || "No description provided."}</p>
-        </div>
+            <div className="prose prose-sm text-muted-foreground mb-8 max-w-none text-sm font-medium">
+              <p>{idea.description || "No description provided."}</p>
+            </div>
+          </>
+        )}
 
         <div className="flex w-full items-center justify-end gap-1.5">
           <div

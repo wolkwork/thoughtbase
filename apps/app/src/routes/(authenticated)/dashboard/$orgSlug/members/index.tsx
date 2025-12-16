@@ -1,49 +1,55 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { MembersDataTable } from "~/components/members-data-table";
+import { $getMembers } from "~/lib/api/members";
+import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/members/")({
+  loader: async ({ params }) => {
+    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
+    if (!organization) {
+      throw new Error("Organization not found");
+    }
+
+    const members = await $getMembers({
+      data: { organizationId: organization.id },
+    });
+    return { members, organizationId: organization.id };
+  },
   component: MembersPage,
 });
 
 function MembersPage() {
-  const { orgSlug } = Route.useParams();
+  const { members: initialMembers, organizationId } = Route.useLoaderData();
+
+  const { data: members } = useQuery({
+    queryKey: ["members", organizationId],
+    queryFn: () =>
+      $getMembers({
+        data: { organizationId },
+      }),
+    initialData: initialMembers,
+  });
+
+  // Map the data to ensure dates are Date objects if they were serialized
+  const tableData = members.map((member) => ({
+    ...member,
+    createdAt: new Date(member.createdAt),
+    lastActiveAt: member.lastActiveAt ? new Date(member.lastActiveAt) : null,
+  }));
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-8">
-      <Card className="w-full max-w-md text-center">
-        <CardHeader>
-          <div className="mb-4 flex justify-center">
-            <div className="bg-muted rounded-full p-3">
-              <Users className="text-muted-foreground h-6 w-6" />
-            </div>
-          </div>
-          <CardTitle>Members Moved</CardTitle>
-          <CardDescription>
-            Team management has been moved to the Settings page under the Team tab.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            render={
-              <Link
-                to="/dashboard/$orgSlug/settings"
-                params={{ orgSlug }}
-                search={{ success: false }}
-              >
-                Go to Settings
-              </Link>
-            }
-          />
-        </CardContent>
-      </Card>
+    <div className="px-4 py-6">
+      <div className="mb-6 flex flex-col justify-between">
+        <h1 className="text-2xl font-bold">Users</h1>
+        <p className="text-muted-foreground text-sm">
+          People that have participated in your workspace.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <MembersDataTable data={tableData} />
+      </div>
     </div>
   );
 }

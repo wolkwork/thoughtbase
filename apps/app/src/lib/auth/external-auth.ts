@@ -107,17 +107,17 @@ export async function getUnifiedAuthContext() {
     headers: getRequest().headers,
   });
 
-  if (dashboardSession?.session?.activeOrganizationId) {
+  if (dashboardSession) {
     return {
       type: "internal" as const,
       user: dashboardSession.user,
-      organizationId: dashboardSession.session.activeOrganizationId,
       session: dashboardSession.session,
     };
   }
 
   // 2. Try widget auth
   const widgetCtx = await getWidgetAuthContext();
+
   if (widgetCtx) {
     return {
       type: "external" as const,

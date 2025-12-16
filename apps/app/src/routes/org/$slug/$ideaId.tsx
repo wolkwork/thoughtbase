@@ -8,7 +8,6 @@ import {
 import { useState } from "react";
 import { AuthForm } from "~/components/auth-form";
 import { ProfileForm } from "~/components/profile-form";
-import { PublicHeader } from "~/components/public-header";
 import { PublicIdeaDetail } from "~/components/public-idea-detail";
 import {
   Dialog,
@@ -64,9 +63,7 @@ function PublicIdeaDetailPage() {
 
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">
-      <PublicHeader org={org} user={user} />
-
-      <div className="mx-auto w-full max-w-4xl flex-1 border-r border-l px-4">
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col border-r border-l px-4">
         <PublicIdeaDetail
           idea={idea}
           currentUser={user}

@@ -1,3 +1,4 @@
+import { Image } from "@unpic/react";
 import { useEffect, useState } from "react";
 import {
   getWidgetChangelogs,
@@ -137,10 +138,13 @@ export function ChangelogView({ organizationId }: ChangelogViewProps) {
           {changelogs.map((changelog) => (
             <article key={changelog.id} className="px-6 py-5">
               {changelog.featuredImage && (
-                <img
+                <Image
                   src={changelog.featuredImage}
                   alt={changelog.title}
-                  className="mb-3 h-32 w-full rounded-lg object-cover"
+                  aspectRatio={16 / 9}
+                  width={330}
+                  fallback="wsrv"
+                  className="mb-3 rounded-lg"
                 />
               )}
 
@@ -157,24 +161,6 @@ export function ChangelogView({ organizationId }: ChangelogViewProps) {
               <p className="text-muted-foreground text-sm leading-relaxed">
                 {renderTiptapAsText(changelog.content)}
               </p>
-
-              {changelog.ideas && changelog.ideas.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {changelog.ideas.slice(0, 3).map((idea) => (
-                    <span
-                      key={idea.id}
-                      className="bg-muted rounded px-2 py-0.5 text-xs"
-                    >
-                      {idea.title}
-                    </span>
-                  ))}
-                  {changelog.ideas.length > 3 && (
-                    <span className="text-muted-foreground text-xs">
-                      +{changelog.ideas.length - 3} more
-                    </span>
-                  )}
-                </div>
-              )}
             </article>
           ))}
         </div>

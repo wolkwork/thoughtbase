@@ -76,7 +76,13 @@ export const $getPublishedChangelogs = createServerFn({ method: "GET" })
       with: {
         ideas: {
           with: {
-            idea: true,
+            idea: {
+              with: {
+                reactions: {
+                  columns: { id: true },
+                },
+              },
+            },
           },
         },
       },
@@ -85,7 +91,10 @@ export const $getPublishedChangelogs = createServerFn({ method: "GET" })
     return {
       items: changelogs.map((cl) => ({
         ...cl,
-        ideas: cl.ideas.map((ci) => ci.idea),
+        ideas: cl.ideas.map((ci) => ({
+          ...ci.idea,
+          reactionCount: ci.idea.reactions.length,
+        })),
       })),
       nextCursor: changelogs.length === data.limit ? data.page + 1 : null,
     };

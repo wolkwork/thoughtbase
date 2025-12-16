@@ -6,10 +6,11 @@ import { cn } from "~/lib/utils";
 
 interface RoadmapCardProps {
   idea: any;
-  publicOrgSlug?: string;
+  orgSlug: string;
+  isPublic?: boolean;
 }
 
-export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
+export function RoadmapCard({ idea, orgSlug, isPublic = false }: RoadmapCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: idea.id, data: { idea } });
 
@@ -47,36 +48,19 @@ export function RoadmapCard({ idea, publicOrgSlug }: RoadmapCardProps) {
         </div>
       </div>
 
-      {/* Invisible link overlay for navigation, but allowing drag */}
-      {/* We can't easily have a full overlay link AND drag. 
-           Best pattern is usually to have a specific handle or make the whole card draggable 
-           and have a button/icon for detail view, OR handle click vs drag.
-           For now, let's just add a small view button or make the title a link that stops propagation?
-           Actually dnd-kit handles click vs drag well usually. 
-           Let's try adding an absolute link that's lower z-index? 
-           Or just a small button. 
-           Let's keep it simple: The whole card is draggable. 
-           Maybe a small icon to open? 
-       */}
-
-      {publicOrgSlug ? (
+      {isPublic ? (
         <Link
           to="/org/$slug/$ideaId"
-          params={{ slug: publicOrgSlug, ideaId: idea.id }}
+          params={{ slug: orgSlug, ideaId: idea.id }}
           className="absolute inset-0 z-0"
         />
       ) : (
         <Link
-          to="/dashboard/ideas/$ideaId"
-          params={{ ideaId: idea.id }}
+          to="/dashboard/$orgSlug/ideas/$ideaId"
+          params={{ orgSlug: orgSlug, ideaId: idea.id }}
           className="absolute inset-0 z-0"
         />
       )}
-      {/* Re-cover with relative content so interactions work? 
-           Actually, wrapping everything in Link is tricky with dnd-kit.
-           Better to just have a specific "View" area or rely on double click?
-           Or just make the title a link.
-       */}
     </div>
   );
 }

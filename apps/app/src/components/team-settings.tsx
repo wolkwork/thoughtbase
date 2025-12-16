@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -42,13 +42,27 @@ import {
 import { authClient } from "~/lib/auth/auth-client";
 
 export function TeamSettings() {
-  const { data: session } = authClient.useSession();
-  const organizationId = session?.session?.activeOrganizationId;
+  const { organization } = useRouteContext({
+    from: "/(authenticated)/dashboard/$orgSlug",
+  });
 
-  const { data: members, isPending: isMembersLoading } = useQuery({
+  const organizationId = organization.id;
+
+  const {
+    data: members,
+    isPending: isMembersLoading,
+    error: membersError,
+  } = useQuery({
     queryKey: ["members", organizationId],
     queryFn: async () => {
-      const { data } = await authClient.organization.listMembers();
+      const { data, error } = await authClient.organization.listMembers({
+        query: {
+          organizationId,
+        },
+      });
+      if (error) {
+        throw error;
+      }
       return data;
     },
     enabled: !!organizationId,
@@ -57,7 +71,14 @@ export function TeamSettings() {
   const { data: invitations, isPending: isInvitationsLoading } = useQuery({
     queryKey: ["invitations", organizationId],
     queryFn: async () => {
-      const { data } = await authClient.organization.listInvitations();
+      const { data, error } = await authClient.organization.listInvitations({
+        query: {
+          organizationId,
+        },
+      });
+      if (error) {
+        throw error;
+      }
       return data;
     },
     enabled: !!organizationId,
@@ -268,12 +289,17 @@ function InviteMemberDialog() {
   const [role, setRole] = useState<"member" | "admin" | "owner">("member");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { organization } = useRouteContext({
+    from: "/(authenticated)/dashboard/$orgSlug",
+  });
+  const organizationId = organization.id;
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       await authClient.organization.inviteMember({
+        organizationId,
         email,
         role,
       });
@@ -283,6 +309,7 @@ function InviteMemberDialog() {
       router.invalidate();
     } catch (error) {
       toast.error("Failed to send invitation");
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

@@ -1,9 +1,9 @@
+import { FeedbackWidget } from "@feedback-tool/widget";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { SignJWT } from "jose";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FeedbackWidget } from "@feedback-tool/widget";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -31,6 +31,9 @@ function SSOExamplePage() {
     "https://api.dicebear.com/9.x/avataaars/svg?seed=Felix",
   );
   const [ssoToken, setSsoToken] = useState("");
+  const { organization } = useRouteContext({
+    from: "/(authenticated)/dashboard/$orgSlug",
+  });
 
   // Manual inputs for organization ID and secret
   const [manualOrgId, setManualOrgId] = useState("");
@@ -39,7 +42,7 @@ function SSOExamplePage() {
   // Auto-fill from session if available
   const { data: secretData } = useQuery({
     queryKey: ["org-secret"],
-    queryFn: () => $getOrgSecret(),
+    queryFn: () => $getOrgSecret({ data: { organizationId: organization.id } }),
     enabled: !!session?.user,
   });
 

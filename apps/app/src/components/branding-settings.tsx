@@ -4,13 +4,6 @@ import { upload } from "@vercel/blob/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/lib/auth/auth-client";
@@ -98,106 +91,94 @@ export function BrandingSettings({ organizationId }: BrandingSettingsProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Branding</CardTitle>
-        <CardDescription>Customize your organization's appearance.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Organization Name</Label>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid gap-2">
+        <Label htmlFor="name">Organization Name</Label>
+        <Input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="My Organization"
+          required
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="logo">Logo</Label>
+        <div className="flex items-center gap-4">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border">
+            {logo ? (
+              <img src={logo} alt="Logo preview" className="h-full w-full object-cover" />
+            ) : (
+              <div className="bg-muted flex h-full w-full items-center justify-center">
+                <span className="text-muted-foreground text-xs">No logo</span>
+              </div>
+            )}
+          </div>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
             <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="My Organization"
-              required
+              id="logo"
+              type="file"
+              accept="image/*"
+              disabled={isUploading}
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                if (file.size > 4.5 * 1024 * 1024) {
+                  toast.error("File size must be less than 4.5MB");
+                  e.target.value = "";
+                  return;
+                }
+
+                setIsUploading(true);
+                try {
+                  const newBlob = await upload(file.name, file, {
+                    access: "public",
+                    handleUploadUrl: "/api/upload",
+                  });
+                  setLogo(newBlob.url);
+                  toast.success("Logo uploaded successfully");
+                } catch (error) {
+                  toast.error("Failed to upload logo");
+                  console.error(error);
+                } finally {
+                  setIsUploading(false);
+                  e.target.value = "";
+                }
+              }}
             />
+            <p className="text-muted-foreground text-xs">
+              Upload a logo image (max 4.5MB).
+            </p>
           </div>
+        </div>
+      </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="logo">Logo</Label>
-            <div className="flex items-center gap-4">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border">
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt="Logo preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="bg-muted flex h-full w-full items-center justify-center">
-                    <span className="text-muted-foreground text-xs">No logo</span>
-                  </div>
-                )}
-              </div>
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Input
-                  id="logo"
-                  type="file"
-                  accept="image/*"
-                  disabled={isUploading}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
+      {/* <div className="grid gap-2">
+        <Label htmlFor="primaryColor">Primary Color</Label>
+        <div className="flex gap-2">
+          <Input
+            id="primaryColor"
+            type="color"
+            value={primaryColor}
+            onChange={(e) => setPrimaryColor(e.target.value)}
+            className="h-10 w-12 p-1 px-1"
+          />
+          <Input
+            value={primaryColor}
+            onChange={(e) => setPrimaryColor(e.target.value)}
+            placeholder="#000000"
+            className="font-mono"
+          />
+        </div>
+      </div> */}
 
-                    if (file.size > 4.5 * 1024 * 1024) {
-                      toast.error("File size must be less than 4.5MB");
-                      e.target.value = "";
-                      return;
-                    }
-
-                    setIsUploading(true);
-                    try {
-                      const newBlob = await upload(file.name, file, {
-                        access: "public",
-                        handleUploadUrl: "/api/upload",
-                      });
-                      setLogo(newBlob.url);
-                      toast.success("Logo uploaded successfully");
-                    } catch (error) {
-                      toast.error("Failed to upload logo");
-                      console.error(error);
-                    } finally {
-                      setIsUploading(false);
-                      e.target.value = "";
-                    }
-                  }}
-                />
-                <p className="text-muted-foreground text-xs">
-                  Upload a logo image (max 4.5MB).
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="primaryColor">Primary Color</Label>
-            <div className="flex gap-2">
-              <Input
-                id="primaryColor"
-                type="color"
-                value={primaryColor}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-                className="h-10 w-12 p-1 px-1"
-              />
-              <Input
-                value={primaryColor}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-                placeholder="#000000"
-                className="font-mono"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button type="submit" disabled={isPending || isUploading}>
-              {isPending ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+      <div className="mt-8 flex justify-start border-t pt-5">
+        <Button type="submit" disabled={isPending || isUploading}>
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
+    </form>
   );
 }

@@ -1,3 +1,4 @@
+import { useRouteContext } from "@tanstack/react-router";
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -109,7 +110,9 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
   const [isLoading, setIsLoading] = useState(false);
 
   const selectedPlan = PLANS.find((p) => p.id === selectedPlanId) || PLANS[0];
-  const { data: organization } = authClient.useActiveOrganization();
+  const { organization } = useRouteContext({
+    from: "/(authenticated)/dashboard/$orgSlug",
+  });
 
   const handleSubscribe = async () => {
     if (selectedPlan.id === "free") {
@@ -130,7 +133,9 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
       });
 
       checkout.addEventListener("success", (event) => {
-        console.log("Succes jonge", event);
+        if (!event.detail.redirect) {
+          console.log("Succes jonge", event);
+        }
       });
     } catch (error) {
       console.error(error);
@@ -142,7 +147,7 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="h-[90vh] max-w-4xl gap-0 overflow-hidden p-0 sm:rounded-xl md:h-[600px]">
+      <DialogContent className="h-[90vh] w-full max-w-4xl gap-0 overflow-hidden p-0 sm:rounded-xl md:h-[600px]">
         <div className="grid h-full grid-cols-1 md:grid-cols-12">
           {/* Sidebar */}
           <div className="bg-muted/30 col-span-1 flex flex-col border-r p-6 md:col-span-5">
@@ -229,7 +234,7 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
                 <div className="space-y-4">
                   {selectedPlan.features.map((feature, i) => (
                     <div key={i} className="flex gap-3">
-                      <div className="bg-primary/10 text-primary mt-0.5 h-fit w-fit flex-shrink-0 rounded-full p-1">
+                      <div className="bg-primary/10 text-primary mt-0.5 h-fit w-fit shrink-0 rounded-full p-1">
                         {feature.icon}
                       </div>
                       <div>

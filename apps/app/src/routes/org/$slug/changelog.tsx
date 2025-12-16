@@ -1,10 +1,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
+import { Image } from "@unpic/react";
 import { format } from "date-fns";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
-import { PublicHeader } from "~/components/public-header";
-import { Badge } from "~/components/ui/badge";
+import { LikeBadge } from "~/components/engagement-badges";
 import { $getPublishedChangelogs } from "~/lib/api/changelogs";
 
 export const Route = createFileRoute("/org/$slug/changelog")({
@@ -159,7 +159,7 @@ function renderNode(node: any): ReactNode {
 }
 
 function ChangelogPage() {
-  const { org, user } = useLoaderData({ from: "/org/$slug" });
+  const { org } = useLoaderData({ from: "/org/$slug" });
 
   const {
     data: changelogsData,
@@ -204,8 +204,6 @@ function ChangelogPage() {
 
   return (
     <div className="bg-background text-foreground relative min-h-screen">
-      <PublicHeader org={org} user={user} />
-
       <div className="mx-auto max-w-3xl px-4 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-bold">Changelog</h1>
@@ -247,10 +245,13 @@ function ChangelogPage() {
 
               {/* Featured Image */}
               {changelog.featuredImage && (
-                <img
+                <Image
                   src={changelog.featuredImage}
                   alt={changelog.title}
-                  className="mb-6 w-full rounded-lg object-cover"
+                  aspectRatio={16 / 9}
+                  className="mb-6 rounded-lg"
+                  fallback="wsrv"
+                  width={702}
                 />
               )}
 
@@ -261,23 +262,27 @@ function ChangelogPage() {
 
               {/* Linked Ideas */}
               {changelog.ideas.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-muted-foreground mb-2 text-xs font-medium tracking-wider uppercase">
+                <div className="mt-6 rounded-lg border">
+                  <h3 className="text-muted-foreground px-3 py-2.5 text-xs font-medium tracking-wider uppercase">
                     Related Ideas
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="">
                     {changelog.ideas.map((idea) => (
                       <Link
                         key={idea.id}
                         to="/org/$slug/$ideaId"
                         params={{ slug: org.slug, ideaId: idea.id }}
+                        className="hover:bg-muted/50 flex items-center justify-between gap-3 border-t px-3 py-3"
                       >
-                        <Badge
-                          variant="secondary"
-                          className="hover:bg-secondary/80 cursor-pointer"
-                        >
-                          {idea.title}
-                        </Badge>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-sm font-medium">{idea.title}</h4>
+                          {idea.description && (
+                            <p className="text-muted-foreground mt-1 line-clamp-1 text-xs">
+                              {idea.description}
+                            </p>
+                          )}
+                        </div>
+                        <LikeBadge count={idea.reactionCount} />
                       </Link>
                     ))}
                   </div>

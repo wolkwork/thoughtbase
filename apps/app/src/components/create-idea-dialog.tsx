@@ -49,7 +49,7 @@ export function CreateIdeaDialog({
       }
     },
     onError: () => {
-      toast.error("Failed to create idea");
+      toast.error("Failed to submit idea");
     },
   });
 
@@ -64,12 +64,10 @@ export function CreateIdeaDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Create Idea</DialogTitle>
-          <DialogDescription>
-            Share your idea or feedback with the team.
-          </DialogDescription>
+          <DialogTitle>Submit Idea</DialogTitle>
+          <DialogDescription>Share your idea or feedback.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -89,7 +87,7 @@ export function CreateIdeaDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="More details..."
-              className="min-h-[100px]"
+              className="field-sizing-content min-h-[120px]"
             />
           </div>
           <div className="flex justify-end">

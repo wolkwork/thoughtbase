@@ -27,7 +27,9 @@ export const externalUser = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
     revenue: integer("revenue"),
-    metadata: jsonb("metadata"),
+    // TODO: Fix
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    metadata: jsonb("metadata").$type<any>(),
   },
   (table) => [
     index("external_user_org_idx").on(table.organizationId),

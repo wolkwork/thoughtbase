@@ -27,7 +27,11 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
     <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
+          <Link
+            to="/org/$slug"
+            params={{ slug: org.slug }}
+            className="flex items-center gap-2"
+          >
             {org.logo ? (
               <img src={org.logo} alt={org.name} className="h-8 w-8 rounded" />
             ) : (
@@ -36,7 +40,7 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
               </div>
             )}
             <span className="text-lg font-bold">{org.name}</span>
-          </div>
+          </Link>
 
           <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
             <Link

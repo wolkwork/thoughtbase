@@ -13,7 +13,6 @@ import { AuthForm } from "~/components/auth-form";
 import { CreateIdeaDialog } from "~/components/create-idea-dialog";
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { ProfileForm } from "~/components/profile-form";
-import { PublicHeader } from "~/components/public-header";
 import { StatusBadge } from "~/components/status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -200,9 +199,7 @@ function OrganizationIndexPage() {
   };
 
   return (
-    <div className="bg-background text-foreground relative min-h-screen">
-      <PublicHeader org={org} user={user} />
-
+    <>
       <div className="mx-auto grid max-w-4xl grid-cols-1 border-r border-l lg:grid-cols-3">
         {/* Main Content */}
         <div className="space-y-6 border-r py-8 lg:col-span-2">
@@ -250,7 +247,7 @@ function OrganizationIndexPage() {
             {ideas.map((idea) => {
               const isExternal = user?.type === "external";
               const hasReacted =
-                user &&
+                !!user &&
                 idea.reactions.some((r: any) => {
                   if (isExternal)
                     return r.externalUserId === user.id && r.type === "upvote";
@@ -388,6 +385,6 @@ function OrganizationIndexPage() {
         onOpenChange={setCreateOpen}
         organizationId={org.id}
       />
-    </div>
+    </>
   );
 }

@@ -6,13 +6,7 @@ import {
   SparkleIcon,
   UserCircleIcon,
 } from "@phosphor-icons/react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useRouteContext,
-  useRouter,
-} from "@tanstack/react-router";
+import { Link, useLocation, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { FeedbackWidget } from "@thoughtbase/widget";
 import { ChevronsUpDown, CircleDashed, LogOut, Plus, Settings } from "lucide-react";
 import { useState } from "react";
@@ -60,7 +54,6 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
   const organizationId = activeOrg?.id;
 
   const location = useLocation();
-  const router = useRouter();
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -194,7 +187,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                         weight="duotone"
                         color="#7d7d7d"
                       />
-                      <span>Members</span>
+                      <span>Users</span>
                     </Link>
                   }
                   isActive={location.pathname.includes("/members")}

@@ -1,10 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { Copy, CreditCard, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { Copy, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { BillingSettings } from "~/components/billing-settings";
 import { BrandingSettings } from "~/components/branding-settings";
-import { SubscriptionDialog } from "~/components/subscription-dialog";
 import { TeamSettings } from "~/components/team-settings";
 import { Button } from "~/components/ui/button";
 import {
@@ -31,11 +30,10 @@ function SettingsPage() {
   const search = useSearch({
     from: "/(authenticated)/dashboard/$orgSlug/settings/",
   });
-  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(!!search.success);
   const { organization } = Route.useRouteContext();
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 p-6">
+    <div className="mx-auto max-w-4xl space-y-8 p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
@@ -52,24 +50,7 @@ function SettingsPage() {
         </TabsList>
 
         <TabsContent value="billing" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscription</CardTitle>
-              <CardDescription>
-                Manage your subscription plan and billing details.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => setIsSubscriptionOpen(true)}>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Manage Subscription
-              </Button>
-            </CardContent>
-          </Card>
-          <SubscriptionDialog
-            open={isSubscriptionOpen}
-            onOpenChange={setIsSubscriptionOpen}
-          />
+          <BillingSettings defaultOpen={!!search.success} />
         </TabsContent>
 
         <TabsContent value="sso" className="mt-6">
@@ -81,11 +62,7 @@ function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="team" className="mt-6">
-          <Card>
-            <CardContent className="pt-6">
-              <TeamSettings />
-            </CardContent>
-          </Card>
+          <TeamSettings />
         </TabsContent>
       </Tabs>
     </div>

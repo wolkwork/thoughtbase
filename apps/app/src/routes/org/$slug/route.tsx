@@ -1,6 +1,7 @@
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
+import { PublicHeader } from "~/components/public-header";
 import { $signInWithSSO } from "~/lib/api/sso";
 import { $getUnifiedProfile, $getUnifiedUser } from "~/lib/auth/unified-auth-functions";
 import { db } from "~/lib/db";
@@ -64,5 +65,16 @@ export const Route = createFileRoute("/org/$slug")({
 
     return { org, user, profile };
   },
-  component: () => <Outlet />,
+  component: PublicLayout,
 });
+
+function PublicLayout() {
+  const { org, user } = Route.useLoaderData();
+
+  return (
+    <div className="bg-background text-foreground relative min-h-screen">
+      <PublicHeader org={org} user={user} />
+      <Outlet />
+    </div>
+  );
+}

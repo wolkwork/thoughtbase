@@ -3,15 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import { format, formatDistanceToNow } from "date-fns";
 import { lowerCase } from "lodash";
-import {
-  ArrowLeftIcon,
-  CalendarIcon,
-  Check,
-  Smile,
-  ThumbsUp,
-  Trash2,
-  X,
-} from "lucide-react";
+import { ArrowLeftIcon, CalendarIcon, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,13 +18,14 @@ import { StatusBadge } from "./status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
 
@@ -209,17 +202,6 @@ export function IdeaDetail({
     (r: any) => r.userId === currentUser.id && r.type === "upvote",
   );
 
-  // Group reactions by type
-  const reactionsByType = idea.reactions.reduce(
-    (acc: any, reaction: any) => {
-      const type = reaction.type || "upvote";
-      if (!acc[type]) acc[type] = [];
-      acc[type].push(reaction);
-      return acc;
-    },
-    {} as Record<string, any[]>,
-  );
-
   return (
     <div className="flex h-full flex-col lg:flex-row">
       {/* Main Content */}
@@ -353,50 +335,46 @@ export function IdeaDetail({
             </TabsContent>
 
             <TabsContent value="reactions">
-              <div className="space-y-6">
-                {Object.entries(reactionsByType).length === 0 && (
+              <div className="mt-8">
+                {idea.reactions.length === 0 && (
                   <div className="text-muted-foreground py-8 text-center text-sm italic">
                     No reactions yet.
                   </div>
                 )}
 
-                {Object.entries(reactionsByType).map(
-                  ([type, reactions]: [string, any]) => (
-                    <div key={type} className="space-y-3">
-                      <h4 className="flex items-center gap-2 text-sm font-semibold capitalize">
-                        {type === "upvote" ? (
-                          <ThumbsUp className="h-4 w-4" />
-                        ) : (
-                          <Smile className="h-4 w-4" />
-                        )}
-                        {type} ({reactions.length})
-                      </h4>
-                      <div className="flex flex-wrap gap-3">
-                        {reactions.map((reaction: any) => {
-                          const userName =
-                            reaction.user?.name || reaction.externalUser?.name || "User";
-                          const userImage =
-                            reaction.user?.image || reaction.externalUser?.avatarUrl;
+                {idea.reactions.map((reaction: any, index: number) => {
+                  const userName =
+                    reaction.user?.name || reaction.externalUser?.name || "User";
+                  const reactionDate = reaction.createdAt
+                    ? formatDistanceToNow(new Date(reaction.createdAt), {
+                        addSuffix: true,
+                      })
+                    : null;
 
-                          return (
-                            <div
-                              key={reaction.id}
-                              className="bg-muted/50 flex items-center gap-2 rounded-full border py-1 pr-3 pl-1"
-                            >
-                              <Avatar className="h-6 w-6">
-                                <AvatarImage src={userImage} />
-                                <AvatarFallback className="text-[10px]">
-                                  {userName.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <span className="text-xs font-medium">{userName}</span>
-                            </div>
-                          );
-                        })}
+                  return (
+                    <div
+                      key={reaction.id}
+                      className="relative flex items-center gap-3 pb-8"
+                    >
+                      {index !== idea.reactions.length - 1 && (
+                        <div className="bg-border absolute top-6 -bottom-3 left-3 z-0 w-px" />
+                      )}
+
+                      <div className="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-white">
+                        <HeartIcon weight="fill" className="size-3 text-red-500" />
+                      </div>
+
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium">{userName}</span>
+                        {reactionDate && (
+                          <span className="text-muted-foreground text-xs">
+                            {reactionDate}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  ),
-                )}
+                  );
+                })}
               </div>
             </TabsContent>
           </Tabs>
@@ -421,37 +399,26 @@ export function IdeaDetail({
         </div>
 
         <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <button className="hover:bg-accent -ml-2 flex cursor-pointer items-center rounded-lg p-2 transition-colors focus:outline-none">
+          <Select value={idea.status} onValueChange={handleUpdateStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue>
+                <StatusBadge
+                  status={idea.status}
+                  className="text-muted-foreground text-sm font-medium"
+                />
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent align="start">
+              {STATUS_OPTIONS.map((status) => (
+                <SelectItem key={status.slug} value={status.slug}>
                   <StatusBadge
-                    status={idea.status}
+                    status={status.slug}
                     className="text-muted-foreground text-sm font-medium"
                   />
-                </button>
-              }
-            />
-
-            <DropdownMenuContent align="start">
-              {STATUS_OPTIONS.map((status) => (
-                <DropdownMenuItem
-                  key={status.slug}
-                  onClick={() => handleUpdateStatus(status.slug)}
-                >
-                  <span
-                    className={cn(
-                      "mr-2 flex h-4 w-4 items-center justify-center",
-                      idea.status === status.slug ? "opacity-100" : "opacity-0",
-                    )}
-                  >
-                    <Check className="h-4 w-4" />
-                  </span>
-                  {status.name}
-                </DropdownMenuItem>
+                </SelectItem>
               ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>

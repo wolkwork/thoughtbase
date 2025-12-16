@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
@@ -7,11 +8,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
+import { SidebarMenuButton } from "./ui/sidebar";
 
 interface SidebarOrganizationSwitcherProps {
   currentOrgSlug: string;
@@ -27,96 +27,98 @@ export function SidebarOrganizationSwitcher({
   const { data: organizations } = authClient.useListOrganizations();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
+  const { data: subscriptions } = useQuery({
+    queryKey: ["subscriptions", activeOrganization?.id],
+    queryFn: async () => {
+      const result = await authClient.customer.subscriptions.list({
+        query: {
+          referenceId: activeOrganization!.id,
+          active: true,
+          limit: 1,
+        },
+      });
+      return result.data;
+    },
+    enabled: !!activeOrganization?.id,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  const activeSubscription = subscriptions?.result?.items?.[0];
+  const planName = activeSubscription?.product?.name ?? "Free";
+
   return (
     <>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border-none! bg-transparent! ring-0! outline-none"
+            >
+              <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                {activeOrganization?.logo ? (
+                  <img
+                    src={activeOrganization.logo}
+                    alt={activeOrganization.name}
+                    className="size-8 rounded-lg"
+                  />
+                ) : (
+                  <span className="font-semibold">
+                    {activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}
+                  </span>
+                )}
+              </div>
+              <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
+                <span className="truncate font-medium">
+                  {activeOrganization?.name || "Select Workspace"}
+                </span>
+                <span className="truncate text-xs text-emerald-600">{planName}</span>
+              </div>
+              <ChevronsUpDown className="ml-auto size-4!" />
+            </SidebarMenuButton>
+          }
+        />
+        <DropdownMenuContent
+          className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+          align="start"
+          side="bottom"
+        >
+          {organizations?.map((org) => (
+            <DropdownMenuItem
+              key={org.id}
+              className="gap-2 p-2"
               render={
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border-none! bg-transparent! ring-0! outline-none"
-                >
-                  <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                    {activeOrganization?.logo ? (
-                      <img
-                        src={activeOrganization.logo}
-                        alt={activeOrganization.name}
-                        className="size-8 rounded-lg"
-                      />
+                <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
+                  <div className="flex size-6 items-center justify-center rounded-sm border">
+                    {org.logo ? (
+                      <img src={org.logo} alt={org.name} className="size-6 rounded-sm" />
                     ) : (
-                      <span className="font-semibold">
-                        {activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}
+                      <span className="text-xs font-medium">
+                        {org.name.substring(0, 2).toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">
-                      {activeOrganization?.name || "Select Organization"}
-                    </span>
-                    <span className="text-muted-foreground truncate text-xs">
-                      Free Plan
-                    </span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4!" />
-                </SidebarMenuButton>
+                  {org.name}
+                  {org.slug === currentOrgSlug && <Check className="ml-auto h-4 w-4" />}
+                </Link>
               }
             />
-            <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-              align="start"
-              side="bottom"
-            >
-              <DropdownMenuLabel className="text-muted-foreground text-xs">
-                Organizations
-              </DropdownMenuLabel>
-              {organizations?.map((org) => (
-                <DropdownMenuItem
-                  key={org.id}
-                  className="gap-2 p-2"
-                  render={
-                    <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
-                      <div className="flex size-6 items-center justify-center rounded-sm border">
-                        {org.logo ? (
-                          <img
-                            src={org.logo}
-                            alt={org.name}
-                            className="size-6 rounded-sm"
-                          />
-                        ) : (
-                          <span className="text-xs font-medium">
-                            {org.name.substring(0, 2).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      {org.name}
-                      {org.slug === currentOrgSlug && (
-                        <Check className="ml-auto h-4 w-4" />
-                      )}
-                    </Link>
-                  }
-                />
-              ))}
-              {organizations?.length === 0 && (
-                <div className="text-muted-foreground p-2 text-center text-sm">
-                  No organizations found.
-                </div>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-2 p-2"
-                onSelect={() => setShowCreateDialog(true)}
-              >
-                <div className="bg-background flex size-6 items-center justify-center rounded-md border">
-                  <Plus className="size-4" />
-                </div>
-                <div className="text-muted-foreground font-medium">Add Organization</div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      </SidebarMenu>
+          ))}
+          {organizations?.length === 0 && (
+            <div className="text-muted-foreground p-2 text-center text-sm">
+              No organizations found.
+            </div>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="gap-2 p-2"
+            onClick={() => setShowCreateDialog(true)}
+          >
+            <Plus className="size-4" />
+            <div className="text-muted-foreground font-medium">Create Workspace</div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <CreateOrganizationDialog
         open={showCreateDialog}
         onOpenChange={setShowCreateDialog}

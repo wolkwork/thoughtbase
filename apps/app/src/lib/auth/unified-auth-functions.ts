@@ -13,7 +13,7 @@ export const $getUnifiedUser = createServerFn({ method: "GET" }).handler(async (
     id: ctx.user.id,
     email: ctx.user.email,
     name: ctx.user.name,
-    image: ctx.user.image || ctx.user.avatarUrl,
+    image: ctx.type === "internal" ? ctx.user.image : ctx.user.avatarUrl,
     type: ctx.type, // "internal" | "external"
     organizationId: ctx.organizationId,
   };

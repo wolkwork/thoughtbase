@@ -98,7 +98,7 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
 
       <div className="grid gap-6">
         <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
-          <div className="grid gap-2">
+          <div className="grid gap-5">
             {isSignUp && (
               <div className="grid gap-1">
                 <Label htmlFor="name">Name</Label>

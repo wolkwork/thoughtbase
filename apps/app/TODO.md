@@ -1,34 +1,19 @@
 MVP:
 
-- Boards --> Topics/tags
-- User can edit ideas
-- Update idea status from idea detail page
-- Reactions styling in details tab
-- Widget changelog styling
-- Metadata on users
-- Public facing idea creation dialog styling
-- Settings styling
-- Backoffice roadmap styling
-- Frontoffice roadmap styling
-- Proper subdomain redirects
-- React component for widget
-- Org switcher styling
-- Guest post (enable disable)
-- DNS configs
-- Add thoughtbase branding
-- Option for turning off thoughtbase branding
 - Docs
 - Terms & Privacy
-- Landing page
 - Onboarding
-- Changelog styling
-- Thank you screen after submission (styling)
-- Clickable logo in public facing
-- Login form styling
-- Add screenshots to ideas
+- Landing page
+- Email verification
+- Invitation emails with resend
 
 Future:
 
+- Thank you screen after submission (styling)
+- Settings->Branding styling
+- Disallow liking closed ideas
+- Auto-like own ideas
+- Add screenshots to ideas
 - Auto approve
 - Customization (color theme)
 - Ban users
@@ -40,6 +25,10 @@ Future:
 - Notifications
 - Deduplication
 - Multi lingual
+- Custom domain DNS configs
+- Multiple boards/topics
+- Zapier integrations
+- Social login
 
 Paid:
 
@@ -49,6 +38,7 @@ Paid:
 - Private boards
 - Integrations
 - no thoughtbase branding
+- Guest post (enable disable)
 
 Enterprise:
 

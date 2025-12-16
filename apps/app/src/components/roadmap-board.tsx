@@ -20,7 +20,8 @@ import { RoadmapColumn } from "./roadmap-column";
 interface RoadmapBoardProps {
   ideas: any[];
   readOnly?: boolean;
-  publicOrgSlug?: string;
+  orgSlug: string;
+  isPublic?: boolean;
   organizationId?: string;
 }
 
@@ -30,6 +31,7 @@ const COLUMN_IDS: IdeaStatus[] = [
   "planned",
   "in_progress",
   "completed",
+  "closed",
 ];
 
 const COLUMNS = COLUMN_IDS.map((id) => ({
@@ -40,7 +42,8 @@ const COLUMNS = COLUMN_IDS.map((id) => ({
 export function RoadmapBoard({
   ideas: initialIdeas,
   readOnly = false,
-  publicOrgSlug,
+  orgSlug,
+  isPublic = false,
   organizationId,
 }: RoadmapBoardProps) {
   const router = useRouter();
@@ -139,15 +142,20 @@ export function RoadmapBoard({
   const activeIdea = activeId ? items.find((i) => i.id === activeId) : null;
 
   if (readOnly) {
+    // Hide pending column in public view
+    const publicColumns = COLUMNS.filter(
+      (col) => !["pending", "closed"].includes(col.id),
+    );
     return (
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {COLUMNS.map((col) => (
+        {publicColumns.map((col) => (
           <RoadmapColumn
             key={col.id}
             id={col.id}
             title={col.title}
             ideas={groupedIdeas[col.id] || []}
-            publicOrgSlug={publicOrgSlug}
+            orgSlug={orgSlug}
+            isPublic={isPublic}
           />
         ))}
       </div>
@@ -163,14 +171,17 @@ export function RoadmapBoard({
             id={col.id}
             title={col.title}
             ideas={groupedIdeas[col.id] || []}
-            publicOrgSlug={publicOrgSlug}
+            orgSlug={orgSlug}
+            isPublic={isPublic}
           />
         ))}
       </div>
 
       {createPortal(
         <DragOverlay>
-          {activeIdea ? <RoadmapCard idea={activeIdea} /> : null}
+          {activeIdea ? (
+            <RoadmapCard idea={activeIdea} orgSlug={orgSlug} isPublic={isPublic} />
+          ) : null}
         </DragOverlay>,
         document.body,
       )}

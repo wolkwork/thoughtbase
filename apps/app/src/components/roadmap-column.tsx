@@ -8,16 +8,23 @@ interface RoadmapColumnProps {
   id: string;
   title: string;
   ideas: any[];
-  publicOrgSlug?: string;
+  orgSlug: string;
+  isPublic?: boolean;
 }
 
-export function RoadmapColumn({ id, title, ideas, publicOrgSlug }: RoadmapColumnProps) {
+export function RoadmapColumn({
+  id,
+  title,
+  ideas,
+  orgSlug,
+  isPublic = false,
+}: RoadmapColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: id,
   });
 
   return (
-    <div className="bg-muted/50 flex w-80 flex-col gap-4 rounded-lg border p-4">
+    <div className="bg-muted/50 flex w-72 flex-col gap-4 rounded-lg border p-4">
       <div className="flex items-center justify-between">
         <StatusBadge status={id} className="text-sm font-medium text-black" />
         <span className="bg-muted rounded-full border px-2 py-0.5 text-xs font-medium">
@@ -37,7 +44,12 @@ export function RoadmapColumn({ id, title, ideas, publicOrgSlug }: RoadmapColumn
           strategy={verticalListSortingStrategy}
         >
           {ideas.map((idea) => (
-            <RoadmapCard key={idea.id} idea={idea} publicOrgSlug={publicOrgSlug} />
+            <RoadmapCard
+              key={idea.id}
+              idea={idea}
+              orgSlug={orgSlug}
+              isPublic={isPublic}
+            />
           ))}
         </SortableContext>
       </div>

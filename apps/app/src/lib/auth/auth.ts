@@ -22,6 +22,7 @@ const getAuthConfig = createServerOnlyFn(() =>
     telemetry: {
       enabled: false,
     },
+    trustedOrigins: ["*.thoughtbase.localhost:3000", "http://localhost:4321"],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {
@@ -46,7 +47,7 @@ const getAuthConfig = createServerOnlyFn(() =>
         // TODO: Fix
         domain: ".thoughtbase.localhost",
       },
-      trustedOrigins: [env.VITE_BASE_URL, "http://localhost:4321"], // Add demo app origin
+      trustedOrigins: ["*.thoughtbase.localhost:3000", "http://localhost:4321"], // Add demo app origin
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
@@ -69,7 +70,6 @@ const getAuthConfig = createServerOnlyFn(() =>
                 slug: "growth",
               },
             ],
-            successUrl: `${env.VITE_BASE_URL}/dashboard/settings?success=true`,
             authenticatedUsersOnly: true,
           }),
           portal(),

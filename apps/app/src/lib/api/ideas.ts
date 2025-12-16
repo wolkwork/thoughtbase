@@ -70,9 +70,15 @@ export const $getIdeas = createServerFn({ method: "GET" })
     });
 
     return ideas.map((item) => {
-      const author = item.externalAuthor || item.author;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { author, externalAuthor, reactions, comments, ...rest } = item;
+
+      const actualAuthor = externalAuthor ?? author;
+
       const image =
-        author && "image" in author ? author.image : (author as any)?.avatarUrl;
+        actualAuthor && "image" in actualAuthor
+          ? actualAuthor.image
+          : actualAuthor?.avatarUrl;
 
       // Calculate total revenue from users who reacted
       const revenue = item.reactions.reduce((acc, reaction) => {
@@ -82,10 +88,11 @@ export const $getIdeas = createServerFn({ method: "GET" })
       }, 0);
 
       return {
-        ...item,
+        ...rest,
         author: {
-          ...author,
-          image, // Normalize image field
+          name: actualAuthor?.name,
+          email: actualAuthor?.email,
+          image,
         },
         commentCount: item.comments.length,
         reactionCount: item.reactions.length,
@@ -206,8 +213,7 @@ export const $getIdeasFeed = createServerFn({ method: "GET" })
 
     const mapped = sortedIdeas.map((item) => {
       const author = item.externalAuthor || item.author;
-      const image =
-        author && "image" in author ? author.image : (author as any)?.avatarUrl;
+      const image = author && "image" in author ? author.image : author?.avatarUrl;
       return {
         ...item,
         author: {
@@ -259,7 +265,7 @@ export const $getIdea = createServerFn({ method: "GET" })
     if (!item) return null;
 
     const author = item.externalAuthor || item.author;
-    const image = author && "image" in author ? author.image : (author as any)?.avatarUrl;
+    const image = author && "image" in author ? author.image : author?.avatarUrl;
 
     return {
       ...item,
@@ -269,8 +275,7 @@ export const $getIdea = createServerFn({ method: "GET" })
       },
       comments: item.comments.map((c) => {
         const cAuthor = c.externalAuthor || c.author;
-        const cImage =
-          cAuthor && "image" in cAuthor ? cAuthor.image : (cAuthor as any)?.avatarUrl;
+        const cImage = cAuthor && "image" in cAuthor ? cAuthor.image : cAuthor?.avatarUrl;
         return {
           ...c,
           author: {
@@ -325,11 +330,7 @@ export const $createIdea = createServerFn({ method: "POST" })
     }
 
     // For external auth, verify organization access
-    if (
-      type === "external" &&
-      user &&
-      data.organizationId !== (user as any).organizationId
-    ) {
+    if (type === "external" && user && data.organizationId !== user.organizationId) {
       throw new Error("Unauthorized organization scope");
     }
 
@@ -502,6 +503,49 @@ export const $getBoards = createServerFn({ method: "GET" })
     });
   });
 
+export const $updateIdea = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      ideaId: z.string(),
+      title: z.string().min(1),
+      description: z.string().optional(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await getAuthContext();
+    if (!ctx.user) throw new Error("Unauthorized");
+
+    // Get the idea to check ownership
+    const existingIdea = await db.query.idea.findFirst({
+      where: eq(idea.id, data.ideaId),
+    });
+
+    if (!existingIdea) {
+      throw new Error("Idea not found");
+    }
+
+    // Check if user is the author (either internal or external)
+    const isAuthor =
+      (ctx.type === "internal" && existingIdea.authorId === ctx.user.id) ||
+      (ctx.type === "external" && existingIdea.externalAuthorId === ctx.user.id);
+
+    if (!isAuthor) {
+      throw new Error("Only the author can edit this idea");
+    }
+
+    const [updatedIdea] = await db
+      .update(idea)
+      .set({
+        title: data.title,
+        description: data.description,
+        updatedAt: new Date(),
+      })
+      .where(eq(idea.id, data.ideaId))
+      .returning();
+
+    return updatedIdea;
+  });
+
 export const $deleteIdea = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
@@ -519,6 +563,87 @@ export const $deleteIdea = createServerFn({ method: "POST" })
       .where(and(eq(idea.id, data.ideaId), eq(idea.organizationId, data.organizationId)));
 
     return { success: true };
+  });
+
+export const $getPublicRoadmapIdeas = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ organizationId: z.string() }))
+  .handler(async ({ data }) => {
+    // Public roadmap: exclude pending ideas and sensitive data like revenue
+    const ideas = await db.query.idea.findMany({
+      where: and(
+        eq(idea.organizationId, data.organizationId),
+        // Exclude pending - only show ideas that have been reviewed
+        sql`${idea.status} != 'pending'`,
+      ),
+      orderBy: desc(idea.createdAt),
+      columns: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        eta: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      with: {
+        author: {
+          columns: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        externalAuthor: {
+          columns: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          },
+        },
+        board: {
+          columns: {
+            id: true,
+            name: true,
+          },
+        },
+        tags: {
+          with: {
+            tag: true,
+          },
+        },
+        comments: {
+          columns: { id: true },
+        },
+        reactions: {
+          columns: { id: true },
+        },
+      },
+    });
+
+    return ideas.map((item) => {
+      const author = item.externalAuthor || item.author;
+      const image = author && "image" in author ? author.image : author?.avatarUrl;
+
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        status: item.status,
+        eta: item.eta,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        board: item.board,
+        tags: item.tags,
+        author: author
+          ? {
+              name: author.name,
+              image,
+            }
+          : null,
+        commentCount: item.comments.length,
+        reactionCount: item.reactions.length,
+      };
+    });
   });
 
 export const $getPublicCounts = createServerFn({ method: "GET" })

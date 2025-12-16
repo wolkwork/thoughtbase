@@ -33,23 +33,36 @@ export function LikeBadge({
   onClick,
   ...props
 }: LikeBadgeProps) {
-  const Component = onClick ? "button" : "div";
-
-  return (
-    <Component
-      onClick={onClick}
-      className={cn(
-        "hover:bg-accent text-muted-foreground flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-colors",
-        onClick && "cursor-pointer",
-        className,
-      )}
-      {...(onClick ? props : {})}
-    >
+  const content = (
+    <>
       <HeartIcon
         weight={hasReacted ? "fill" : "bold"}
         className={cn("size-4", hasReacted && "fill-red-500")}
       />
       <span className="mt-px font-mono text-xs">{count}</span>
-    </Component>
+    </>
+  );
+
+  return onClick ? (
+    <button
+      onClick={onClick}
+      className={cn(
+        "hover:bg-accent text-muted-foreground flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-colors",
+        "cursor-pointer",
+        className,
+      )}
+      {...props}
+    >
+      {content}
+    </button>
+  ) : (
+    <div
+      className={cn(
+        "hover:bg-accent text-muted-foreground flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-colors",
+        className,
+      )}
+    >
+      {content}
+    </div>
   );
 }

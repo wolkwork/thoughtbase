@@ -25,15 +25,15 @@ function DashboardIndex() {
     <div className="bg-muted/50 flex min-h-screen flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle>Select Organization</CardTitle>
+          <CardTitle>Select Workspace</CardTitle>
           <CardDescription>
-            Choose an organization to continue to your dashboard.
+            Choose a workspace to continue to your dashboard.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading ? (
             <div className="text-muted-foreground text-center text-sm">
-              Loading organizations...
+              Loading workspaces...
             </div>
           ) : (
             <div className="grid gap-2">
@@ -41,10 +41,21 @@ function DashboardIndex() {
                 <Button
                   key={org.id}
                   variant="outline"
-                  className="h-auto w-full justify-start px-4 py-4"
+                  className="h-auto w-full items-center justify-start px-4 py-4"
                   render={
                     <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
-                      <Building2 className="text-muted-foreground mr-3 h-5 w-5" />
+                      {org.logo ? (
+                        <img
+                          src={org.logo}
+                          alt={org.name}
+                          className="mr-1.5 size-8 rounded-md"
+                        />
+                      ) : (
+                        <span className="bg-muted mr-1.5 flex size-8 items-center justify-center rounded-md">
+                          <Building2 className="text-muted-foreground size-5" />
+                        </span>
+                      )}
+
                       <div className="flex flex-col items-start">
                         <span className="font-medium">{org.name}</span>
                         <span className="text-muted-foreground text-xs">{org.slug}</span>
@@ -55,7 +66,7 @@ function DashboardIndex() {
               ))}
               {organizations?.length === 0 && (
                 <div className="text-muted-foreground py-4 text-center text-sm">
-                  You don't have any organizations yet.
+                  You don't have any workspaces yet.
                 </div>
               )}
             </div>
@@ -64,7 +75,7 @@ function DashboardIndex() {
         <CardFooter>
           <Button className="w-full" onClick={() => setShowCreateDialog(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Create New Organization
+            Create New Workspace
           </Button>
         </CardFooter>
       </Card>

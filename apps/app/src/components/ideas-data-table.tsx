@@ -19,7 +19,6 @@ import * as React from "react";
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { StatusBadge } from "~/components/status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -186,38 +185,38 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       );
     },
   },
-  {
-    accessorKey: "tags",
-    header: "Tags",
-    cell: ({ row }) => {
-      const tags = row.original.tags;
-      if (!tags || tags.length === 0)
-        return <span className="text-muted-foreground text-xs">-</span>;
+  // {
+  //   accessorKey: "tags",
+  //   header: "Tags",
+  //   cell: ({ row }) => {
+  //     const tags = row.original.tags;
+  //     if (!tags || tags.length === 0)
+  //       return <span className="text-muted-foreground text-xs">-</span>;
 
-      return (
-        <div className="flex max-w-[200px] flex-wrap gap-1">
-          {tags.slice(0, 2).map((t) => (
-            <Badge
-              key={t.tag.id}
-              variant="outline"
-              className="h-5 px-1 py-0 text-[10px] font-normal"
-            >
-              {t.tag.name}
-            </Badge>
-          ))}
-          {tags.length > 2 && (
-            <Badge
-              variant="outline"
-              className="text-muted-foreground h-5 px-1 py-0 text-[10px] font-normal"
-            >
-              +{tags.length - 2}
-            </Badge>
-          )}
-        </div>
-      );
-    },
-    filterFn: tagsFilter,
-  },
+  //     return (
+  //       <div className="flex max-w-[200px] flex-wrap gap-1">
+  //         {tags.slice(0, 2).map((t) => (
+  //           <Badge
+  //             key={t.tag.id}
+  //             variant="outline"
+  //             className="h-5 px-1 py-0 text-[10px] font-normal"
+  //           >
+  //             {t.tag.name}
+  //           </Badge>
+  //         ))}
+  //         {tags.length > 2 && (
+  //           <Badge
+  //             variant="outline"
+  //             className="text-muted-foreground h-5 px-1 py-0 text-[10px] font-normal"
+  //           >
+  //             +{tags.length - 2}
+  //           </Badge>
+  //         )}
+  //       </div>
+  //     );
+  //   },
+  //   filterFn: tagsFilter,
+  // },
 ];
 
 // Keep backward compatibility - default columns without orgSlug
