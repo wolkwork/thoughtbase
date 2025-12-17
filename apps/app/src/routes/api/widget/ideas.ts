@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { json } from "@tanstack/react-start";
 import { $createIdea, $getIdeas } from "~/lib/api/ideas";
 
 const corsHeaders = {
@@ -17,8 +16,8 @@ export const Route = createFileRoute("/api/widget/ideas")({
         return new Response(null, {
           status: 204,
           headers: {
-             ...corsHeaders,
-             "Access-Control-Allow-Origin": origin,
+            ...corsHeaders,
+            "Access-Control-Allow-Origin": origin,
           },
         });
       },
@@ -26,14 +25,14 @@ export const Route = createFileRoute("/api/widget/ideas")({
         const origin = request.headers.get("origin") || "*";
         const url = new URL(request.url);
         const organizationId = url.searchParams.get("organizationId");
-        
+
         if (!organizationId) {
-          return new Response("Missing organizationId", { 
+          return new Response("Missing organizationId", {
             status: 400,
             headers: {
-               ...corsHeaders,
-               "Access-Control-Allow-Origin": origin,
-            }
+              ...corsHeaders,
+              "Access-Control-Allow-Origin": origin,
+            },
           });
         }
 
@@ -43,48 +42,47 @@ export const Route = createFileRoute("/api/widget/ideas")({
           const ideas = await $getIdeas({ data: { organizationId } });
           return new Response(JSON.stringify(ideas), {
             headers: {
-                ...corsHeaders,
-                "Access-Control-Allow-Origin": origin,
-                "Content-Type": "application/json"
-            }
+              ...corsHeaders,
+              "Access-Control-Allow-Origin": origin,
+              "Content-Type": "application/json",
+            },
           });
         } catch (e) {
           console.error("Widget API Error:", e);
-          return new Response(JSON.stringify({ error: (e as Error).message }), { 
+          return new Response(JSON.stringify({ error: (e as Error).message }), {
             status: 500,
             headers: {
-                ...corsHeaders,
-                "Access-Control-Allow-Origin": origin,
-                "Content-Type": "application/json"
-            }
+              ...corsHeaders,
+              "Access-Control-Allow-Origin": origin,
+              "Content-Type": "application/json",
+            },
           });
         }
       },
       POST: async ({ request }) => {
         const origin = request.headers.get("origin") || "*";
         try {
-            const body = await request.json();
-            const result = await $createIdea({ data: body });
-            return new Response(JSON.stringify(result), {
-                headers: {
-                    ...corsHeaders,
-                    "Access-Control-Allow-Origin": origin,
-                    "Content-Type": "application/json"
-                }
-            });
+          const body = await request.json();
+          const result = await $createIdea({ data: body });
+          return new Response(JSON.stringify(result), {
+            headers: {
+              ...corsHeaders,
+              "Access-Control-Allow-Origin": origin,
+              "Content-Type": "application/json",
+            },
+          });
         } catch (e) {
-            console.error("Widget API POST Error:", e);
-            return new Response(JSON.stringify({ error: (e as Error).message }), { 
-                status: 500,
-                headers: {
-                    ...corsHeaders,
-                    "Access-Control-Allow-Origin": origin,
-                    "Content-Type": "application/json"
-                }
-            });
+          console.error("Widget API POST Error:", e);
+          return new Response(JSON.stringify({ error: (e as Error).message }), {
+            status: 500,
+            headers: {
+              ...corsHeaders,
+              "Access-Control-Allow-Origin": origin,
+              "Content-Type": "application/json",
+            },
+          });
         }
       },
     },
   },
 });
-

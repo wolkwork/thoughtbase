@@ -5,6 +5,7 @@ import { auth } from "~/lib/auth/auth";
 const allowedOriginRegexes = [
   /^http:\/\/(?:[^.]+\.)?thoughtbase\.localhost:3000$/,
   /^http:\/\/(?:[^.]+\.)?thoughtbase\.app$/,
+  /^https:\/\/(?:[^.]+\.)?vercel\.app$/,
 ];
 
 function isAllowedOrigin(origin: string) {
