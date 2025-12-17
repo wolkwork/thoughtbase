@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { z } from "zod";
-import { authClient } from "~/lib/auth/auth-client";
+import { $getSession } from "~/lib/auth/functions";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/(auth-pages)")({
   beforeLoad: async ({ search }) => {
     const redirectUrl = search.redirect || "/dashboard";
 
-    const { data: session } = await authClient.getSession();
+    const session = await $getSession();
 
     if (session?.user) {
       throw redirect({

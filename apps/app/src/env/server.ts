@@ -4,7 +4,7 @@ import * as z from "zod";
 export const env = createEnv({
   server: {
     DATABASE_URL: z.url(),
-    VITE_VERCEL_BRANCH_URL: z.string().default("localhost:3000"),
+    VITE_VERCEL_BRANCH_URL: z.string().default("thoughtbase.localhost:3000"),
     BETTER_AUTH_SECRET: z.string().min(1),
 
     // OAuth2 providers, optional, update as needed

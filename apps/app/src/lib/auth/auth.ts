@@ -18,8 +18,9 @@ const polarClient = new Polar({
   server: "sandbox",
 });
 
-const getAuthConfig = createServerOnlyFn(() =>
-  betterAuth({
+const getAuthConfig = createServerOnlyFn(() => {
+  return betterAuth({
+    baseURL: getBaseUrl(),
     telemetry: {
       enabled: false,
     },
@@ -166,7 +167,7 @@ const getAuthConfig = createServerOnlyFn(() =>
         });
       },
     },
-  }),
-);
+  });
+});
 
 export const auth = getAuthConfig();
