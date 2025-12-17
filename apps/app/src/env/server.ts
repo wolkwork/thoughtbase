@@ -5,6 +5,7 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.url(),
     VERCEL_BRANCH_URL: z.string().default("thoughtbase.localhost:3000"),
+    VERCEL_PROJECT_PRODUCTION_URL: z.string(),
     VERCEL_ENV: z.string().default("development"),
     BETTER_AUTH_SECRET: z.string().min(1),
 
