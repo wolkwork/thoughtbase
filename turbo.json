@@ -14,7 +14,23 @@
         "POLAR_STARTER_ID",
         "POLAR_GROWTH_ID",
         "BLOB_READ_WRITE_TOKEN",
-        "RESEND_API_KEY"
+        "RESEND_API_KEY",
+        "POSTGRES_URL",
+        "POSTGRES_PRISMA_URL",
+        "DATABASE_URL_UNPOOLED",
+        "POSTGRES_URL_NON_POOLING",
+        "PGHOST",
+        "POSTGRES_USER",
+        "DATABASE_URL",
+        "POSTGRES_PASSWORD",
+        "POSTGRES_DATABASE",
+        "PGPASSWORD",
+        "PGDATABASE",
+        "PGHOST_UNPOOLED",
+        "PGUSER",
+        "POSTGRES_URL_NO_SSL",
+        "POSTGRES_HOST",
+        "NEON_PROJECT_ID"
       ]
     },
     "check-types": {
