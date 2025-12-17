@@ -6,6 +6,43 @@ import { DefaultCatchBoundary } from "~/components/default-catch-boundary";
 import { DefaultNotFound } from "~/components/default-not-found";
 import { routeTree } from "./routeTree.gen";
 
+// Known base domains for subdomain detection
+const BASE_DOMAINS = ["thoughtbase.app", "thoughtbase.localhost"] as const;
+
+/**
+ * Extract subdomain from hostname if it matches a known base domain.
+ * e.g., "acme.thoughtbase.app" → "acme"
+ * e.g., "acme.thoughtbase.localhost" → "acme"
+ * e.g., "thoughtbase.app" → null
+ * e.g., "thoughtbase.localhost" → null
+ * e.g., "thoughtbase.vercel.app" → null (not a known base domain)
+ */
+function getSubdomain(hostname: string): string | null {
+  for (const baseDomain of BASE_DOMAINS) {
+    if (hostname.endsWith(`.${baseDomain}`)) {
+      return hostname.slice(0, -(baseDomain.length + 1));
+    }
+  }
+  return null;
+}
+
+/**
+ * Get the base domain from hostname.
+ * e.g., "acme.thoughtbase.app" → "thoughtbase.app"
+ * e.g., "thoughtbase.app" → "thoughtbase.app"
+ * e.g., "acme.thoughtbase.localhost" → "thoughtbase.localhost"
+ * e.g., "thoughtbase.localhost" → "thoughtbase.localhost"
+ */
+function getBaseDomain(hostname: string): string {
+  for (const baseDomain of BASE_DOMAINS) {
+    if (hostname === baseDomain || hostname.endsWith(`.${baseDomain}`)) {
+      return baseDomain;
+    }
+  }
+  // Fallback: return the hostname as-is
+  return hostname;
+}
+
 export function getRouter() {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -30,20 +67,21 @@ export function getRouter() {
 
     rewrite: {
       input: ({ url }) => {
-        const parts = url.hostname.split(".");
-        if (parts.length > 2) {
-          const subdomain = parts[0];
+        // Detect subdomain for production (*.thoughtbase.app) and local (*.localhost)
+        const subdomain = getSubdomain(url.hostname);
 
+        if (subdomain) {
           url.pathname = `/org/${subdomain}${url.pathname}`;
         } else {
-          // TODO: Idk if this redirect is correct
+          // Redirect /org/slug paths to subdomain URLs (client-side only)
           const pathParts = url.pathname.split("/");
           if (pathParts[1] === "org" && pathParts[2]) {
-            const subdomain = pathParts[2];
+            const orgSlug = pathParts[2];
             if (typeof window !== "undefined") {
+              const baseDomain = getBaseDomain(url.hostname);
               const newUrl = new URL(url.href);
-              newUrl.hostname = `${subdomain}.${url.hostname}`;
-              newUrl.pathname = url.pathname.replace(`/org/${subdomain}`, "") || "/";
+              newUrl.hostname = `${orgSlug}.${baseDomain}`;
+              newUrl.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
               window.location.replace(newUrl.href);
             }
           }
@@ -52,17 +90,17 @@ export function getRouter() {
         return url;
       },
       output: ({ url }) => {
-        const parts = url.hostname.split(".");
-        if (parts.length > 2) {
-          const subdomain = parts[0];
+        const subdomain = getSubdomain(url.hostname);
 
+        if (subdomain) {
           url.pathname = url.pathname.replace(`/org/${subdomain}`, "");
         } else {
           const pathParts = url.pathname.split("/");
           if (pathParts[1] === "org" && pathParts[2]) {
-            const subdomain = pathParts[2];
-            url.hostname = `${subdomain}.${url.hostname}`;
-            url.pathname = url.pathname.replace(`/org/${subdomain}`, "") || "/";
+            const orgSlug = pathParts[2];
+            const baseDomain = getBaseDomain(url.hostname);
+            url.hostname = `${orgSlug}.${baseDomain}`;
+            url.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
           }
         }
 

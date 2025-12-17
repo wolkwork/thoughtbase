@@ -2,7 +2,7 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build": {
-      "outputs": ["dist/**", ".output/**"],
+      "outputs": ["dist/**"],
       "env": [
         "VITE_BASE_URL",
         "BETTER_AUTH_SECRET",
