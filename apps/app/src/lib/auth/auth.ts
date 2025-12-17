@@ -48,7 +48,7 @@ const getAuthConfig = createServerOnlyFn(() => {
         // TODO: Fix
         domain: `.${env.VERCEL_BRANCH_URL}`,
       },
-      trustedOrigins: [`*.${env.VERCEL_BRANCH_URL}`, `http://localhost:4321`],
+      trustedOrigins: [`*.vercel.app`, `http://localhost:4321`],
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
