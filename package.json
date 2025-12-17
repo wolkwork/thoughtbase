@@ -10,5 +10,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build"
+  },
+  "dependencies": {
+    "tldts": "^7.0.19"
   }
 }

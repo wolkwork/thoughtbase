@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { parse } from "tldts";
 
 import { DefaultCatchBoundary } from "~/components/default-catch-boundary";
 import { DefaultNotFound } from "~/components/default-not-found";
@@ -19,17 +20,21 @@ const BASE_DOMAINS = ["thoughtbase.app", "thoughtbase.localhost"] as const;
  * e.g., "thoughtbase.vercel.app" → null (not a known base domain)
  */
 function getSubdomain(hostname: string): string | null {
-  for (const baseDomain of BASE_DOMAINS) {
-    if (hostname.endsWith(`.${baseDomain}`)) {
-      const subdomain = hostname.slice(0, -(baseDomain.length + 1));
-      // Exclude "app" from being treated as an org subdomain
-      if (subdomain === "app") {
-        return null;
-      }
-      return subdomain;
-    }
+  const parsed = parse(hostname);
+  const domain = parsed.domain;
+
+  // Only process if domain matches a known base domain
+  if (!domain || !BASE_DOMAINS.includes(domain as (typeof BASE_DOMAINS)[number])) {
+    return null;
   }
-  return null;
+
+  const subdomain = parsed.subdomain;
+  // Exclude "app" from being treated as an org subdomain
+  if (subdomain === "app" || !subdomain) {
+    return null;
+  }
+
+  return subdomain;
 }
 
 /**
@@ -40,11 +45,14 @@ function getSubdomain(hostname: string): string | null {
  * e.g., "thoughtbase.localhost" → "thoughtbase.localhost"
  */
 function getBaseDomain(hostname: string): string {
-  for (const baseDomain of BASE_DOMAINS) {
-    if (hostname === baseDomain || hostname.endsWith(`.${baseDomain}`)) {
-      return baseDomain;
-    }
+  const parsed = parse(hostname);
+  const domain = parsed.domain;
+
+  // If domain matches a known base domain, return it
+  if (domain && BASE_DOMAINS.includes(domain as (typeof BASE_DOMAINS)[number])) {
+    return domain;
   }
+
   // Fallback: return the hostname as-is
   return hostname;
 }
