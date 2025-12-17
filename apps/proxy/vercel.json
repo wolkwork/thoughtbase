@@ -9,6 +9,16 @@
       "has": [
         {
           "type": "host",
+          "value": "www\\..*"
+        }
+      ],
+      "destination": "https://thoughtbase-app.vercel.app/:path*"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
           "value": "(?<subdomain>.*)\\..*"
         }
       ],
