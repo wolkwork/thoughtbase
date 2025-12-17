@@ -1,5 +1,7 @@
-export function getBaseUrl() {
-  const protocol = import.meta.env.VITE_VERCEL_ENV === "development" ? "http" : "https";
+import { env } from "~/env/server";
 
-  return `${protocol}://${import.meta.env.VITE_VERCEL_BRANCH_URL}`;
+export function getBaseUrl() {
+  const protocol = env.VERCEL_ENV === "development" ? "http" : "https";
+
+  return `${protocol}://${env.VERCEL_BRANCH_URL}`;
 }

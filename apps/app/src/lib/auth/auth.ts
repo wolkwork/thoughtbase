@@ -24,11 +24,6 @@ const getAuthConfig = createServerOnlyFn(() => {
     telemetry: {
       enabled: false,
     },
-    trustedOrigins: [
-      "*.thoughtbase.localhost:3000",
-      "http://localhost:4321",
-      "*.thoughtbase.app",
-    ],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {
@@ -51,13 +46,9 @@ const getAuthConfig = createServerOnlyFn(() => {
         sameSite: "none",
         secure: true,
         // TODO: Fix
-        domain: ".thoughtbase.localhost,.thoughtbase.app",
+        domain: `.${env.VERCEL_BRANCH_URL}`,
       },
-      trustedOrigins: [
-        "*.thoughtbase.localhost:3000",
-        "http://localhost:4321",
-        "*.thoughtbase.app",
-      ],
+      trustedOrigins: [`*.${env.VERCEL_BRANCH_URL}`, `http://localhost:4321`],
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
