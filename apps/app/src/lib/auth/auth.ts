@@ -41,13 +41,13 @@ const getAuthConfig = createServerOnlyFn(() => {
         enabled: true,
         domain: new URL(getBaseUrl()).hostname,
       },
-      defaultCookieAttributes: {
-        sameSite: "none",
-        secure: true,
-        // TODO: Fix
-        domain: `.${env.VERCEL_BRANCH_URL}`,
-      },
-      trustedOrigins: [`*.vercel.app`, `http://localhost:4321`],
+      // defaultCookieAttributes: {
+      //   sameSite: "none",
+      //   secure: true,
+      //   // TODO: Fix
+      //   domain: `.${getBaseUrl()}`,
+      // },
+      // trustedOrigins: [`*.vercel.app`, `http://localhost:4321`],
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
