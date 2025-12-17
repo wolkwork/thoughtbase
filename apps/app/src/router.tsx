@@ -15,12 +15,18 @@ const BASE_DOMAINS = ["thoughtbase.app", "thoughtbase.localhost"] as const;
  * e.g., "acme.thoughtbase.localhost" → "acme"
  * e.g., "thoughtbase.app" → null
  * e.g., "thoughtbase.localhost" → null
+ * e.g., "www.thoughtbase.app" → null (www is excluded)
  * e.g., "thoughtbase.vercel.app" → null (not a known base domain)
  */
 function getSubdomain(hostname: string): string | null {
   for (const baseDomain of BASE_DOMAINS) {
     if (hostname.endsWith(`.${baseDomain}`)) {
-      return hostname.slice(0, -(baseDomain.length + 1));
+      const subdomain = hostname.slice(0, -(baseDomain.length + 1));
+      // Exclude "www" from being treated as an org subdomain
+      if (subdomain === "www") {
+        return null;
+      }
+      return subdomain;
     }
   }
   return null;
