@@ -53,7 +53,7 @@ export function TeamSettings() {
     isPending: isMembersLoading,
     error: membersError,
   } = useQuery({
-    queryKey: ["members", organizationId],
+    queryKey: ["team-members", organizationId],
     queryFn: async () => {
       const { data, error } = await authClient.organization.listMembers({
         query: {

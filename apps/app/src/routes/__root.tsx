@@ -40,11 +40,11 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "React TanStarter",
+        title: "Thoughtbase — Feedback tools for product engineers",
       },
       {
         name: "description",
-        content: "A minimal starter template for 🏝️ TanStack Start.",
+        content: "Collect feedback, prioritize your roadmap, and ship changelogs",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

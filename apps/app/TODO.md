@@ -5,6 +5,7 @@ MVP:
 - Terms & Privacy
 - Onboarding
 - Landing page
+- Favicons
 
 Future:
 

@@ -23,7 +23,7 @@ function MembersPage() {
   const { members: initialMembers, organizationId } = Route.useLoaderData();
 
   const { data: members } = useQuery({
-    queryKey: ["members", organizationId],
+    queryKey: ["workspace-users", organizationId],
     queryFn: () =>
       $getMembers({
         data: { organizationId },
