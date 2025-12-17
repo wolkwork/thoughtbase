@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
+    "prebuild": "bunx drizzle-kit push",
     "build": "vite build",
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
