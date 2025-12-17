@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "https://thoughtbase-landing.vercel.app/"
-    }
-  ]
-}
