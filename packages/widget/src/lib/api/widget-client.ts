@@ -1,5 +1,11 @@
-const BASE_URL =
-  import.meta.env.VITE_VERCEL_BRANCH_URL || "http://localhost:3000";
+export function getBaseUrl() {
+  const protocol =
+    import.meta.env.VITE_VERCEL_ENV === "development" ? "http" : "https";
+
+  return `${protocol}://${import.meta.env.VITE_VERCEL_BRANCH_URL}`;
+}
+
+const BASE_URL = getBaseUrl();
 
 export interface Idea {
   id: string;

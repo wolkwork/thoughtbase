@@ -11,6 +11,7 @@ import { sendEmail } from "~/lib/email";
 import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { apiKey, organization } from "better-auth/plugins";
+import { getBaseUrl } from "../base-url";
 
 const polarClient = new Polar({
   accessToken: env.POLAR_ACCESS_TOKEN,
@@ -19,7 +20,6 @@ const polarClient = new Polar({
 
 const getAuthConfig = createServerOnlyFn(() =>
   betterAuth({
-    baseURL: env.VERCEL_BRANCH_URL,
     telemetry: {
       enabled: false,
     },
@@ -44,7 +44,7 @@ const getAuthConfig = createServerOnlyFn(() =>
     advanced: {
       crossSubDomainCookies: {
         enabled: true,
-        domain: new URL(env.VERCEL_BRANCH_URL).hostname,
+        domain: new URL(getBaseUrl()).hostname,
       },
       defaultCookieAttributes: {
         sameSite: "none",
@@ -65,7 +65,7 @@ const getAuthConfig = createServerOnlyFn(() =>
       organization({
         // https://www.better-auth.com/docs/plugins/organization#setup-invitation-email
         async sendInvitationEmail(data) {
-          const inviteLink = `${env.VERCEL_BRANCH_URL}/accept-invitation/${data.id}`;
+          const inviteLink = `${getBaseUrl()}/accept-invitation/${data.id}`;
           void sendEmail({
             to: data.email,
             subject: `You've been invited to join ${data.organization.name}`,

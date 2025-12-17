@@ -21,7 +21,7 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
   const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
 
   const getIdeaUrl = (idea: any) => {
-    const baseUrl = `${import.meta.env.VITE_VERCEL_BRANCH_URL || "http://localhost:3000"}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
+    const baseUrl = `${getBaseUrl()}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
     if (ssoToken) {
       return `${baseUrl}?sso_token=${encodeURIComponent(ssoToken)}`;
     }
