@@ -2,7 +2,20 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build": {
-      "outputs": ["dist/**", ".output/**"]
+      "outputs": ["dist/**", ".output/**"],
+      "env": [
+        "VITE_BASE_URL",
+        "BETTER_AUTH_SECRET",
+        "GITHUB_CLIENT_ID",
+        "GITHUB_CLIENT_SECRET",
+        "POLAR_ACCESS_TOKEN",
+        "POLAR_SUCCESS_URL",
+        "POLAR_WEBHOOK_SECRET",
+        "POLAR_STARTER_ID",
+        "POLAR_GROWTH_ID",
+        "BLOB_READ_WRITE_TOKEN",
+        "RESEND_API_KEY"
+      ]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
