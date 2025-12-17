@@ -1,0 +1,196 @@
+---
+title: API Reference
+description: Complete API reference for the Thoughtbase widget
+---
+
+## Overview
+
+The Thoughtbase widget exposes a JavaScript API that you can use to initialize the widget and identify users. This reference documents all available functions and their parameters.
+
+## Functions
+
+### `initFeedbackWidget(config)`
+
+Initializes the widget on your page. This function must be called before using any other widget functions.
+
+#### Parameters
+
+- `config` (object, required): Configuration object
+  - `organizationId` (string, required): Your Thoughtbase organization ID
+  - `selector` (string, optional): CSS selector for a custom trigger button. If provided, the default floating button will be hidden.
+
+#### Returns
+
+`undefined`
+
+#### Example
+
+```javascript
+window.initFeedbackWidget({
+  organizationId: 'org-123',
+  selector: '#my-button'
+});
+```
+
+#### Notes
+
+- This function should be called once per page load
+- If called multiple times, subsequent calls are ignored
+- The widget creates a Shadow DOM container to isolate styles
+- The widget script must be loaded before calling this function
+
+---
+
+### `feedbackWidget.identify(token)`
+
+Identifies a user in the widget using an SSO token. This allows you to track which users submitted feedback and maintain user context.
+
+#### Parameters
+
+- `token` (string, required): JWT token signed with your SSO secret. The token should contain:
+  - `userId`: User ID from your system
+  - `email`: User's email address
+  - `organizationId`: Your Thoughtbase organization ID
+
+#### Returns
+
+`undefined`
+
+#### Example
+
+```javascript
+window.feedbackWidget.identify('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+```
+
+#### Notes
+
+- The widget must be initialized before calling this function
+- The token should be generated server-side using your SSO secret
+- Tokens expire after the time specified during generation
+- Call this function after a user logs into your application
+
+#### Error Handling
+
+If the widget is not initialized, this function will log an error to the console:
+
+```javascript
+console.error("Feedback Widget: Initialize widget before calling identify");
+```
+
+---
+
+## Global Objects
+
+### `window.initFeedbackWidget`
+
+The initialization function is available on the `window` object after the widget script loads.
+
+### `window.feedbackWidget`
+
+An object containing widget functions, available after initialization:
+- `identify(token)`: Identify a user with an SSO token
+
+## Widget Behavior
+
+### Initialization
+
+When `initFeedbackWidget` is called:
+1. A container element is created in the document body
+2. A Shadow DOM is attached to the container
+3. The widget React component is rendered inside the Shadow DOM
+4. Event listeners are set up for the trigger button
+
+### Custom Selector
+
+If a `selector` is provided:
+- The default floating button is not rendered
+- Click events on elements matching the selector open the widget
+- Multiple elements can match the selector (all will trigger the widget)
+
+### SSO Token Storage
+
+SSO tokens are stored in memory (not in localStorage or cookies) for security:
+- Tokens are passed to API requests when creating ideas
+- Tokens are included in URLs when linking to idea pages
+- Tokens are cleared when the page is refreshed
+
+## Error Handling
+
+The widget handles errors gracefully:
+
+- **Initialization errors**: Logged to console, widget may not appear
+- **API errors**: Logged to console, user sees generic error message
+- **SSO errors**: Logged to console, widget continues to work without SSO
+
+## Browser Compatibility
+
+The widget requires:
+- Modern browsers with Shadow DOM support
+- JavaScript enabled
+- No Content Security Policy restrictions on inline scripts
+
+## Examples
+
+### Basic Integration
+
+```html
+<script src="https://app.thoughtbase.app/widget.js"></script>
+<script>
+  window.initFeedbackWidget({
+    organizationId: 'your-org-id'
+  });
+</script>
+```
+
+### With Custom Button
+
+```html
+<button id="feedback-btn">Give Feedback</button>
+<script src="https://app.thoughtbase.app/widget.js"></script>
+<script>
+  window.initFeedbackWidget({
+    organizationId: 'your-org-id',
+    selector: '#feedback-btn'
+  });
+</script>
+```
+
+### With SSO
+
+```html
+<script src="https://app.thoughtbase.app/widget.js"></script>
+<script>
+  window.initFeedbackWidget({
+    organizationId: 'your-org-id'
+  });
+  
+  // After user login
+  async function onLogin(userId) {
+    const token = await getSSOToken(userId);
+    window.feedbackWidget.identify(token);
+  }
+</script>
+```
+
+## Troubleshooting
+
+### Widget Not Initializing
+
+- Check browser console for errors
+- Verify the script loaded successfully
+- Ensure `organizationId` is correct
+- Check for JavaScript errors blocking execution
+
+### Identify Not Working
+
+- Verify widget is initialized first
+- Check token format and expiration
+- Ensure SSO secret matches
+- Check browser console for errors
+
+## Support
+
+For additional help:
+- Check the [Getting Started Guide](/docs/widget/guides/getting-started)
+- Review the [SSO Integration Guide](/docs/widget/guides/sso-integration)
+- Contact support through your Thoughtbase dashboard

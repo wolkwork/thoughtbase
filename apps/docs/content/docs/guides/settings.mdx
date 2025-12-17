@@ -1,0 +1,99 @@
+---
+title: Organization Settings
+description: Configure your organization's settings and preferences
+---
+
+## Accessing Settings
+
+Go to **Settings** in the sidebar to configure your organization. Settings are organized into tabs:
+
+- **Billing**: Manage your subscription
+- **SSO**: Configure Single Sign-On
+- **Branding**: Customize appearance
+- **Team**: Manage team settings
+
+## Billing
+
+Manage your subscription and payment:
+
+- **View current plan**: See what plan you're on
+- **Update payment methods**: Add or change payment information
+- **View billing history**: See past invoices and payments
+- **Upgrade or downgrade**: Change your plan as needed
+
+## SSO (Single Sign-On)
+
+Configure SSO to allow users from your external application to authenticate with the widget.
+
+### Setting Up SSO
+
+1. Go to **Settings** → **SSO** tab
+2. Generate or view your SSO secret
+3. Use this secret to sign JWTs in your application
+4. Users can then authenticate using the widget with SSO tokens
+
+### SSO Secret
+
+- **Generate**: Create a new secret if you don't have one
+- **Rotate**: Regularly rotate your secret for security
+- **Keep secure**: Never expose your secret in client-side code
+
+**Important**: Keep your SSO secret secure! Rotate it regularly for security.
+
+For detailed SSO integration instructions, see the [Widget SSO Integration Guide](/docs/widget/guides/sso-integration).
+
+## Branding
+
+Customize your organization's appearance:
+
+### Organization Name
+
+- Set your organization's display name
+- This appears in the dashboard and public pages
+
+### Logo
+
+- Upload your organization logo
+- Recommended size: Square format, at least 256x256 pixels
+- Maximum file size: 4.5MB
+- Supported formats: PNG, JPG, SVG
+
+### Colors
+
+- Customize primary colors (if available)
+- Colors affect public pages and widget appearance
+
+## Team Settings
+
+Manage team-wide settings:
+
+- **View team activity**: See what your team has been doing
+- **Configure permissions**: Set default permissions for new members
+- **Team preferences**: Configure organization-wide preferences
+
+## Best Practices
+
+### Security
+
+- **Rotate SSO secrets**: Change secrets regularly
+- **Review access**: Regularly audit who has access
+- **Secure credentials**: Never share secrets or credentials
+
+### Branding
+
+- **Consistent branding**: Use your logo and colors consistently
+- **Professional appearance**: Keep branding professional and on-brand
+- **Regular updates**: Update branding as your brand evolves
+
+### Billing
+
+- **Monitor usage**: Keep an eye on your plan limits
+- **Update payment methods**: Keep payment information current
+- **Plan appropriately**: Choose a plan that fits your needs
+
+## Tips & Tricks
+
+1. **Test SSO**: Test SSO integration in a development environment first
+2. **Backup secrets**: Store SSO secrets securely (password manager)
+3. **Brand consistency**: Use the same logo across all platforms
+4. **Regular reviews**: Periodically review all settings

@@ -1,0 +1,200 @@
+---
+title: SSO Integration
+description: Set up Single Sign-On to identify users in the widget
+---
+
+## Overview
+
+Single Sign-On (SSO) allows you to identify users who are already logged into your application. This enables you to:
+- Track which users submitted feedback
+- Show personalized content
+- Maintain user context across your app and the widget
+
+## Setting Up SSO
+
+### Step 1: Generate an SSO Secret
+
+1. Go to your Thoughtbase dashboard
+2. Navigate to Settings → SSO
+3. Generate or copy your SSO secret
+
+**Important**: Keep your SSO secret secure! Never expose it in client-side code.
+
+### Step 2: Create SSO Tokens in Your Backend
+
+When a user logs into your application, generate a JWT token signed with your SSO secret:
+
+```javascript
+// Example (pseudo-code)
+const jwt = require('jsonwebtoken');
+
+const ssoToken = jwt.sign(
+  {
+    userId: user.id,
+    email: user.email,
+    organizationId: 'your-org-id'
+  },
+  'your-sso-secret',
+  { expiresIn: '1h' }
+);
+```
+
+### Step 3: Identify Users in the Widget
+
+After initializing the widget and when a user logs in, call the identify function:
+
+```html
+<script>
+  // Initialize widget
+  window.initFeedbackWidget({
+    organizationId: 'your-organization-id-here'
+  });
+  
+  // After user logs in on your site
+  function onUserLogin(user) {
+    // Get SSO token from your backend
+    fetch('/api/generate-sso-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Identify user in widget
+      window.feedbackWidget.identify(data.token);
+    });
+  }
+</script>
+```
+
+## SSO Token Format
+
+Your SSO token should be a JWT with the following payload:
+
+```json
+{
+  "userId": "user-id-from-your-system",
+  "email": "user@example.com",
+  "organizationId": "your-thoughtbase-org-id"
+}
+```
+
+The token should be signed with your SSO secret using HS256 algorithm.
+
+## Backend Integration
+
+You'll need to create an endpoint in your backend to generate SSO tokens. Here's an example using Node.js:
+
+```javascript
+const jwt = require('jsonwebtoken');
+const express = require('express');
+const app = express();
+
+app.post('/api/generate-sso-token', authenticateUser, (req, res) => {
+  const { user } = req; // Your authenticated user
+  
+  const token = jwt.sign(
+    {
+      userId: user.id,
+      email: user.email,
+      organizationId: process.env.THOUGHTBASE_ORG_ID
+    },
+    process.env.THOUGHTBASE_SSO_SECRET, // Your SSO secret from Thoughtbase
+    { expiresIn: '1h' }
+  );
+  
+  res.json({ token });
+});
+```
+
+## Complete Integration Example
+
+Here's a complete example of integrating the widget with SSO:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Website</title>
+</head>
+<body>
+  <h1>Welcome to My Site</h1>
+  
+  <!-- Your custom feedback button -->
+  <button id="feedback-btn">Give Feedback</button>
+  
+  <!-- Load widget script -->
+  <script src="https://app.thoughtbase.app/widget.js"></script>
+  
+  <!-- Initialize widget -->
+  <script>
+    // Initialize widget with custom button
+    window.initFeedbackWidget({
+      organizationId: 'your-organization-id-here',
+      selector: '#feedback-btn'
+    });
+    
+    // Example: Identify user after login
+    async function handleUserLogin(userId) {
+      try {
+        // Get SSO token from your backend
+        const response = await fetch('/api/generate-sso-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        
+        const { token } = await response.json();
+        
+        // Identify user in widget
+        if (window.feedbackWidget) {
+          window.feedbackWidget.identify(token);
+        }
+      } catch (error) {
+        console.error('Failed to identify user:', error);
+      }
+    }
+    
+    // Call this when user logs in
+    // handleUserLogin(currentUserId);
+  </script>
+</body>
+</html>
+```
+
+## Security Best Practices
+
+### Token Security
+
+- **Never expose your SSO secret** in client-side code
+- **Generate tokens server-side only**
+- **Use appropriate token expiration times** (recommended: 1 hour)
+- **Validate user authentication** before generating tokens
+
+### Secret Management
+
+- **Store secrets securely**: Use environment variables
+- **Rotate secrets regularly**: Change your SSO secret periodically
+- **Use different secrets**: Use different secrets for development and production
+
+## Troubleshooting
+
+### SSO Not Working
+
+1. **Verify your SSO secret** matches what's in your Thoughtbase dashboard
+2. **Check token format** - ensure it's a valid JWT
+3. **Verify token expiration** - tokens expire after the set time
+4. **Check browser console** for error messages
+5. **Ensure your backend endpoint** is accessible and working
+
+### Common Issues
+
+- **Token expired**: Generate a new token when the current one expires
+- **Invalid signature**: Verify your SSO secret is correct
+- **Missing fields**: Ensure token includes userId, email, and organizationId
+
+## Next Steps
+
+- Review the [API Reference](/docs/widget/api/reference) for detailed function documentation
+- Test your SSO integration in a development environment
+- Monitor token generation and usage
