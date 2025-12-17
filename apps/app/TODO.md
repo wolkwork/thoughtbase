@@ -1,5 +1,6 @@
 MVP:
 
+- Filter pending and closed from All Feedback landing page
 - Docs
 - Terms & Privacy
 - Onboarding
