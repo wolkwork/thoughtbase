@@ -20,7 +20,9 @@ const getOrganization = createServerFn({ method: "GET" })
   });
 
 export const Route = createFileRoute("/org/$slug")({
-  loaderDeps: ({ search: { sso_token } }) => ({ sso_token }),
+  loaderDeps: ({ search: { sso_token } }: { search: { sso_token?: string } }) => ({
+    sso_token,
+  }),
   loader: async ({ params, deps: { sso_token }, location }) => {
     const org = await getOrganization({ data: params.slug });
     if (!org) {

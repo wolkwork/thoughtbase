@@ -274,14 +274,19 @@ function OrganizationIndexPage() {
                     <div className="flex w-full items-center gap-3">
                       <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
                         <Avatar className="size-8">
-                          <AvatarImage src={idea.author.image} />
-                          <AvatarFallback>
-                            {idea.author.name?.charAt(0) || "?"}
-                          </AvatarFallback>
+                          <AvatarImage src={idea.author.image ?? undefined} />
+                          {/* TODO: Fix */}
+                          {"name" in idea.author && (
+                            <AvatarFallback>
+                              {idea.author.name?.charAt(0) || "?"}
+                            </AvatarFallback>
+                          )}
                         </Avatar>
                         <div className="flex flex-col gap-0.5">
                           <div className="text-foreground flex items-center gap-2 font-medium">
-                            <span>{idea.author.name}</span>
+                            <span>
+                              {"name" in idea.author ? idea.author.name : "Unknown"}
+                            </span>
                           </div>
                           <span className="text-xs">
                             {format(new Date(idea.createdAt), "MMM d, yyyy")}

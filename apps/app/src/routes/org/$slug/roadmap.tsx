@@ -26,7 +26,7 @@ function PublicRoadmapPage() {
       {/* Full-width scrollable container - roadmap can scroll over left padding */}
       <div className="min-h-0 flex-1 overflow-x-auto pr-8 pb-8">
         <div className="inline-flex min-w-full pl-[max(1rem,calc((100vw-72rem)/2+1rem))]">
-          <RoadmapBoard ideas={ideas || []} readOnly publicOrgSlug={org.slug} public />
+          <RoadmapBoard ideas={ideas || []} readOnly orgSlug={org.slug} isPublic />
         </div>
       </div>
     </div>

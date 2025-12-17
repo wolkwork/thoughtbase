@@ -14,6 +14,7 @@ import { Route as authPagesRouteRouteImport } from './routes/(auth-pages)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesSsoRouteImport } from './routes/examples/sso'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
+import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation/$invitationId'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
 import { Route as authPagesLoginRouteImport } from './routes/(auth-pages)/login'
 import { Route as OrgSlugRouteRouteImport } from './routes/org/$slug/route'
@@ -61,6 +62,12 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcceptInvitationInvitationIdRoute =
+  AcceptInvitationInvitationIdRouteImport.update({
+    id: '/accept-invitation/$invitationId',
+    path: '/accept-invitation/$invitationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const authPagesSignupRoute = authPagesSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
+  '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugRouteRouteWithChildren
@@ -222,6 +230,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
+  '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -252,6 +261,7 @@ export interface FileRoutesById {
   '/org/$slug': typeof OrgSlugRouteRouteWithChildren
   '/(auth-pages)/login': typeof authPagesLoginRoute
   '/(auth-pages)/signup': typeof authPagesSignupRoute
+  '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/api/upload': typeof ApiUploadRoute
   '/examples/sso': typeof ExamplesSsoRoute
   '/(authenticated)/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugRouteRouteWithChildren
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/login'
     | '/signup'
+    | '/accept-invitation/$invitationId'
     | '/api/upload'
     | '/examples/sso'
     | '/dashboard/$orgSlug'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/signup'
+    | '/accept-invitation/$invitationId'
     | '/api/upload'
     | '/examples/sso'
     | '/api/auth/$'
@@ -337,6 +349,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/(auth-pages)/login'
     | '/(auth-pages)/signup'
+    | '/accept-invitation/$invitationId'
     | '/api/upload'
     | '/examples/sso'
     | '/(authenticated)/dashboard/$orgSlug'
@@ -365,6 +378,7 @@ export interface RootRouteChildren {
   authPagesRouteRoute: typeof authPagesRouteRouteWithChildren
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
   OrgSlugRouteRoute: typeof OrgSlugRouteRouteWithChildren
+  AcceptInvitationInvitationIdRoute: typeof AcceptInvitationInvitationIdRoute
   ApiUploadRoute: typeof ApiUploadRoute
   ExamplesSsoRoute: typeof ExamplesSsoRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -407,6 +421,13 @@ declare module '@tanstack/react-router' {
       path: '/api/upload'
       fullPath: '/api/upload'
       preLoaderRoute: typeof ApiUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accept-invitation/$invitationId': {
+      id: '/accept-invitation/$invitationId'
+      path: '/accept-invitation/$invitationId'
+      fullPath: '/accept-invitation/$invitationId'
+      preLoaderRoute: typeof AcceptInvitationInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth-pages)/signup': {
@@ -681,6 +702,7 @@ const rootRouteChildren: RootRouteChildren = {
   authPagesRouteRoute: authPagesRouteRouteWithChildren,
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
   OrgSlugRouteRoute: OrgSlugRouteRouteWithChildren,
+  AcceptInvitationInvitationIdRoute: AcceptInvitationInvitationIdRoute,
   ApiUploadRoute: ApiUploadRoute,
   ExamplesSsoRoute: ExamplesSsoRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

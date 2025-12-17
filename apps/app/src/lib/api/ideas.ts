@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { getUnifiedAuthContext, getUserFromToken } from "~/lib/auth/external-auth";
+import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
 import { board, comment, idea, reaction } from "~/lib/db/schema";
+import { getUnifiedUser } from "./unified-user";
 
 // Context helper for auth - organizationId comes from URL params, not session
 async function getAuthContext() {
@@ -306,41 +307,18 @@ export const $createIdea = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    // If token is provided, validate it and use it to identify the user
-    let user = null;
-    let type: "internal" | "external" | null = null;
-
-    if (data.token) {
-      try {
-        const externalUser = await getUserFromToken(data.token, data.organizationId);
-        if (externalUser) {
-          user = externalUser;
-          type = "external";
-        }
-      } catch (e) {
-        console.warn("Invalid SSO token provided for idea creation", e);
-      }
-    }
-
-    // Fallback to session context if no valid token provided or verification failed
-    if (!user) {
-      const ctx = await getAuthContext();
-      user = ctx.user;
-      type = ctx.type;
-    }
-
-    // For external auth, verify organization access
-    if (type === "external" && user && data.organizationId !== user.organizationId) {
-      throw new Error("Unauthorized organization scope");
-    }
+    const user = await getUnifiedUser({
+      token: data.token,
+      organizationId: data.organizationId,
+    });
 
     const [newIdea] = await db
       .insert(idea)
       .values({
         id: crypto.randomUUID(),
         organizationId: data.organizationId,
-        authorId: type === "internal" && user ? user.id : null,
-        externalAuthorId: type === "external" && user ? user.id : null,
+        authorId: user?.type === "internal" ? user.id : null,
+        externalAuthorId: user?.type === "external" ? user.id : null,
         title: data.title,
         description: data.description,
         boardId: data.boardId,

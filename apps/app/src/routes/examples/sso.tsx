@@ -1,6 +1,6 @@
-import { FeedbackWidget } from "@feedback-tool/widget";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { FeedbackWidget } from "@thoughtbase/widget";
 import { SignJWT } from "jose";
 import { useState } from "react";
 import { toast } from "sonner";

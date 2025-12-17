@@ -20,6 +20,9 @@ export const env = createEnv({
     POLAR_GROWTH_ID: z.string().min(1),
 
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
+
+    // Email (Resend)
+    RESEND_API_KEY: z.string().min(1),
   },
   runtimeEnv: process.env,
 });

@@ -296,18 +296,6 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                   }
                 />
                 <DropdownMenuItem
-                  render={
-                    <Link
-                      to="/dashboard/$orgSlug/account"
-                      params={{ orgSlug }}
-                      className="flex items-center"
-                    >
-                      <Settings className="mr-2 size-4" />
-                      Settings
-                    </Link>
-                  }
-                />
-                <DropdownMenuItem
                   onClick={async () => {
                     await authClient.signOut({
                       fetchOptions: {

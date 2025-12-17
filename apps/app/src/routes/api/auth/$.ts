@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { auth } from "~/lib/auth/auth";
 
 // TODO: Make production ready. Include custom domains
-const allowedOriginRegex = /^http:\/\/(?:[^.]+\.)?thoughtbase\.localhost:3000$/;
+const allowedOriginRegexes = [
+  /^http:\/\/(?:[^.]+\.)?thoughtbase\.localhost:3000$/,
+  /^http:\/\/(?:[^.]+\.)?thoughtbase\.app$/,
+];
+
+function isAllowedOrigin(origin: string) {
+  return allowedOriginRegexes.some((regex) => regex.test(origin));
+}
 
 export const Route = createFileRoute("/api/auth/$")({
   server: {
@@ -10,7 +17,7 @@ export const Route = createFileRoute("/api/auth/$")({
       OPTIONS: async ({ request }) => {
         const origin = request.headers.get("origin");
 
-        if (origin && allowedOriginRegex.test(origin)) {
+        if (origin && isAllowedOrigin(origin)) {
           return new Response(null, {
             status: 200,
             headers: {
@@ -31,7 +38,7 @@ export const Route = createFileRoute("/api/auth/$")({
 
         const response = await auth.handler(request);
 
-        if (origin && allowedOriginRegex.test(origin)) {
+        if (origin && isAllowedOrigin(origin)) {
           response.headers.set("Access-Control-Allow-Origin", origin);
         }
         response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -46,7 +53,7 @@ export const Route = createFileRoute("/api/auth/$")({
         const origin = request.headers.get("origin");
 
         const response = await auth.handler(request);
-        if (origin && allowedOriginRegex.test(origin)) {
+        if (origin && isAllowedOrigin(origin)) {
           response.headers.set("Access-Control-Allow-Origin", origin);
         }
         response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");

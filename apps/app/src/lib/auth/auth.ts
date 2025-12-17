@@ -6,6 +6,7 @@ import * as schema from "~/lib/db/schema";
 
 import { env } from "~/env/server";
 import { db } from "~/lib/db";
+import { sendEmail } from "~/lib/email";
 
 import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
@@ -22,7 +23,11 @@ const getAuthConfig = createServerOnlyFn(() =>
     telemetry: {
       enabled: false,
     },
-    trustedOrigins: ["*.thoughtbase.localhost:3000", "http://localhost:4321"],
+    trustedOrigins: [
+      "*.thoughtbase.localhost:3000",
+      "http://localhost:4321",
+      "*.thoughtbase.app",
+    ],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {
@@ -45,15 +50,38 @@ const getAuthConfig = createServerOnlyFn(() =>
         sameSite: "none",
         secure: true,
         // TODO: Fix
-        domain: ".thoughtbase.localhost",
+        domain: ".thoughtbase.localhost,.thoughtbase.app",
       },
-      trustedOrigins: ["*.thoughtbase.localhost:3000", "http://localhost:4321"], // Add demo app origin
+      trustedOrigins: [
+        "*.thoughtbase.localhost:3000",
+        "http://localhost:4321",
+        "*.thoughtbase.app",
+      ],
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [
       tanstackStartCookies(),
-      organization(),
+      organization({
+        // https://www.better-auth.com/docs/plugins/organization#setup-invitation-email
+        async sendInvitationEmail(data) {
+          const inviteLink = `${env.VITE_BASE_URL}/accept-invitation/${data.id}`;
+          void sendEmail({
+            to: data.email,
+            subject: `You've been invited to join ${data.organization.name}`,
+            html: `
+              <h1>You've been invited!</h1>
+              <p>Hi there,</p>
+              <p><strong>${data.inviter.user.name || data.inviter.user.email}</strong> has invited you to join <strong>${data.organization.name}</strong> on Thoughtbase.</p>
+              <p>Click the link below to accept the invitation:</p>
+              <p><a href="${inviteLink}">Accept Invitation</a></p>
+              <p>Or copy and paste this URL into your browser:</p>
+              <p>${inviteLink}</p>
+              <p>This invitation will expire in 48 hours.</p>
+            `,
+          });
+        },
+      }),
       apiKey(),
       polar({
         client: polarClient,
@@ -101,6 +129,42 @@ const getAuthConfig = createServerOnlyFn(() =>
     // https://www.better-auth.com/docs/authentication/email-password
     emailAndPassword: {
       enabled: true,
+      sendResetPassword: async ({ user, url }) => {
+        void sendEmail({
+          to: user.email,
+          subject: "Reset your password",
+          html: `
+            <h1>Reset your password</h1>
+            <p>Hi ${user.name || "there"},</p>
+            <p>Click the link below to reset your password:</p>
+            <p><a href="${url}">Reset Password</a></p>
+            <p>Or copy and paste this URL into your browser:</p>
+            <p>${url}</p>
+            <p>If you didn't request this, you can safely ignore this email.</p>
+          `,
+        });
+      },
+    },
+
+    // https://www.better-auth.com/docs/concepts/email
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        void sendEmail({
+          to: user.email,
+          subject: "Verify your email address",
+          html: `
+            <h1>Verify your email</h1>
+            <p>Hi ${user.name || "there"},</p>
+            <p>Please click the link below to verify your email address:</p>
+            <p><a href="${url}">Verify Email</a></p>
+            <p>Or copy and paste this URL into your browser:</p>
+            <p>${url}</p>
+            <p>This link will expire in 1 hour.</p>
+          `,
+        });
+      },
     },
   }),
 );

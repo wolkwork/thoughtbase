@@ -4,11 +4,11 @@ MVP:
 - Terms & Privacy
 - Onboarding
 - Landing page
-- Email verification
-- Invitation emails with resend
 
 Future:
 
+- Invitation emails with resend fix styling and flow to be better
+- Email verification
 - Thank you screen after submission (styling)
 - Settings->Branding styling
 - Disallow liking closed ideas
