@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "https://thoughtbase-landing.vercel.app"
+      "destination": "https://thoughtbase-landing.vercel.app/"
     },
     {
       "source": "/:match*",
