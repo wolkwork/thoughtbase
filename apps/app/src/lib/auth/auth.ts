@@ -19,7 +19,7 @@ const polarClient = new Polar({
 
 const getAuthConfig = createServerOnlyFn(() =>
   betterAuth({
-    baseURL: env.VITE_BASE_URL,
+    baseURL: env.VERCEL_BRANCH_URL,
     telemetry: {
       enabled: false,
     },
@@ -44,7 +44,7 @@ const getAuthConfig = createServerOnlyFn(() =>
     advanced: {
       crossSubDomainCookies: {
         enabled: true,
-        domain: new URL(env.VITE_BASE_URL).hostname,
+        domain: new URL(env.VERCEL_BRANCH_URL).hostname,
       },
       defaultCookieAttributes: {
         sameSite: "none",
@@ -65,7 +65,7 @@ const getAuthConfig = createServerOnlyFn(() =>
       organization({
         // https://www.better-auth.com/docs/plugins/organization#setup-invitation-email
         async sendInvitationEmail(data) {
-          const inviteLink = `${env.VITE_BASE_URL}/accept-invitation/${data.id}`;
+          const inviteLink = `${env.VERCEL_BRANCH_URL}/accept-invitation/${data.id}`;
           void sendEmail({
             to: data.email,
             subject: `You've been invited to join ${data.organization.name}`,

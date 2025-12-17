@@ -9,18 +9,19 @@ interface RoadmapViewProps {
 
 export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
-  
+
   useEffect(() => {
     getWidgetIdeas(organizationId)
       .then(setIdeas)
       .catch((err) => console.error("Failed to load ideas", err));
   }, [organizationId]);
 
-  const inProgressIdeas = ideas?.filter((i) => i.status === "in_progress") || [];
+  const inProgressIdeas =
+    ideas?.filter((i) => i.status === "in_progress") || [];
   const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
 
   const getIdeaUrl = (idea: any) => {
-    const baseUrl = `${import.meta.env.VITE_BASE_URL || "http://localhost:3000"}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
+    const baseUrl = `${import.meta.env.VITE_VERCEL_BRANCH_URL || "http://localhost:3000"}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
     if (ssoToken) {
       return `${baseUrl}?sso_token=${encodeURIComponent(ssoToken)}`;
     }
@@ -42,7 +43,10 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
                 In progress
               </span>
               {inProgressIdeas.map((idea, index) => (
-                <div key={idea.id} className="group relative w-full cursor-pointer">
+                <div
+                  key={idea.id}
+                  className="group relative w-full cursor-pointer"
+                >
                   <a
                     href={getIdeaUrl(idea)}
                     target="_blank"
@@ -59,10 +63,14 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
                     </div>
                     <div className="w-full flex-1 pb-5">
                       <div className="justify flex items-center justify-between gap-2">
-                        <h4 className="text-sm leading-none font-medium">{idea.title}</h4>
+                        <h4 className="text-sm leading-none font-medium">
+                          {idea.title}
+                        </h4>
                         <div className="text-muted-foreground flex items-center gap-1">
                           <Heart className="size-3.5 fill-current" />
-                          <span className="mt-0.5 text-xs">{idea.reactionCount}</span>
+                          <span className="mt-0.5 text-xs">
+                            {idea.reactionCount}
+                          </span>
                         </div>
                       </div>
                       <p className="text-muted-foreground mt-2 line-clamp-2 text-xs font-light">
@@ -83,7 +91,10 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
                 Planned
               </span>
               {plannedIdeas.map((idea, index) => (
-                <div key={idea.id} className="group relative w-full cursor-pointer">
+                <div
+                  key={idea.id}
+                  className="group relative w-full cursor-pointer"
+                >
                   <a
                     href={getIdeaUrl(idea)}
                     target="_blank"
@@ -100,10 +111,14 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
                     </div>
                     <div className="w-full flex-1 pb-5">
                       <div className="justify flex items-center justify-between gap-2">
-                        <h4 className="text-sm leading-none font-medium">{idea.title}</h4>
+                        <h4 className="text-sm leading-none font-medium">
+                          {idea.title}
+                        </h4>
                         <div className="text-muted-foreground flex items-center gap-1">
                           <Heart className="size-3.5 fill-current" />
-                          <span className="mt-0.5 text-xs">{idea.reactionCount}</span>
+                          <span className="mt-0.5 text-xs">
+                            {idea.reactionCount}
+                          </span>
                         </div>
                       </div>
                       <p className="text-muted-foreground mt-2 line-clamp-2 text-xs font-light">

@@ -4,7 +4,7 @@
     "build": {
       "outputs": ["dist/**"],
       "env": [
-        "VITE_BASE_URL",
+        "VERCEL_BRANCH_URL",
         "BETTER_AUTH_SECRET",
         "GITHUB_CLIENT_ID",
         "GITHUB_CLIENT_SECRET",
