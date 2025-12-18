@@ -267,9 +267,9 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
               render={
                 <Button
                   variant="outline"
-                  className="border-border w-full justify-start rounded-lg border bg-white text-start"
+                  className="border-border h-auto! w-full justify-start rounded-lg border bg-white"
                 >
-                  <SparkleIcon weight="bold" />
+                  <SparkleIcon className="size-4.5!" weight="bold" />
                   <span>Got Ideas? Tell Us!</span>
                 </Button>
               }
