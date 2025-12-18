@@ -1,3 +1,4 @@
+import slugify from "@sindresorhus/slugify";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -27,7 +28,6 @@ export function CreateOrganizationDialog({
   onOpenChange,
 }: CreateOrganizationDialogProps) {
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -41,10 +41,26 @@ export function CreateOrganizationDialog({
     e.preventDefault();
     setLoading(true);
     try {
+      let slug = slugify(name);
+
+      const slugExists = await authClient.organization.checkSlug({
+        slug,
+      });
+
+      if (slugExists.error) {
+        slug = slug + "-" + crypto.randomUUID().substring(0, 4);
+      }
+
       const result = await authClient.organization.create({
         name,
         slug,
       });
+
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
       toast.success("Organization created successfully");
       finalOnOpenChange?.(false);
 
@@ -58,7 +74,6 @@ export function CreateOrganizationDialog({
       }
 
       setName("");
-      setSlug("");
     } catch (error: any) {
       console.error(error);
       toast.error(error?.message || "Failed to create organization");
@@ -87,15 +102,6 @@ export function CreateOrganizationDialog({
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Acme Inc."
                 required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="slug">Slug (Optional)</Label>
-              <Input
-                id="slug"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="acme-inc"
               />
             </div>
           </div>
