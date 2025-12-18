@@ -12,15 +12,18 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { Copy, ExternalLink, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
+import type { BundledLanguage } from "shiki";
 import { toast } from "sonner";
 import { BrandingSettings } from "~/components/branding-settings";
 import { SubscriptionDialog } from "~/components/subscription-dialog";
 import { InviteMemberForm } from "~/components/team-settings";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 import { authClient } from "~/lib/auth/auth-client";
 import { cn } from "~/lib/utils";
+import { CopyButton } from "./ui/shadcn-io/copy-button";
 
 type StepId =
   | "install-widget"
@@ -201,33 +204,30 @@ export function OnboardingDialog({
   );
 }
 
-function CodeSnippet({ label, value }: { label: string; value: string }) {
+function CodeSnippet({
+  label,
+  value,
+  lang,
+}: {
+  label: string;
+  value: string;
+  lang: BundledLanguage;
+}) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <div className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
           {label}
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(value);
-              toast.success("Copied to clipboard");
-            } catch {
-              toast.error("Failed to copy");
-            }
-          }}
-        >
-          <Copy className="mr-2 h-4 w-4" />
-          Copy
-        </Button>
       </div>
-      <pre className="bg-muted overflow-x-auto rounded-lg border p-4 text-xs">
-        <code>{value}</code>
-      </pre>
+      <div className="relative">
+        <CopyButton
+          variant="outline"
+          content={value}
+          className="absolute top-2 right-2"
+        />
+        <ShikiCodeBlock code={value} lang={lang} />
+      </div>
     </div>
   );
 }
@@ -283,9 +283,13 @@ function InstallWidgetStep({ organizationId }: { organizationId?: string }) {
         </div>
       </div>
 
-      <CodeSnippet label="1) Add the script" value={installScript} />
-      <CodeSnippet label="2) Initialize" value={initSnippet} />
-      <CodeSnippet label="Optional: use your own button" value={customButtonSnippet} />
+      <CodeSnippet label="1) Add the script" value={installScript} lang="html" />
+      <CodeSnippet label="2) Initialize" value={initSnippet} lang="html" />
+      <CodeSnippet
+        label="Optional: use your own button"
+        value={customButtonSnippet}
+        lang="html"
+      />
     </div>
   );
 }
@@ -353,22 +357,7 @@ const token = await new SignJWT({
           ) : secret ? (
             <div className="flex items-center gap-2">
               <code className="bg-muted rounded px-2 py-1 text-xs">{secret}</code>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(secret);
-                    toast.success("Secret copied");
-                  } catch {
-                    toast.error("Failed to copy");
-                  }
-                }}
-              >
-                <Copy className="mr-2 h-4 w-4" />
-                Copy
-              </Button>
+              <CopyButton variant="outline" content={secret} />
             </div>
           ) : (
             <Button
@@ -383,7 +372,7 @@ const token = await new SignJWT({
         </div>
       </div>
 
-      <CodeSnippet label="Generate JWT (Node / jose)" value={joseExample} />
+      <CodeSnippet label="Generate JWT (Node / jose)" value={joseExample} lang="ts" />
       <div className="text-muted-foreground text-sm">
         After generating a token, pass it into the widget as{" "}
         <code className="bg-muted rounded px-1 py-0.5 text-xs">ssoToken</code>.
@@ -474,22 +463,7 @@ function ShareBoardStep({ orgSlug }: { orgSlug: string }) {
         <div className="mt-3 flex flex-col gap-2">
           <code className="bg-muted rounded px-3 py-2 text-xs">{boardUrl}</code>
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(boardUrl);
-                  toast.success("Link copied");
-                } catch {
-                  toast.error("Failed to copy");
-                }
-              }}
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              Copy
-            </Button>
+            <CopyButton variant="outline" content={boardUrl} />
             <Button
               type="button"
               variant="outline"
