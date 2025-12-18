@@ -24,3 +24,5 @@ dist
 .tanstack
 
 .turbo
+
+.playwright-mcp
