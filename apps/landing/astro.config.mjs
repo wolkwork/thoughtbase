@@ -9,9 +9,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  adapter: vercel({
-    webAnalytics: true,
-  }),
+  adapter: vercel(),
   markdown: {
     drafts: true,
     shikiConfig: {
