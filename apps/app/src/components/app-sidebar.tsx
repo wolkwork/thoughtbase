@@ -1,6 +1,7 @@
 import {
   BrowserIcon,
   GearSixIcon,
+  HandWavingIcon,
   KanbanIcon,
   NewspaperIcon,
   SparkleIcon,
@@ -10,6 +11,7 @@ import { Link, useLocation, useNavigate, useRouteContext } from "@tanstack/react
 import { FeedbackWidget } from "@thoughtbase/widget";
 import { ChevronsUpDown, CircleDashed, LogOut, Plus, Settings } from "lucide-react";
 import { useState } from "react";
+import { OnboardingDialog } from "~/components/onboarding-dialog";
 import { StatusBadge, STATUSES } from "~/components/status-badge";
 import {
   DropdownMenu,
@@ -48,6 +50,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
   const navigate = useNavigate();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [widgetOpen, setWidgetOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
   const { data: organizations } = authClient.useListOrganizations();
 
   const activeOrg = organizations?.find((org) => org.slug === orgSlug);
@@ -78,7 +81,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {Object.entries(STATUSES).map(([statusSlug, config]) => {
+              {Object.entries(STATUSES).map(([statusSlug]) => {
                 const isStatusActive = location.search?.status === statusSlug;
                 return (
                   <SidebarMenuItem
@@ -239,6 +242,25 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem className="mb-2">
+            <SidebarMenuButton
+              onClick={() => setOnboardingOpen(true)}
+              render={
+                <Button
+                  variant="outline"
+                  className="border-border h-auto! w-full items-start! justify-start rounded-lg border bg-white text-start"
+                >
+                  <HandWavingIcon weight="duotone" className="mt-0.5 size-5!" />
+                  <div>
+                    <div>Welcome, {user?.name}</div>
+                    <div className="text-muted-foreground mt-1 text-xs">
+                      Click here to get started!
+                    </div>
+                  </div>
+                </Button>
+              }
+            />
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setWidgetOpen(true)}
@@ -319,6 +341,12 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
       <CreateIdeaDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
+        orgSlug={orgSlug}
+        organizationId={organizationId}
+      />
+      <OnboardingDialog
+        open={onboardingOpen}
+        onOpenChange={setOnboardingOpen}
         orgSlug={orgSlug}
         organizationId={organizationId}
       />

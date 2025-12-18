@@ -200,7 +200,7 @@ function OrganizationIndexPage() {
 
   return (
     <>
-      <div className="mx-auto grid max-w-4xl grid-cols-1 border-r border-l lg:grid-cols-3">
+      <div className="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 border-r border-l lg:grid-cols-3">
         {/* Main Content */}
         <div className="space-y-6 border-r py-8 lg:col-span-2">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">

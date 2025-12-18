@@ -74,7 +74,7 @@ function PublicLayout() {
   const { org, user } = Route.useLoaderData();
 
   return (
-    <div className="bg-background text-foreground relative min-h-screen">
+    <div className="bg-background text-foreground relative flex min-h-screen flex-col">
       <PublicHeader org={org} user={user} />
       <Outlet />
     </div>

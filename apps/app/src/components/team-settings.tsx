@@ -48,11 +48,7 @@ export function TeamSettings() {
 
   const organizationId = organization.id;
 
-  const {
-    data: members,
-    isPending: isMembersLoading,
-    error: membersError,
-  } = useQuery({
+  const { data: members, isPending: isMembersLoading } = useQuery({
     queryKey: ["team-members", organizationId],
     queryFn: async () => {
       const { data, error } = await authClient.organization.listMembers({
@@ -68,7 +64,7 @@ export function TeamSettings() {
     enabled: !!organizationId,
   });
 
-  const { data: invitations, isPending: isInvitationsLoading } = useQuery({
+  const { data: invitations } = useQuery({
     queryKey: ["invitations", organizationId],
     queryFn: async () => {
       const { data, error } = await authClient.organization.listInvitations({
@@ -93,7 +89,7 @@ export function TeamSettings() {
             Manage your organization members and invitations.
           </p>
         </div>
-        <InviteMemberDialog />
+        <InviteMemberDialog organizationId={organizationId} />
       </div>
 
       <div className="space-y-4">
@@ -158,7 +154,27 @@ export function TeamSettings() {
   );
 }
 
-function MemberRow({ member }: { member: any }) {
+type TeamMember = {
+  id: string;
+  userId: string;
+  role: "admin" | "member" | "owner" | string;
+  createdAt: string | Date;
+  user: {
+    image?: string | null;
+    name?: string | null;
+    email: string;
+  };
+};
+
+type TeamInvitation = {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  expiresAt: string | Date;
+};
+
+function MemberRow({ member }: { member: TeamMember }) {
   const user = member.user;
   const router = useRouter();
 
@@ -169,12 +185,13 @@ function MemberRow({ member }: { member: any }) {
       });
       toast.success("Member removed");
       router.invalidate();
-    } catch (error) {
+    } catch {
       toast.error("Failed to remove member");
     }
   };
 
-  const handleUpdateRole = async (newRole: string) => {
+  const handleUpdateRole = async (newRole: string | null) => {
+    if (!newRole) return;
     try {
       await authClient.organization.updateMemberRole({
         memberId: member.userId,
@@ -182,7 +199,7 @@ function MemberRow({ member }: { member: any }) {
       });
       toast.success("Role updated");
       router.invalidate();
-    } catch (error) {
+    } catch {
       toast.error("Failed to update role");
     }
   };
@@ -191,11 +208,11 @@ function MemberRow({ member }: { member: any }) {
     <TableRow>
       <TableCell className="flex items-center gap-3">
         <Avatar className="h-9 w-9">
-          <AvatarImage src={user.image} alt={user.name} />
-          <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+          <AvatarImage src={user.image || ""} alt={user.name || user.email} />
+          <AvatarFallback>{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <span className="font-medium">{user.name}</span>
+          <span className="font-medium">{user.name || user.email}</span>
           <span className="text-muted-foreground text-xs">{user.email}</span>
         </div>
       </TableCell>
@@ -235,7 +252,7 @@ function MemberRow({ member }: { member: any }) {
   );
 }
 
-function InvitationRow({ invitation }: { invitation: any }) {
+function InvitationRow({ invitation }: { invitation: TeamInvitation }) {
   const router = useRouter();
   const handleRevoke = async () => {
     try {
@@ -244,7 +261,7 @@ function InvitationRow({ invitation }: { invitation: any }) {
       });
       toast.success("Invitation revoked");
       router.invalidate();
-    } catch (error) {
+    } catch {
       toast.error("Failed to revoke invitation");
     }
   };
@@ -283,37 +300,8 @@ function InvitationRow({ invitation }: { invitation: any }) {
   );
 }
 
-function InviteMemberDialog() {
+export function InviteMemberDialog({ organizationId }: { organizationId: string }) {
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"member" | "admin" | "owner">("member");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const { organization } = useRouteContext({
-    from: "/(authenticated)/dashboard/$orgSlug",
-  });
-  const organizationId = organization.id;
-
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await authClient.organization.inviteMember({
-        organizationId,
-        email,
-        role,
-      });
-      toast.success("Invitation sent");
-      setOpen(false);
-      setEmail("");
-      router.invalidate();
-    } catch (error) {
-      toast.error("Failed to send invitation");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -332,42 +320,86 @@ function InviteMemberDialog() {
             Send an invitation to join your organization.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleInvite}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={role}
-                onValueChange={(val) => setRole(val as "member" | "admin" | "owner")}
-              >
-                <SelectTrigger>
-                  <SelectValue data-placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="member">Member</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Invitation"}
-            </Button>
-          </DialogFooter>
-        </form>
+        <InviteMemberForm
+          organizationId={organizationId}
+          onSuccess={() => setOpen(false)}
+          submitLabel="Send Invitation"
+        />
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function InviteMemberForm({
+  organizationId,
+  onSuccess,
+  submitLabel = "Invite Member",
+}: {
+  organizationId: string;
+  onSuccess?: () => void;
+  submitLabel?: string;
+}) {
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<"member" | "admin" | "owner">("member");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await authClient.organization.inviteMember({
+        organizationId,
+        email,
+        role,
+      });
+      toast.success("Invitation sent");
+      setEmail("");
+      onSuccess?.();
+      router.invalidate();
+    } catch (error) {
+      toast.error("Failed to send invitation");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleInvite}>
+      <div className="grid gap-4 py-4">
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="role">Role</Label>
+          <Select
+            value={role}
+            onValueChange={(val) => setRole(val as "member" | "admin" | "owner")}
+          >
+            <SelectTrigger>
+              <SelectValue data-placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="member">Member</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <DialogFooter>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Sending..." : submitLabel}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }
