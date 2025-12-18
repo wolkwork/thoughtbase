@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { $createIdea, $getIdeas } from "~/lib/api/ideas";
+import { $createIdea, $getPublicRoadmapIdeas } from "~/lib/api/ideas";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/api/widget/ideas")({
         try {
           // $getIdeas uses getRequest() internally to check auth/headers
           // This should work if the headers are passed through or available in context
-          const ideas = await $getIdeas({ data: { organizationId } });
+          const ideas = await $getPublicRoadmapIdeas({ data: { organizationId } });
           return new Response(JSON.stringify(ideas), {
             headers: {
               ...corsHeaders,

@@ -1,11 +1,4 @@
-export function getBaseUrl() {
-  const protocol =
-    import.meta.env.VITE_VERCEL_ENV === "development" ? "http" : "https";
-
-  return `${protocol}://${import.meta.env.VITE_VERCEL_BRANCH_URL}`;
-}
-
-const BASE_URL = getBaseUrl();
+const BASE_URL = "https://app.thoughtbase.app";
 
 export interface Idea {
   id: string;

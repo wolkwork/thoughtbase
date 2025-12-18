@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, not, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
@@ -132,7 +132,10 @@ export const $getIdeasFeed = createServerFn({ method: "GET" })
     }
 
     const offset = (data.page - 1) * data.limit;
-    const whereConditions = [eq(idea.organizationId, organizationId)];
+    const whereConditions = [
+      eq(idea.organizationId, organizationId),
+      not(eq(idea.status, "pending")),
+    ];
 
     if (data.status) {
       whereConditions.push(eq(idea.status, data.status));
@@ -551,7 +554,7 @@ export const $getPublicRoadmapIdeas = createServerFn({ method: "GET" })
       where: and(
         eq(idea.organizationId, data.organizationId),
         // Exclude pending - only show ideas that have been reviewed
-        sql`${idea.status} != 'pending'`,
+        not(eq(idea.status, "pending")),
       ),
       orderBy: desc(idea.createdAt),
       columns: {

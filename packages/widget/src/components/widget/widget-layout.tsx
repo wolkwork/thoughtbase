@@ -84,7 +84,12 @@ export function WidgetLayout({
       </div>
 
       <div className="text-xs text-muted-foreground text-center py-2 bg-muted/20 border-t">
-        Powered by <AnimatedShinyText>Thoughtbase</AnimatedShinyText>
+        Powered by{" "}
+        <AnimatedShinyText>
+          <a href="https://thoughtbase.app" className="font-medium">
+            Thoughtbase
+          </a>
+        </AnimatedShinyText>
       </div>
     </div>
   );

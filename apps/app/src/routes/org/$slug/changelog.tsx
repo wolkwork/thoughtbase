@@ -224,11 +224,11 @@ function ChangelogPage() {
           </div>
         )}
 
-        <div className="space-y-12">
+        <div>
           {changelogs.map((changelog) => (
             <article
               key={changelog.id}
-              className="border-muted relative border-l-2 pb-8 pl-8"
+              className="border-muted relative border-l-2 pb-20 pl-8"
             >
               {/* Timeline dot */}
               <div className="border-primary bg-background absolute top-0 -left-[9px] h-4 w-4 rounded-full border-2" />

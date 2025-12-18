@@ -352,7 +352,10 @@ function OrganizationIndexPage() {
           </div>
 
           <div className="text-muted-foreground bg-muted/20 border-t py-3 text-center text-xs">
-            Powered by <span className="font-medium">Thoughtbase</span>
+            Powered by{" "}
+            <a href="https://thoughtbase.app" className="font-medium">
+              Thoughtbase
+            </a>
           </div>
         </div>
       </div>

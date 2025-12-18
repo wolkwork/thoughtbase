@@ -31,6 +31,7 @@ Future:
 - Multiple boards/topics
 - Zapier integrations
 - Social login
+- Delete workspace/org
 
 Paid:
 

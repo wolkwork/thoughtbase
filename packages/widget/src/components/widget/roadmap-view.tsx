@@ -5,9 +5,14 @@ import { getWidgetIdeas, type Idea } from "../../lib/api/widget-client";
 interface RoadmapViewProps {
   organizationId: string;
   ssoToken?: string;
+  host?: string;
 }
 
-export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
+export function RoadmapView({
+  organizationId,
+  ssoToken,
+  host = "https://app.thoughtbase.app",
+}: RoadmapViewProps) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
 
   useEffect(() => {
@@ -21,7 +26,7 @@ export function RoadmapView({ organizationId, ssoToken }: RoadmapViewProps) {
   const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
 
   const getIdeaUrl = (idea: any) => {
-    const baseUrl = `${getBaseUrl()}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
+    const baseUrl = `${host}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
     if (ssoToken) {
       return `${baseUrl}?sso_token=${encodeURIComponent(ssoToken)}`;
     }
