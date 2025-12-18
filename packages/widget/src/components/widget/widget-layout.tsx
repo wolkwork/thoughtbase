@@ -1,10 +1,4 @@
-import {
-  Gift,
-  HeartIcon,
-  Map as MapIcon,
-  MessageCircleHeart,
-  X,
-} from "lucide-react";
+import { Gift, Map as MapIcon, MessageCircleHeart, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { AnimatedShinyText } from "../ui/animated-shiny-text";

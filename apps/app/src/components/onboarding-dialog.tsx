@@ -100,8 +100,6 @@ export function OnboardingDialog({
     [activeStepId],
   );
 
-  const activeIndex = STEPS.findIndex((s) => s.id === activeStepId);
-
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -174,7 +172,7 @@ export function OnboardingDialog({
 
                 <div className="space-y-6">
                   {activeStepId === "install-widget" && (
-                    <InstallWidgetStep organizationId={organizationId} />
+                    <InstallWidgetStep organizationSlug={orgSlug} />
                   )}
                   {activeStepId === "enable-auto-login" && (
                     <EnableAutoLoginStep organizationId={organizationId} />
@@ -232,8 +230,7 @@ function CodeSnippet({
   );
 }
 
-function InstallWidgetStep({ organizationId }: { organizationId?: string }) {
-  const orgId = organizationId ?? "org_...";
+function InstallWidgetStep({ organizationSlug }: { organizationSlug: string }) {
   const scriptSrc =
     typeof window !== "undefined" ? `${window.location.origin}/widget.js` : "/widget.js";
 
@@ -241,7 +238,7 @@ function InstallWidgetStep({ organizationId }: { organizationId?: string }) {
 
   const initSnippet = `<script>
   window.initFeedbackWidget({
-    organizationId: "${orgId}",
+    organizationSlug: "${organizationSlug}",
   });
 </script>`;
 
@@ -250,7 +247,7 @@ function InstallWidgetStep({ organizationId }: { organizationId?: string }) {
 <script src="${scriptSrc}"></script>
 <script>
   window.initFeedbackWidget({
-    organizationId: "${orgId}",
+    organizationSlug: "${organizationSlug}",
     selector: "#feedback-btn",
   });
 </script>`;
@@ -263,14 +260,14 @@ function InstallWidgetStep({ organizationId }: { organizationId?: string }) {
           You’ll need this when embedding the widget.
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <code className="bg-muted rounded px-2 py-1 text-xs">{orgId}</code>
+          <code className="bg-muted rounded px-2 py-1 text-xs">{organizationSlug}</code>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(orgId);
+                await navigator.clipboard.writeText(organizationSlug);
                 toast.success("Organization ID copied");
               } catch {
                 toast.error("Failed to copy");

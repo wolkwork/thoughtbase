@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
 import { board, comment, idea, reaction } from "~/lib/db/schema";
+import { $getOrganizationBySlug } from "./organizations";
 import { getUnifiedUser } from "./unified-user";
 
 // Context helper for auth - organizationId comes from URL params, not session
@@ -305,21 +306,26 @@ export const $createIdea = createServerFn({ method: "POST" })
       description: z.string().optional(),
       boardId: z.string().optional(),
       status: z.string().default("pending"),
-      organizationId: z.string(),
+      organizationSlug: z.string(),
       token: z.string().optional(),
     }),
   )
   .handler(async ({ data }) => {
+    const organization = await $getOrganizationBySlug({ data: data.organizationSlug });
+    if (!organization) {
+      throw new Error("Organization not found");
+    }
+
     const user = await getUnifiedUser({
       token: data.token,
-      organizationId: data.organizationId,
+      organizationId: organization.id,
     });
 
     const [newIdea] = await db
       .insert(idea)
       .values({
         id: crypto.randomUUID(),
-        organizationId: data.organizationId,
+        organizationId: organization.id,
         authorId: user?.type === "internal" ? user.id : null,
         externalAuthorId: user?.type === "external" ? user.id : null,
         title: data.title,
@@ -547,12 +553,20 @@ export const $deleteIdea = createServerFn({ method: "POST" })
   });
 
 export const $getPublicRoadmapIdeas = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ organizationId: z.string() }))
+  .inputValidator(z.object({ organizationSlug: z.string() }))
   .handler(async ({ data }) => {
+    const organization = await $getOrganizationBySlug({
+      data: data.organizationSlug,
+    });
+
+    if (!organization) {
+      throw new Error("Organization not found");
+    }
+
     // Public roadmap: exclude pending ideas and sensitive data like revenue
     const ideas = await db.query.idea.findMany({
       where: and(
-        eq(idea.organizationId, data.organizationId),
+        eq(idea.organizationId, organization.id),
         // Exclude pending - only show ideas that have been reviewed
         not(eq(idea.status, "pending")),
       ),

@@ -24,10 +24,10 @@ export const Route = createFileRoute("/api/widget/ideas")({
       GET: async ({ request }) => {
         const origin = request.headers.get("origin") || "*";
         const url = new URL(request.url);
-        const organizationId = url.searchParams.get("organizationId");
+        const organizationSlug = url.searchParams.get("organizationSlug");
 
-        if (!organizationId) {
-          return new Response("Missing organizationId", {
+        if (!organizationSlug) {
+          return new Response("Missing organizationSlug", {
             status: 400,
             headers: {
               ...corsHeaders,
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/api/widget/ideas")({
         try {
           // $getIdeas uses getRequest() internally to check auth/headers
           // This should work if the headers are passed through or available in context
-          const ideas = await $getPublicRoadmapIdeas({ data: { organizationId } });
+          const ideas = await $getPublicRoadmapIdeas({ data: { organizationSlug } });
           return new Response(JSON.stringify(ideas), {
             headers: {
               ...corsHeaders,

@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as authPagesRouteRouteImport } from './routes/(auth-pages)/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ExamplesSsoRouteImport } from './routes/examples/sso'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation/$invitationId'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
@@ -50,11 +49,6 @@ const authPagesRouteRoute = authPagesRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExamplesSsoRoute = ExamplesSsoRouteImport.update({
-  id: '/examples/sso',
-  path: '/examples/sso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUploadRoute = ApiUploadRouteImport.update({
@@ -205,7 +199,6 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authPagesSignupRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/api/upload': typeof ApiUploadRoute
-  '/examples/sso': typeof ExamplesSsoRoute
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
@@ -232,7 +225,6 @@ export interface FileRoutesByTo {
   '/signup': typeof authPagesSignupRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/api/upload': typeof ApiUploadRoute
-  '/examples/sso': typeof ExamplesSsoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
@@ -263,7 +255,6 @@ export interface FileRoutesById {
   '/(auth-pages)/signup': typeof authPagesSignupRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/api/upload': typeof ApiUploadRoute
-  '/examples/sso': typeof ExamplesSsoRoute
   '/(authenticated)/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
@@ -294,7 +285,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/accept-invitation/$invitationId'
     | '/api/upload'
-    | '/examples/sso'
     | '/dashboard/$orgSlug'
     | '/api/auth/$'
     | '/api/widget/changelog'
@@ -321,7 +311,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/accept-invitation/$invitationId'
     | '/api/upload'
-    | '/examples/sso'
     | '/api/auth/$'
     | '/api/widget/changelog'
     | '/api/widget/ideas'
@@ -351,7 +340,6 @@ export interface FileRouteTypes {
     | '/(auth-pages)/signup'
     | '/accept-invitation/$invitationId'
     | '/api/upload'
-    | '/examples/sso'
     | '/(authenticated)/dashboard/$orgSlug'
     | '/api/auth/$'
     | '/api/widget/changelog'
@@ -380,7 +368,6 @@ export interface RootRouteChildren {
   OrgSlugRouteRoute: typeof OrgSlugRouteRouteWithChildren
   AcceptInvitationInvitationIdRoute: typeof AcceptInvitationInvitationIdRoute
   ApiUploadRoute: typeof ApiUploadRoute
-  ExamplesSsoRoute: typeof ExamplesSsoRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiWidgetChangelogRoute: typeof ApiWidgetChangelogRoute
   ApiWidgetIdeasRoute: typeof ApiWidgetIdeasRoute
@@ -407,13 +394,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/examples/sso': {
-      id: '/examples/sso'
-      path: '/examples/sso'
-      fullPath: '/examples/sso'
-      preLoaderRoute: typeof ExamplesSsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/upload': {
@@ -704,7 +684,6 @@ const rootRouteChildren: RootRouteChildren = {
   OrgSlugRouteRoute: OrgSlugRouteRouteWithChildren,
   AcceptInvitationInvitationIdRoute: AcceptInvitationInvitationIdRoute,
   ApiUploadRoute: ApiUploadRoute,
-  ExamplesSsoRoute: ExamplesSsoRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiWidgetChangelogRoute: ApiWidgetChangelogRoute,
   ApiWidgetIdeasRoute: ApiWidgetIdeasRoute,

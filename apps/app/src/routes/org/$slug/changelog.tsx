@@ -172,7 +172,7 @@ function ChangelogPage() {
     queryFn: ({ pageParam }) =>
       $getPublishedChangelogs({
         data: {
-          organizationId: org.id,
+          organizationSlug: org.slug,
           page: pageParam,
           limit: 10,
         },

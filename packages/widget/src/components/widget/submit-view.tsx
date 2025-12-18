@@ -4,11 +4,11 @@ import { createWidgetIdea } from "../../lib/api/widget-client";
 import { Button } from "../ui/button";
 
 interface SubmitViewProps {
-  organizationId: string;
+  organizationSlug: string;
   ssoToken?: string;
 }
 
-export function SubmitView({ organizationId, ssoToken }: SubmitViewProps) {
+export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
   const [description, setDescription] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -22,7 +22,7 @@ export function SubmitView({ organizationId, ssoToken }: SubmitViewProps) {
       await createWidgetIdea({
         title: description.slice(0, 50),
         description,
-        organizationId,
+        organizationSlug,
         token: ssoToken,
       });
       setIsSuccess(true);

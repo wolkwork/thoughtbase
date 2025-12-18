@@ -5,14 +5,14 @@ import { SubmitView } from "./widget/submit-view";
 import { Tab, WidgetLayout } from "./widget/widget-layout";
 
 interface FeedbackWidgetProps {
-  organizationId: string;
+  organizationSlug: string;
   isOpen: boolean;
   onClose: () => void;
   ssoToken?: string;
 }
 
 export function FeedbackWidget({
-  organizationId,
+  organizationSlug,
   isOpen,
   onClose,
   ssoToken,
@@ -28,13 +28,13 @@ export function FeedbackWidget({
       onClose={onClose}
     >
       {activeTab === "feedback" && (
-        <SubmitView organizationId={organizationId} ssoToken={ssoToken} />
+        <SubmitView organizationSlug={organizationSlug} ssoToken={ssoToken} />
       )}
       {activeTab === "roadmap" && (
-        <RoadmapView organizationId={organizationId} ssoToken={ssoToken} />
+        <RoadmapView organizationSlug={organizationSlug} ssoToken={ssoToken} />
       )}
       {activeTab === "updates" && (
-        <ChangelogView organizationId={organizationId} />
+        <ChangelogView organizationSlug={organizationSlug} />
       )}
     </WidgetLayout>
   );

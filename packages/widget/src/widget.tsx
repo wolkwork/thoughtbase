@@ -6,14 +6,14 @@ import styles from "./styles.css?inline";
 import { Button } from "./components/ui/button";
 
 interface WidgetProps {
-  organizationId: string;
+  organizationSlug: string;
   selector?: string;
 }
 
 // Global state to hold the SSO token for the widget instance
 let ssoToken: string | null = null;
 
-function WidgetContainer({ organizationId, selector }: WidgetProps) {
+function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Force re-render when token changes (though identify is usually called once at start)
   const [token, setToken] = useState<string | null>(ssoToken);
@@ -55,7 +55,7 @@ function WidgetContainer({ organizationId, selector }: WidgetProps) {
         </Button>
       )}
       <FeedbackWidget
-        organizationId={organizationId}
+        organizationSlug={organizationSlug}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         ssoToken={token || undefined} // Pass token to widget
@@ -64,10 +64,10 @@ function WidgetContainer({ organizationId, selector }: WidgetProps) {
   );
 }
 
-let activeOrganizationId: string | null = null;
+let activeOrganizationSlug: string | null = null;
 
 export function initFeedbackWidget(config: WidgetProps) {
-  activeOrganizationId = config.organizationId;
+  activeOrganizationSlug = config.organizationSlug;
   const containerId = "feedback-widget-container";
 
   if (document.getElementById(containerId)) {
@@ -85,7 +85,7 @@ export function initFeedbackWidget(config: WidgetProps) {
 }
 
 export function identify(token: string) {
-  if (!activeOrganizationId) {
+  if (!activeOrganizationSlug) {
     console.error("Feedback Widget: Initialize widget before calling identify");
     return;
   }
@@ -97,8 +97,6 @@ export function identify(token: string) {
   if ((window as any).__setWidgetToken) {
     (window as any).__setWidgetToken(token);
   }
-
-  console.log("Feedback Widget: Identified with token");
 }
 
 if (typeof window !== "undefined") {

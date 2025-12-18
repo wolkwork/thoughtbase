@@ -3,15 +3,13 @@ import { useEffect, useState } from "react";
 import { getWidgetIdeas, type Idea } from "../../lib/api/widget-client";
 
 interface RoadmapViewProps {
-  organizationId: string;
   ssoToken?: string;
   host?: string;
+  organizationSlug: string;
 }
 
-console.log("env", process.env.NODE_ENV);
-
 export function RoadmapView({
-  organizationId,
+  organizationSlug,
   ssoToken,
   host = process.env.NODE_ENV === "development"
     ? "http://thoughtbase.localhost:3000"
@@ -20,17 +18,17 @@ export function RoadmapView({
   const [ideas, setIdeas] = useState<Idea[]>([]);
 
   useEffect(() => {
-    getWidgetIdeas(organizationId)
+    getWidgetIdeas(organizationSlug)
       .then(setIdeas)
       .catch((err) => console.error("Failed to load ideas", err));
-  }, [organizationId]);
+  }, [organizationSlug]);
 
   const inProgressIdeas =
     ideas?.filter((i) => i.status === "in_progress") || [];
   const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
 
   const getIdeaUrl = (idea: any) => {
-    const baseUrl = `${host}/org/${idea.organization?.slug || "unknown"}/${idea.id}`;
+    const baseUrl = `${host}/org/${organizationSlug}/${idea.id}`;
     if (ssoToken) {
       return `${baseUrl}?sso_token=${encodeURIComponent(ssoToken)}`;
     }

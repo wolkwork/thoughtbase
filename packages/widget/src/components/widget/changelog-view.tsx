@@ -6,7 +6,7 @@ import {
 } from "../../lib/api/widget-client";
 
 interface ChangelogViewProps {
-  organizationId: string;
+  organizationSlug: string;
 }
 
 // Helper to render Tiptap JSON content as plain text for the widget
@@ -61,16 +61,16 @@ function formatDate(dateString: string | null): string {
   });
 }
 
-export function ChangelogView({ organizationId }: ChangelogViewProps) {
+export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
   const [changelogs, setChangelogs] = useState<Changelog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!organizationId) return;
+    if (!organizationSlug) return;
 
     setLoading(true);
-    getWidgetChangelogs(organizationId)
+    getWidgetChangelogs(organizationSlug)
       .then((data) => {
         setChangelogs(data);
         setError(null);
@@ -82,7 +82,7 @@ export function ChangelogView({ organizationId }: ChangelogViewProps) {
       .finally(() => {
         setLoading(false);
       });
-  }, [organizationId]);
+  }, [organizationSlug]);
 
   if (loading) {
     return (

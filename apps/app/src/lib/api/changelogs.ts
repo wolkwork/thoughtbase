@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
 import { changelog, changelogIdea, idea } from "~/lib/db/schema";
+import { $getOrganizationBySlug } from "./organizations";
 
 // Context helper for auth
 async function getAuthContext() {
@@ -57,17 +58,25 @@ export const $getChangelogs = createServerFn({ method: "GET" })
 export const $getPublishedChangelogs = createServerFn({ method: "GET" })
   .inputValidator(
     z.object({
-      organizationId: z.string(),
+      organizationSlug: z.string(),
       page: z.number().default(1),
       limit: z.number().default(20),
     }),
   )
   .handler(async ({ data }) => {
+    const organization = await $getOrganizationBySlug({
+      data: data.organizationSlug,
+    });
+
+    if (!organization) {
+      throw new Error("Organization not found");
+    }
+
     const offset = (data.page - 1) * data.limit;
 
     const changelogs = await db.query.changelog.findMany({
       where: and(
-        eq(changelog.organizationId, data.organizationId),
+        eq(changelog.organizationId, organization.id),
         eq(changelog.status, "published"),
       ),
       orderBy: desc(changelog.publishedAt),

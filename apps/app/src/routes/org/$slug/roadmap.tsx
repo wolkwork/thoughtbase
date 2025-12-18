@@ -12,7 +12,7 @@ function PublicRoadmapPage() {
 
   const { data: ideas } = useQuery({
     queryKey: ["public-roadmap-ideas", org.id],
-    queryFn: () => $getPublicRoadmapIdeas({ data: { organizationId: org.id } }),
+    queryFn: () => $getPublicRoadmapIdeas({ data: { organizationSlug: org.slug } }),
   });
 
   return (

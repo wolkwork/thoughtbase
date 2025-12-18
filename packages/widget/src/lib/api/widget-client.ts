@@ -28,9 +28,11 @@ export interface Changelog {
   ideas: Idea[];
 }
 
-export async function getWidgetIdeas(organizationId: string): Promise<Idea[]> {
+export async function getWidgetIdeas(
+  organizationSlug: string
+): Promise<Idea[]> {
   const res = await fetch(
-    `${BASE_URL}/api/widget/ideas?organizationId=${organizationId}`,
+    `${BASE_URL}/api/widget/ideas?organizationSlug=${organizationSlug}`,
     {
       mode: "cors",
     }
@@ -45,7 +47,7 @@ export async function getWidgetIdeas(organizationId: string): Promise<Idea[]> {
 export async function createWidgetIdea(data: {
   title: string;
   description: string;
-  organizationId: string;
+  organizationSlug: string;
   token?: string;
 }) {
   const res = await fetch(`${BASE_URL}/api/widget/ideas`, {
@@ -63,10 +65,10 @@ export async function createWidgetIdea(data: {
 }
 
 export async function getWidgetChangelogs(
-  organizationId: string
+  organizationSlug: string
 ): Promise<Changelog[]> {
   const res = await fetch(
-    `${BASE_URL}/api/widget/changelog?organizationId=${organizationId}`,
+    `${BASE_URL}/api/widget/changelog?organizationSlug=${organizationSlug}`,
     {
       mode: "cors",
     }

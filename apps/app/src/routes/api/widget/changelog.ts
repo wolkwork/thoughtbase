@@ -24,10 +24,10 @@ export const Route = createFileRoute("/api/widget/changelog")({
       GET: async ({ request }) => {
         const origin = request.headers.get("origin") || "*";
         const url = new URL(request.url);
-        const organizationId = url.searchParams.get("organizationId");
+        const organizationSlug = url.searchParams.get("organizationSlug");
 
-        if (!organizationId) {
-          return new Response("Missing organizationId", {
+        if (!organizationSlug) {
+          return new Response("Missing organizationSlug", {
             status: 400,
             headers: {
               ...corsHeaders,
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/api/widget/changelog")({
         try {
           const result = await $getPublishedChangelogs({
             data: {
-              organizationId,
+              organizationSlug,
               page: 1,
               limit: 10,
             },
