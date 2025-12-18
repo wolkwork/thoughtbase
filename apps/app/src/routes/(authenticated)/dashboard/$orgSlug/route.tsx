@@ -25,20 +25,11 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
     // Provide organization to child routes via context
     return { organization };
   },
-  loader: async ({ params }) => {
-    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-
-    if (!organization) {
-      throw notFound();
-    }
-
-    return { organization };
-  },
   component: DashboardLayout,
 });
 
 function DashboardLayout() {
-  const { organization } = Route.useLoaderData();
+  const { organization } = Route.useRouteContext();
   const { orgSlug } = Route.useParams();
 
   const { data: counts } = useQuery({
