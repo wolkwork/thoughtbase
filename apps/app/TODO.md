@@ -9,6 +9,7 @@ MVP:
 
 Future:
 
+- Fix roadmap drag and drop
 - Invitation emails with resend fix styling and flow to be better
 - Email verification
 - Thank you screen after submission (styling)

@@ -1,4 +1,7 @@
-const BASE_URL = "https://app.thoughtbase.app";
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://thoughtbase.localhost:3000"
+    : "https://app.thoughtbase.app";
 
 export interface Idea {
   id: string;

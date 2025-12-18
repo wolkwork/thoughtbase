@@ -8,10 +8,14 @@ interface RoadmapViewProps {
   host?: string;
 }
 
+console.log("env", process.env.NODE_ENV);
+
 export function RoadmapView({
   organizationId,
   ssoToken,
-  host = "https://app.thoughtbase.app",
+  host = process.env.NODE_ENV === "development"
+    ? "http://thoughtbase.localhost:3000"
+    : "https://app.thoughtbase.app",
 }: RoadmapViewProps) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
 

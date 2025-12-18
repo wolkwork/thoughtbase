@@ -10,7 +10,6 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { STATUSES, type IdeaStatus } from "~/components/status-badge";
 import { $updateIdeaStatus } from "~/lib/api/ideas";
@@ -177,14 +176,11 @@ export function RoadmapBoard({
         ))}
       </div>
 
-      {createPortal(
-        <DragOverlay>
-          {activeIdea ? (
-            <RoadmapCard idea={activeIdea} orgSlug={orgSlug} isPublic={isPublic} />
-          ) : null}
-        </DragOverlay>,
-        document.body,
-      )}
+      <DragOverlay>
+        {activeIdea ? (
+          <RoadmapCard idea={activeIdea} orgSlug={orgSlug} isPublic={isPublic} />
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }

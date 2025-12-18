@@ -51,10 +51,11 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [widgetOpen, setWidgetOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const { data: organizations } = authClient.useListOrganizations();
 
-  const activeOrg = organizations?.find((org) => org.slug === orgSlug);
-  const organizationId = activeOrg?.id;
+  const { organization } = useRouteContext({
+    from: "/(authenticated)/dashboard/$orgSlug",
+  });
+  const organizationId = organization?.id;
 
   const location = useLocation();
 
