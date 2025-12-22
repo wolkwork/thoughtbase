@@ -344,6 +344,12 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
         onOpenChange={setCreateDialogOpen}
         orgSlug={orgSlug}
         organizationId={organizationId}
+        onSuccess={(newIdea) => {
+          navigate({
+            to: "/dashboard/$orgSlug/ideas/$ideaId",
+            params: { orgSlug, ideaId: newIdea.id },
+          });
+        }}
       />
       <OnboardingDialog
         open={onboardingOpen}

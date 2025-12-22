@@ -1,14 +1,17 @@
 MVP:
 
-- Filter pending and closed from All Feedback landing page
 - Docs
 - Terms & Privacy
 - Onboarding
 - Landing page
 - Favicons
+- Turn off dark mode
+- Dashboard link on public facing is broken
 
 Future:
 
+- Only allow users to view their own pending ideas
+- Fix dark mode
 - Fix roadmap drag and drop
 - Invitation emails with resend fix styling and flow to be better
 - Email verification
@@ -20,7 +23,7 @@ Future:
 - Auto approve
 - Customization (color theme)
 - Ban users
-- Email "subscribers" of issues
+- Email "subscribers" of ideas
 - Integrations (Linear?)
 - AI Assistant
 - Report
@@ -33,6 +36,7 @@ Future:
 - Zapier integrations
 - Social login
 - Delete workspace/org
+- Customize status names and colors
 
 Paid:
 

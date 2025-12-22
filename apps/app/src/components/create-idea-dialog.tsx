@@ -15,11 +15,14 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
+type CreateIdeaReturnType = Awaited<ReturnType<typeof $createIdea>>;
+
 interface CreateIdeaDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   organizationId?: string;
-  orgSlug?: string;
+  orgSlug: string;
+  onSuccess?: (newIdea: CreateIdeaReturnType) => void;
 }
 
 export function CreateIdeaDialog({
@@ -27,6 +30,7 @@ export function CreateIdeaDialog({
   onOpenChange,
   organizationId,
   orgSlug,
+  onSuccess,
 }: CreateIdeaDialogProps) {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -39,14 +43,7 @@ export function CreateIdeaDialog({
       onOpenChange(false);
       setTitle("");
       setDescription("");
-
-      // Navigate to the new idea's detail page
-      if (orgSlug && organizationId) {
-        navigate({
-          to: "/dashboard/$orgSlug/ideas/$ideaId",
-          params: { orgSlug, ideaId: newIdea.id },
-        });
-      }
+      onSuccess?.(newIdea);
     },
     onError: () => {
       toast.error("Failed to submit idea");
@@ -59,7 +56,7 @@ export function CreateIdeaDialog({
       toast.error("Organization ID is required");
       return;
     }
-    createIdea({ data: { title, description, organizationId } });
+    createIdea({ data: { title, description, organizationSlug: orgSlug } });
   };
 
   return (

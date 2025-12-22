@@ -25,12 +25,12 @@ interface StatusConfig {
 }
 
 export const STATUSES: Record<IdeaStatus, StatusConfig> = {
-  pending: { label: "Pending", icon: CircleDashed, color: "text-yellow-500" },
-  reviewing: { label: "Reviewing", icon: Circle, color: "text-orange-500" },
+  pending: { label: "Reviewing", icon: CircleDashed, color: "text-yellow-500" },
+  reviewing: { label: "Open", icon: Circle, color: "text-orange-500" },
   planned: { label: "Planned", icon: Clock4, color: "text-blue-500" },
   in_progress: { label: "In Progress", icon: Clock8, color: "text-purple-500" },
   completed: { label: "Completed", icon: CheckCircle2, color: "text-green-500" },
-  closed: { label: "Closed", icon: XCircle, color: "text-gray-500" },
+  closed: { label: "Archived", icon: XCircle, color: "text-gray-500" },
 };
 
 interface StatusBadgeProps {

@@ -5,9 +5,15 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createFileRoute, Link, useLoaderData, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  useLoaderData,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { format } from "date-fns";
-import { ArrowDown, ArrowUp, Flame, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, Flame } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AuthForm } from "~/components/auth-form";
 import { CreateIdeaDialog } from "~/components/create-idea-dialog";
@@ -39,6 +45,7 @@ function OrganizationIndexPage() {
   const { org, user, profile } = useLoaderData({ from: "/org/$slug" });
   const router = useRouter();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [loginOpen, setLoginOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -185,8 +192,6 @@ function OrganizationIndexPage() {
     setCreateOpen(true); // Auto open create after profile setup
   };
 
-  const totalCount = counts ? counts.reduce((acc, curr) => acc + curr.count, 0) : 0;
-
   const getSortLabel = (sort: typeof sortBy) => {
     switch (sort) {
       case "newest":
@@ -237,9 +242,9 @@ function OrganizationIndexPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button variant="outline" size="icon">
+              {/* <Button variant="outline" size="icon">
                 <Search className="h-4 w-4" />
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -392,6 +397,13 @@ function OrganizationIndexPage() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         organizationId={org.id}
+        orgSlug={org.slug}
+        onSuccess={(newIdea) => {
+          navigate({
+            to: "/org/$slug/$ideaId",
+            params: { slug: org.slug, ideaId: newIdea.id },
+          });
+        }}
       />
     </>
   );
