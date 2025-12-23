@@ -20,6 +20,7 @@
     "@tailwindcss/vite": "^4.1.13",
     "@vercel/analytics": "^1.6.1",
     "astro": "^5.13.7",
+    "@thoughtbase/widget": "workspace:*",
     "tailwind-scrollbar-hide": "^4.0.0",
     "tailwindcss": "^4.1.13"
   },

@@ -8,6 +8,7 @@ import Feature2 from "@/components/features/Feature2.astro";
 import Pricing1 from "@/components/pricing/Pricing1.astro";
 import Cta1 from "@/components/ctas/Cta1.astro";
 import Cta2 from "@/components/ctas/Cta2.astro";
+import { WidgetContainer } from "@thoughtbase/widget";
 // import { SignJWT } from "jose";
 
 // const secret = "DLePfZvOs24wxZdn24-Q9AjL7eB7DU0j";
@@ -39,6 +40,9 @@ import Cta2 from "@/components/ctas/Cta2.astro";
 //   .setIssuedAt()
 //   .setExpirationTime("2h")
 //   .sign(secretKey);
+
+const WIDGET_URL = import.meta.env.PUBLIC_WIDGET_URL;
+const ORGANIZATION_SLUG = import.meta.env.PUBLIC_ORGANIZATION_SLUG;
 ---
 
 <BaseLayout>
@@ -51,13 +55,15 @@ import Cta2 from "@/components/ctas/Cta2.astro";
   <Cta1 />
 </BaseLayout>
 
-<script is:inline src="https://app.thoughtbase.app/widget.js"></script>
-<script is:inline>
+<WidgetContainer client:load organizationSlug={ORGANIZATION_SLUG} />
+
+<!-- <script is:inline src={WIDGET_URL}></script>
+<script is:inline define:vars={{ ORGANIZATION_SLUG }}>
   window.addEventListener("load", () => {
     if (window.initFeedbackWidget) {
       window.initFeedbackWidget({
-        organizationSlug: "wolk",
+        organizationSlug: ORGANIZATION_SLUG,
       });
     }
   });
-</script>
+</script> -->

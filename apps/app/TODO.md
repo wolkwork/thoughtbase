@@ -37,6 +37,7 @@ Future:
 - Social login
 - Delete workspace/org
 - Customize status names and colors
+- Make widget accessible with dialog etc.
 
 Paid:
 

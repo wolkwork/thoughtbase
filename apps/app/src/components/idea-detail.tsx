@@ -1,6 +1,6 @@
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { format, formatDistanceToNow } from "date-fns";
 import { lowerCase } from "lodash";
 import { ArrowLeftIcon, CalendarIcon, Trash2, X } from "lucide-react";
@@ -53,6 +53,7 @@ export function IdeaDetail({
 }: IdeaDetailProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [activeTab, setActiveTab] = useState("comments");
 
@@ -166,7 +167,7 @@ export function IdeaDetail({
     mutationFn: $deleteIdea,
     onSuccess: () => {
       toast.success("Idea deleted");
-      router.history.back();
+      navigate({ to: ".." });
     },
     onError: () => {
       toast.error("Failed to delete idea");
@@ -223,6 +224,7 @@ export function IdeaDetail({
               size="icon"
               onClick={handleDelete}
               disabled={isDeleting}
+              aria-label="Delete idea"
             >
               <Trash2 className="size-4" />
             </Button>
@@ -400,7 +402,7 @@ export function IdeaDetail({
 
         <div>
           <Select value={idea.status} onValueChange={handleUpdateStatus}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" aria-label="Status">
               <SelectValue>
                 <StatusBadge
                   status={idea.status}

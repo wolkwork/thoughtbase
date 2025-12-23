@@ -1,3 +1,2 @@
 export { FeedbackWidget } from "./components/feedback-widget";
-export { initFeedbackWidget, identify } from "./widget";
-
+export { initFeedbackWidget, identify, WidgetContainer } from "./widget";

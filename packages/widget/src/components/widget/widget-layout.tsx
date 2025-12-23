@@ -19,7 +19,10 @@ export function WidgetLayout({
   onClose,
 }: WidgetLayoutProps) {
   return (
-    <div className="bg-background text-foreground animate-in slide-in-from-bottom-4 fade-in fixed top-4 right-4 bottom-4 z-50 flex w-[380px] flex-col overflow-hidden rounded-2xl border shadow-2xl duration-100">
+    <div
+      className="bg-background text-foreground animate-in slide-in-from-bottom-4 fade-in fixed top-4 right-4 bottom-4 z-50 flex w-[380px] flex-col overflow-hidden rounded-2xl border shadow-2xl duration-100"
+      data-testid="thoughtbase-widget"
+    >
       {/* Content */}
       <div className="flex flex-1 grow flex-col overflow-hidden">
         <div className="flex items-center justify-end px-4 py-4">

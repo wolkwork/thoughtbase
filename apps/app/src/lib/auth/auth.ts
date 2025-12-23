@@ -23,6 +23,7 @@ const getAuthConfig = createServerOnlyFn(() => {
     telemetry: {
       enabled: false,
     },
+    trustedOrigins: [getBaseUrl()],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {
@@ -76,7 +77,7 @@ const getAuthConfig = createServerOnlyFn(() => {
       apiKey(),
       polar({
         client: polarClient,
-        createCustomerOnSignUp: true,
+        createCustomerOnSignUp: env.VERCEL_ENV === "production" ? true : false,
         use: [
           checkout({
             products: [

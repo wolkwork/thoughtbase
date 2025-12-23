@@ -69,6 +69,7 @@ export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
         className="flex flex-1 flex-col gap-8 px-6 pb-6"
       >
         <textarea
+          aria-label="Idea description"
           placeholder="Type your idea here..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}

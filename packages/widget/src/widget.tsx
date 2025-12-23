@@ -13,7 +13,7 @@ interface WidgetProps {
 // Global state to hold the SSO token for the widget instance
 let ssoToken: string | null = null;
 
-function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
+export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Force re-render when token changes (though identify is usually called once at start)
   const [token, setToken] = useState<string | null>(ssoToken);
