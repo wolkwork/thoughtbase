@@ -1,14 +1,21 @@
 import { expect, test } from "@playwright/test";
-import { createTestUser, loginUser } from "../helpers/auth";
-import { createTestIdea } from "../helpers/ideas";
+import {
+  addUserToOrganization,
+  createTestOrganization,
+  createTestUser,
+  loginUser,
+} from "../helpers/auth";
+import { createTestIdeaInDb } from "../helpers/ideas";
 
 test("should create idea and view it in the list", async ({ page }) => {
   // Create user and login
   const { email, password } = await createTestUser();
   await page.context().clearCookies();
-  await loginUser(page, email, password);
+  const { user } = await loginUser(page, email, password);
+  const { id: orgId, slug: orgSlug } = await createTestOrganization();
+  await addUserToOrganization(user.id, orgId);
 
-  await page.waitForLoadState("networkidle");
+  await page.goto(`/dashboard/${orgSlug}/ideas`, { waitUntil: "networkidle" });
 
   // Open create idea dialog
   await page.getByRole("button", { name: "Create Idea" }).click();
@@ -40,14 +47,15 @@ test("should update idea status", async ({ page }) => {
   // Create user and login
   const { email, password } = await createTestUser();
   await page.context().clearCookies();
-  const { orgSlug, cookies } = await loginUser(page, email, password);
+  const { id: orgId, slug: orgSlug } = await createTestOrganization();
+  const { user } = await loginUser(page, email, password);
+  await addUserToOrganization(user.id, orgId);
 
   // Create an idea programmatically
   const ideaTitle = `Test Idea ${Date.now()}`;
-  const idea = await createTestIdea({
-    organizationSlug: orgSlug,
+  const idea = await createTestIdeaInDb({
+    organizationId: orgId,
     title: ideaTitle,
-    cookies,
   });
 
   // Navigate to idea detail page
@@ -66,14 +74,15 @@ test("should post a comment on an idea", async ({ page }) => {
   // Create user and login
   const { email, password } = await createTestUser();
   await page.context().clearCookies();
-  const { orgSlug, cookies } = await loginUser(page, email, password);
+  const { user } = await loginUser(page, email, password);
+  const { id: orgId, slug: orgSlug } = await createTestOrganization();
+  await addUserToOrganization(user.id, orgId);
 
   // Create an idea programmatically
   const ideaTitle = `Test Idea ${Date.now()}`;
-  const idea = await createTestIdea({
-    organizationSlug: orgSlug,
+  const idea = await createTestIdeaInDb({
+    organizationId: orgId,
     title: ideaTitle,
-    cookies,
   });
 
   // Navigate to idea detail page
@@ -91,14 +100,15 @@ test("should delete an idea", async ({ page }) => {
   // Create user and login
   const { email, password } = await createTestUser();
   await page.context().clearCookies();
-  const { orgSlug, cookies } = await loginUser(page, email, password);
+  const { user } = await loginUser(page, email, password);
+  const { id: orgId, slug: orgSlug } = await createTestOrganization();
+  await addUserToOrganization(user.id, orgId);
 
   // Create an idea programmatically
   const ideaTitle = `Test Idea ${Date.now()}`;
-  const idea = await createTestIdea({
-    organizationSlug: orgSlug,
+  const idea = await createTestIdeaInDb({
+    organizationId: orgId,
     title: ideaTitle,
-    cookies,
   });
 
   // Navigate to idea detail page

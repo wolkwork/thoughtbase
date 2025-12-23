@@ -3,12 +3,20 @@ import tailwindcss from "@tailwindcss/vite";
 import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
+import tsconfigPaths from "vite-tsconfig-paths";
+import preact from "@astrojs/preact";
 
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tsconfigPaths({
+        projects: ["./tsconfig.json", "../../packages/widget/tsconfig.json"],
+      }),
+      tailwindcss(),
+    ],
   },
+  integrations: [preact({ compat: true }), sitemap(), mdx()],
   adapter: vercel(),
   markdown: {
     drafts: true,
@@ -22,5 +30,4 @@ export default defineConfig({
     drafts: true,
   },
   site: "https://thoughtbase.app",
-  integrations: [sitemap(), mdx()],
 });

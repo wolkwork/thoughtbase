@@ -39,6 +39,5 @@ export default defineConfig({
     rollupOptions: {
       external: [],
     },
-    minify: true,
   },
 });

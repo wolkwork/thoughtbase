@@ -24,3 +24,7 @@ dist
 .tanstack
 
 .turbo
+
+test-pglite-db
+playwright-report
+test-results

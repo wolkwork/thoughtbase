@@ -27,6 +27,7 @@ export function WidgetLayout({
       <div className="flex flex-1 grow flex-col overflow-hidden">
         <div className="flex items-center justify-end px-4 py-4">
           <Button
+            aria-label="Close"
             variant="outline"
             size="icon"
             className="size-7"

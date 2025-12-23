@@ -12,20 +12,23 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.5",
+    "@astrojs/preact": "^4.1.3",
+    "@astrojs/react": "^4.4.2",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.5.1",
     "@astrojs/vercel": "^9.0.2",
     "@astrolib/seo": "^1.0.0-beta.8",
     "@lucide/astro": "^0.555.0",
     "@tailwindcss/vite": "^4.1.13",
+    "@thoughtbase/widget": "workspace:*",
     "@vercel/analytics": "^1.6.1",
     "astro": "^5.13.7",
-    "@thoughtbase/widget": "workspace:*",
     "tailwind-scrollbar-hide": "^4.0.0",
     "tailwindcss": "^4.1.13"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",
-    "@tailwindcss/typography": "^0.5.16"
+    "@tailwindcss/typography": "^0.5.16",
+    "vite-tsconfig-paths": "^6.0.3"
   }
 }

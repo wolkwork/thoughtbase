@@ -1,3 +1,7 @@
+import type { Page } from "@playwright/test";
+import { eq } from "drizzle-orm";
+import { member, organization, user } from "~/lib/db/schema";
+import { db } from "./db";
 /**
  * Helper utilities for authentication tests
  */
@@ -15,10 +19,9 @@ export function generateTestName(): string {
 }
 
 /**
- * Create a user account programmatically using the better-auth API
- * This is faster than going through the UI and useful for test setup
+ * Create a user account programmatically using the HTTP API
+ * This handles password hashing and all user creation logic via Better Auth
  * @param options Optional user details. If not provided, random values will be generated
- * @param baseURL Base URL for the API (defaults to http://thoughtbase.localhost:3000)
  * @returns User credentials (email, password, name)
  */
 export async function createTestUser(options?: {
@@ -57,66 +60,55 @@ export async function createTestUser(options?: {
 
     return { email, password, name };
   } catch (error) {
-    console.error("error kek", error);
+    console.error("Error creating test user:", error);
     throw error;
   }
 }
 
 /**
- * Create an organization programmatically using the Better Auth API
- * @param cookies Authentication cookies from a logged-in user
- * @param name Optional organization name. If not provided, a random name will be generated
+ * Create an organization programmatically using the database directly
+ * @param userId The user ID who will own the organization
+ * @param options Optional organization details
  * @returns The created organization with slug
  */
-export async function createTestOrganization(
-  cookies: string,
-  name?: string,
-): Promise<{ id: string; name: string; slug: string }> {
-  const orgName = name || `Test Org ${Date.now()}`;
-  // Generate a slug from the name
-  const baseSlug = orgName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+export async function createTestOrganization(options?: { name?: string; slug?: string }) {
+  const orgName = options?.name || `Test Org ${Date.now()}`;
 
-  // Create the organization
-  const createResponse = await fetch(
-    `http://localhost:3000/api/auth/organization/create`,
-    {
-      method: "POST",
-      headers: {
-        Cookie: cookies,
-        "Content-Type": "application/json",
-        Origin: "http://thoughtbase.localhost:3000",
-      },
-      body: JSON.stringify({
-        name: orgName,
-        slug,
-      }),
-    },
-  );
-
-  if (!createResponse.ok) {
-    const errorText = await createResponse.text();
-    let errorMessage = `Failed to create test organization: ${createResponse.status} ${createResponse.statusText}`;
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage += ` - ${errorJson.message || errorJson.error || errorText}`;
-    } catch {
-      errorMessage += ` - ${errorText}`;
-    }
-    throw new Error(errorMessage);
+  let slug: string;
+  if (options?.slug) {
+    slug = options.slug;
+  } else {
+    // Generate a slug from the name
+    const baseSlug = orgName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
   }
 
-  const result = await createResponse.json();
-  // Better Auth returns { data: {...} } or just the object
-  const org = result?.data || result;
+  // Create the organization
+  const orgId = crypto.randomUUID();
+  const [newOrg] = await db
+    .insert(organization)
+    .values({
+      id: orgId,
+      name: orgName,
+      slug,
+      createdAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [organization.slug],
+      set: {
+        name: orgName,
+        createdAt: new Date(),
+      },
+    })
+    .returning();
 
   return {
-    id: org.id,
-    name: org.name,
-    slug: org.slug || slug,
+    id: newOrg.id,
+    name: newOrg.name,
+    slug: newOrg.slug,
   };
 }
 
@@ -125,15 +117,10 @@ export async function createTestOrganization(
  * @param page Playwright page object
  * @param email User email
  * @param password User password
- * @returns Object with organization slug and cookies string
+ * @returns Object with cookies string
  */
-export async function loginUser(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  page: any,
-  email: string,
-  password: string,
-): Promise<{ orgSlug: string; cookies: string }> {
-  // Login via API
+export async function loginUser(page: Page, email: string, password: string) {
+  // Login via API to get cookies
   const loginResponse = await fetch(`http://localhost:3000/api/auth/sign-in/email`, {
     method: "POST",
     headers: {
@@ -155,14 +142,12 @@ export async function loginUser(
   const cookies = setCookieHeaders.map((cookie) => cookie.split(";")[0]).join("; ");
 
   // Set cookies on the page context
-  // Parse cookies from Set-Cookie headers
   const cookiesArray = setCookieHeaders.map((cookieHeader) => {
     const parts = cookieHeader.split(";").map((p) => p.trim());
     const [nameValue] = parts;
     const [name, ...valueParts] = nameValue.split("=");
     const value = valueParts.join("=");
 
-    // Extract attributes from cookie header
     const domainMatch = cookieHeader.match(/Domain=([^;]+)/i);
     const pathMatch = cookieHeader.match(/Path=([^;]+)/i);
     const secureMatch = cookieHeader.match(/Secure/i);
@@ -184,7 +169,7 @@ export async function loginUser(
     };
 
     if (domainMatch) {
-      cookie.domain = domainMatch[1].trim().replace(/^\./, ""); // Remove leading dot for Playwright
+      cookie.domain = domainMatch[1].trim().replace(/^\./, "");
     }
     if (secureMatch) {
       cookie.secure = true;
@@ -204,38 +189,67 @@ export async function loginUser(
 
   await page.context().addCookies(cookiesArray);
 
-  // Get organizations to find the org slug
-  // Better Auth organization list endpoint
-  const orgsResponse = await fetch(`http://localhost:3000/api/auth/organization/list`, {
-    method: "GET",
-    headers: {
-      Cookie: cookies,
-      "Content-Type": "application/json",
-    },
+  // Get user ID from database to check/create organizations
+  const dbUser = await db.query.user.findFirst({
+    where: eq(user.email, email),
   });
 
-  if (!orgsResponse.ok) {
-    const errorText = await orgsResponse.text();
-    throw new Error(`Failed to get organizations: ${orgsResponse.status} ${errorText}`);
+  if (!dbUser) {
+    throw new Error("User not found after login");
   }
 
-  const orgsData = await orgsResponse.json();
-  // Better Auth returns { data: [...] } or just the array
-  const orgs = orgsData?.data || orgsData || [];
+  return { cookies, user: dbUser };
+}
 
-  let orgSlug: string;
-  if (!orgs || orgs.length === 0) {
-    // Create an organization if the user doesn't have one
-    const org = await createTestOrganization(cookies);
-    orgSlug = org.slug;
+/**
+ * Add a user to an organization programmatically
+ * @param userId The user ID to add to the organization
+ * @param organizationId The organization ID (or slug) to add the user to
+ * @param options Optional member details (role)
+ * @returns The created member record
+ */
+export async function addUserToOrganization(
+  userId: string,
+  organizationIdOrSlug: string,
+  options?: { role?: string },
+) {
+  // Check if organizationIdOrSlug is a slug or ID
+  let orgId: string;
+  const existingOrg = await db.query.organization.findFirst({
+    where: eq(organization.slug, organizationIdOrSlug),
+  });
+
+  if (existingOrg) {
+    orgId = existingOrg.id;
   } else {
-    orgSlug = orgs[0].slug;
+    // Assume it's an ID if not found by slug
+    orgId = organizationIdOrSlug;
   }
 
-  // Navigate to dashboard to ensure cookies are set
-  await page.goto(`/dashboard/${orgSlug}/ideas`);
+  // Check if member already exists
+  const existingMember = await db.query.member.findFirst({
+    where: (members, { and }) =>
+      and(eq(members.organizationId, orgId), eq(members.userId, userId)),
+  });
 
-  return { orgSlug, cookies };
+  if (existingMember) {
+    return existingMember;
+  }
+
+  // Create the member record
+  const memberId = crypto.randomUUID();
+  const [newMember] = await db
+    .insert(member)
+    .values({
+      id: memberId,
+      organizationId: orgId,
+      userId,
+      role: options?.role || "member",
+      createdAt: new Date(),
+    })
+    .returning();
+
+  return newMember;
 }
 
 /**

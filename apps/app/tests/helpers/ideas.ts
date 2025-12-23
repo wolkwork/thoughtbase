@@ -1,3 +1,6 @@
+import { idea } from "~/lib/db/schema";
+import { db } from "./db";
+
 /**
  * Helper utilities for idea-related tests
  */
@@ -40,4 +43,37 @@ export async function createTestIdea(options: {
   }
 
   return await response.json();
+}
+
+/**
+ * Create an idea directly in the database for test setup
+ * @param options Idea details
+ * @returns The created idea
+ */
+export async function createTestIdeaInDb(options: {
+  organizationId: string;
+  title: string;
+  description?: string;
+  status?: "open" | "in_progress" | "completed" | "closed" | "pending" | "planned";
+}): Promise<{ id: string; title: string; description?: string; status: string }> {
+  const ideaId = crypto.randomUUID();
+  const [newIdea] = await db
+    .insert(idea)
+    .values({
+      id: ideaId,
+      organizationId: options.organizationId,
+      title: options.title,
+      description: options.description || null,
+      status: options.status || "open",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  return {
+    id: newIdea.id,
+    title: newIdea.title,
+    description: newIdea.description || undefined,
+    status: newIdea.status,
+  };
 }

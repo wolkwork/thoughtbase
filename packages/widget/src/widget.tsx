@@ -50,7 +50,7 @@ export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
           onClick={() => setIsOpen(true)}
           className="fixed right-4 bottom-4 z-50"
         >
-          <MessageCircleHeart className="h-7 w-7" />
+          <MessageCircleHeart className="size-6" />
           Submit Feedback
         </Button>
       )}

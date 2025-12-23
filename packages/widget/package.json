@@ -7,7 +7,6 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
     "postbuild": "cp ./dist/widget.js ../../apps/app/public/widget.js",
     "preview": "vite preview",
