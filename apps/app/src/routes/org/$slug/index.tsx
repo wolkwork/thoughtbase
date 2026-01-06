@@ -20,7 +20,6 @@ import { CreateIdeaDialog } from "~/components/create-idea-dialog";
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { ProfileForm } from "~/components/profile-form";
 import { StatusBadge } from "~/components/status-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -35,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { UserAvatar } from "~/components/user-avatar";
 import { $getIdeasFeed, $getPublicCounts, $toggleReaction } from "~/lib/api/ideas";
 
 export const Route = createFileRoute("/org/$slug/")({
@@ -278,15 +278,7 @@ function OrganizationIndexPage() {
 
                     <div className="flex w-full items-center gap-3">
                       <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
-                        <Avatar className="size-8">
-                          <AvatarImage src={idea.author.image ?? undefined} />
-                          {/* TODO: Fix */}
-                          {"name" in idea.author && (
-                            <AvatarFallback>
-                              {idea.author.name?.charAt(0) || "?"}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
+                        <UserAvatar user={idea.author} />
                         <div className="flex flex-col gap-0.5">
                           <div className="text-foreground flex items-center gap-2 font-medium">
                             <span>

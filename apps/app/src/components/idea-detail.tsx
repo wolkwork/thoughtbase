@@ -15,7 +15,6 @@ import {
 } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 import { StatusBadge } from "./status-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -28,6 +27,7 @@ import {
 } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
+import { UserAvatar } from "./user-avatar";
 
 interface IdeaDetailProps {
   idea: any; // Replace with proper type inference if possible
@@ -386,10 +386,7 @@ export function IdeaDetail({
       {/* Sidebar */}
       <div className="w-full space-y-6 px-6 py-8 lg:w-72">
         <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
-          <Avatar className="size-8">
-            <AvatarImage src={idea.author.image} />
-            <AvatarFallback>{idea.author.name?.charAt(0) || "?"}</AvatarFallback>
-          </Avatar>
+          <UserAvatar user={idea.author} />
           <div className="flex flex-col gap-0.5">
             <div className="text-foreground flex items-center gap-2 font-medium">
               <span>{idea.author.name}</span>

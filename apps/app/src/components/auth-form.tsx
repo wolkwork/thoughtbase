@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
+import { AlertCircle, LoaderCircle } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/lib/auth/auth-client";
+import { Alert, AlertDescription } from "./ui/alert";
 
 interface AuthFormProps {
   orgName: string;
@@ -16,48 +17,60 @@ interface AuthFormProps {
 
 export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormProps) {
   const [isSignUp, setIsSignUp] = React.useState(false);
+  const [formError, setFormError] = React.useState("");
 
   const { mutate: loginMutate, isPending: isLoginPending } = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      await authClient.signIn.email({
+      const response = await authClient.signIn.email({
         email: data.email,
         password: data.password,
         // @ts-expect-error - dynamic property
         organizationId: orgId,
       });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      return response;
     },
     onSuccess: () => {
       toast.success("Logged in successfully");
       onSuccess();
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to login");
+    onError: (error) => {
+      setFormError(error.message ?? "Failed to login");
     },
   });
 
   const { mutate: signUpMutate, isPending: isSignUpPending } = useMutation({
     mutationFn: async (data: { email: string; password: string; name: string }) => {
-      await authClient.signUp.email({
+      const response = await authClient.signUp.email({
         email: data.email,
         password: data.password,
         name: data.name,
         // @ts-expect-error - dynamic property
         organizationId: orgId,
       });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      return response;
     },
     onSuccess: () => {
       toast.success("Account created successfully");
       onSuccess();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to sign up");
+      setFormError(error.message ?? "Failed to sign up");
     },
   });
 
   const isPending = isLoginPending || isSignUpPending;
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("handleLogin");
     e.preventDefault();
     if (isPending) return;
     const formData = new FormData(e.currentTarget);
@@ -97,6 +110,13 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
       </div>
 
       <div className="grid gap-6">
+        {formError && (
+          <Alert variant="destructive">
+            <AlertDescription className="flex items-center gap-2">
+              <AlertCircle className="size-4" /> {formError}
+            </AlertDescription>
+          </Alert>
+        )}
         <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
           <div className="grid gap-5">
             {isSignUp && (
@@ -154,7 +174,10 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
           <>
             Already have an account?{" "}
             <button
-              onClick={() => setIsSignUp(false)}
+              onClick={() => {
+                setIsSignUp(false);
+                setFormError("");
+              }}
               className="hover:text-primary underline underline-offset-4"
             >
               Sign In
@@ -164,7 +187,10 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
           <>
             Don't have an account?{" "}
             <button
-              onClick={() => setIsSignUp(true)}
+              onClick={() => {
+                setIsSignUp(true);
+                setFormError("");
+              }}
               className="hover:text-primary underline underline-offset-4"
             >
               Sign Up

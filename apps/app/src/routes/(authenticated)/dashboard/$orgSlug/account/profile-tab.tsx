@@ -1,8 +1,7 @@
 import { upload } from "@vercel/blob/client";
-import { Loader2, Upload, User as UserIcon } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -13,6 +12,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { UserAvatar } from "~/components/user-avatar";
 import { authClient } from "~/lib/auth/auth-client";
 
 export function ProfileTab() {
@@ -67,7 +67,7 @@ export function ProfileTab() {
       await authClient.updateUser({
         image: newBlob.url,
       });
-      
+
       toast.success("Profile picture updated");
       refetch();
     } catch (error) {
@@ -84,7 +84,7 @@ export function ProfileTab() {
   if (isSessionPending) {
     return (
       <div className="flex justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -101,12 +101,7 @@ export function ProfileTab() {
         <CardContent>
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="flex flex-col items-center gap-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={user?.image || ""} className="object-cover" />
-                <AvatarFallback className="text-2xl">
-                  {user?.name?.slice(0, 2)?.toUpperCase() || <UserIcon className="h-10 w-10" />}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar user={user} />
               <div className="flex flex-col items-center gap-2">
                 <Button
                   variant="outline"
@@ -129,9 +124,7 @@ export function ProfileTab() {
                   accept="image/*"
                   onChange={handleImageUpload}
                 />
-                <p className="text-xs text-muted-foreground">
-                  JPG, GIF or PNG. Max 5MB.
-                </p>
+                <p className="text-muted-foreground text-xs">JPG, GIF or PNG. Max 5MB.</p>
               </div>
             </div>
 
@@ -166,7 +159,7 @@ export function ProfileTab() {
                   readOnly
                   className="bg-muted"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Email address cannot be changed directly.
                 </p>
               </div>
@@ -184,4 +177,3 @@ export function ProfileTab() {
     </div>
   );
 }
-

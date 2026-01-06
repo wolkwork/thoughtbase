@@ -3,7 +3,6 @@ import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -40,6 +39,7 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { authClient } from "~/lib/auth/auth-client";
+import { UserAvatar } from "./user-avatar";
 
 export function TeamSettings() {
   const { organization } = useRouteContext({
@@ -207,10 +207,7 @@ function MemberRow({ member }: { member: TeamMember }) {
   return (
     <TableRow>
       <TableCell className="flex items-center gap-3">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src={user.image || ""} alt={user.name || user.email} />
-          <AvatarFallback>{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-        </Avatar>
+        <UserAvatar user={user} />
         <div className="flex flex-col">
           <span className="font-medium">{user.name || user.email}</span>
           <span className="text-muted-foreground text-xs">{user.email}</span>

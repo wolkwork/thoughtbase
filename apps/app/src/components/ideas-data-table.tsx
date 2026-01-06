@@ -18,7 +18,6 @@ import * as React from "react";
 
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { StatusBadge } from "~/components/status-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -44,6 +43,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { UserAvatar } from "./user-avatar";
 
 // Define the Idea type based on what we receive from the API
 export type Idea = {
@@ -172,12 +172,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       const author = row.original.author;
       return (
         <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={author.image || undefined} alt={author.name} />
-            <AvatarFallback className="text-[10px]">
-              {author.name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar user={author} className="size-6" />
           <span className="max-w-[120px] truncate text-sm" title={author.name}>
             {author.name}
           </span>

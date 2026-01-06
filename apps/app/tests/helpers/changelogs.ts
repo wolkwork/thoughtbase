@@ -1,4 +1,4 @@
-import { randSentence, randWord } from "@ngneat/falso";
+import { randSentence } from "@ngneat/falso";
 import { changelog } from "~/lib/db/schema";
 import { db } from "./db";
 

@@ -14,7 +14,6 @@ import { ArrowDown01, Search } from "lucide-react";
 import * as React from "react";
 
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -32,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { UserAvatar } from "./user-avatar";
 
 export type Member = {
   id: string;
@@ -67,12 +67,7 @@ const columns: ColumnDef<Member>[] = [
       const member = row.original;
       return (
         <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={member.image || undefined} alt={member.name} />
-            <AvatarFallback className="text-xs">
-              {member.name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar user={member} />
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-sm font-medium" title={member.name}>
               {member.name}

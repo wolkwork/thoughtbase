@@ -8,6 +8,8 @@ import { Button } from "./components/ui/button";
 interface WidgetProps {
   organizationSlug: string;
   selector?: string;
+  // TODO: Maybe in the future
+  // radius?: RadiusKey;
 }
 
 // Global state to hold the SSO token for the widget instance

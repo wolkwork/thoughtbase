@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AuthForm } from "~/components/auth-form";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
+import { UserAvatar } from "./user-avatar";
 
 interface PublicHeaderProps {
   org: {
@@ -89,15 +90,7 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
                 />
               )}
               <div className="bg-muted flex h-8 w-8 items-center justify-center overflow-hidden rounded-full text-xs">
-                {user.image ? (
-                  <img
-                    src={user.image}
-                    alt={user.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span>{user.name?.charAt(0) || user.email?.charAt(0)}</span>
-                )}
+                <UserAvatar user={user} />
               </div>
             </div>
           ) : (

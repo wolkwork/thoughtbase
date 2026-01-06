@@ -8,11 +8,11 @@ import { toast } from "sonner";
 import { $createComment, $toggleReaction, $updateIdea } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 import { StatusBadge } from "./status-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { UserAvatar } from "./user-avatar";
 
 interface PublicIdeaDetailProps {
   idea: any;
@@ -346,10 +346,7 @@ export function PublicIdeaDetail({
       {/* Sidebar */}
       <div className="w-full space-y-6 px-4 py-8 lg:w-72">
         <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
-          <Avatar className="size-8">
-            <AvatarImage src={idea.author.image} />
-            <AvatarFallback>{idea.author.name?.charAt(0) || "?"}</AvatarFallback>
-          </Avatar>
+          <UserAvatar user={idea.author} />
           <div className="flex flex-col gap-0.5">
             <div className="text-foreground flex items-center gap-2 font-medium">
               <span>{idea.author.name}</span>

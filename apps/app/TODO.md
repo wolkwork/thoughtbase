@@ -6,7 +6,7 @@ MVP:
 - Landing page
 - Favicons
 - Turn off dark mode
-- Dashboard link on public facing is broken
+- Login on public facing is broken. Logging in with 404 says success. So does signup
 
 Future:
 
