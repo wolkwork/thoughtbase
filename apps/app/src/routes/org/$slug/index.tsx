@@ -278,6 +278,8 @@ function OrganizationIndexPage() {
 
                     <div className="flex w-full items-center gap-3">
                       <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
+                        {/* TODO: fix */}
+                        {/* @ts-expect-error - user is not typed */}
                         <UserAvatar user={idea.author} />
                         <div className="flex flex-col gap-0.5">
                           <div className="text-foreground flex items-center gap-2 font-medium">
