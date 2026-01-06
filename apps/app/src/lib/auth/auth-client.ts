@@ -7,7 +7,7 @@ function getBaseUrl() {
     return "http://thoughtbase.localhost:3000";
   }
 
-  return "https://thoughtbase.app";
+  return "https://app.thoughtbase.app";
 }
 
 export const authClient = createAuthClient({
