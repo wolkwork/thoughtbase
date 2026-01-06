@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { ApiKeysTab } from "./api-keys-tab";
 import { ProfileTab } from "./profile-tab";
 import { SettingsTab } from "./settings-tab";
 
@@ -16,9 +17,10 @@ function AccountPage() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="api-keys">API Keys</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
@@ -27,6 +29,10 @@ function AccountPage() {
 
         <TabsContent value="settings" className="mt-6">
           <SettingsTab />
+        </TabsContent>
+
+        <TabsContent value="api-keys" className="mt-6">
+          <ApiKeysTab />
         </TabsContent>
       </Tabs>
     </div>

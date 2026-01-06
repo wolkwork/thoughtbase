@@ -1,8 +1,14 @@
-import type { ZObject, Bundle } from "zapier-platform-core";
+import { ZObject, Bundle, Trigger, defineTrigger } from "zapier-platform-core";
 
 // Subscribe to the webhook - this tells your app to send webhooks to Zapier's URL
 const performSubscribe = async (z: ZObject, bundle: Bundle) => {
-  const baseUrl = bundle.authData.baseUrl || "https://thoughtbase.app";
+  const baseUrl = bundle.authData.baseUrl || "https://app.thoughtbase.app";
+  const apiKey = bundle.authData.apiKey;
+
+  if (!apiKey) {
+    throw new z.errors.Error("API key is required", "ValidationError", 400);
+  }
+
   const webhookUrl = bundle.targetUrl; // Zapier provides this
 
   try {
@@ -10,10 +16,14 @@ const performSubscribe = async (z: ZObject, bundle: Bundle) => {
     // Organization is automatically determined from the API key
     const response = await z.request({
       method: "POST",
-      url: "/api/zapier/webhooks/subscribe",
+      url: `${baseUrl}/api/zapier/webhooks/subscribe`,
       body: {
         event: "idea.created",
         webhookUrl,
+      },
+      headers: {
+        "x-api-key": apiKey,
+        "Content-Type": "application/json",
       },
     });
 
@@ -45,7 +55,8 @@ const performSubscribe = async (z: ZObject, bundle: Bundle) => {
 
 // Unsubscribe from the webhook - this tells your app to stop sending webhooks
 const performUnsubscribe = async (z: ZObject, bundle: Bundle) => {
-  const baseUrl = bundle.authData.baseUrl || "https://thoughtbase.app";
+  const baseUrl = bundle.authData.baseUrl || "https://app.thoughtbase.app";
+  const apiKey = bundle.authData.apiKey;
   const subscriptionId = bundle.subscribeData?.id;
 
   if (!subscriptionId) {
@@ -53,10 +64,18 @@ const performUnsubscribe = async (z: ZObject, bundle: Bundle) => {
     return {};
   }
 
+  if (!apiKey) {
+    throw new z.errors.Error("API key is required", "ValidationError", 400);
+  }
+
   try {
     await z.request({
       method: "DELETE",
-      url: `/api/zapier/webhooks/subscribe/${subscriptionId}`,
+      url: `${baseUrl}/api/zapier/webhooks/subscribe/${subscriptionId}`,
+      headers: {
+        "x-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
     });
 
     return {};
@@ -86,7 +105,33 @@ const perform = async (z: ZObject, bundle: Bundle) => {
   return [idea];
 };
 
-export default {
+const getFallbackSample = (z: ZObject, bundle: Bundle) => {
+  const baseUrl = bundle.authData.baseUrl || "https://app.thoughtbase.app";
+  const apiKey = bundle.authData.apiKey;
+
+  if (!apiKey) {
+    throw new z.errors.Error("API key is required", "ValidationError", 400);
+  }
+
+  return Promise.resolve([
+    {
+      id: "idea-123",
+      title: "Sample Idea",
+      description: "This is a sample idea description",
+      status: "open",
+      organizationId: "org-123",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: "user-123",
+        name: "John Doe",
+        email: "john@example.com",
+      },
+    },
+  ]);
+};
+
+export default defineTrigger({
   // A key to uniquely identify this trigger
   key: "newIdea",
 
@@ -117,6 +162,9 @@ export default {
     // Handle incoming webhook data
     perform,
 
+    // Get fallback sample data
+    performList: getFallbackSample,
+
     // What the sample data looks like (for testing)
     sample: {
       id: "idea-123",
@@ -133,4 +181,4 @@ export default {
       },
     },
   },
-};
+});

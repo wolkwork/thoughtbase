@@ -4,6 +4,7 @@ MVP:
 - Terms & Privacy
 - Decide and fix pricing everywhere
 - Turn off dark mode
+- "No secret generated"
 
 Future:
 

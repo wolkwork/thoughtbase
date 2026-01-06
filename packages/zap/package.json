@@ -1,13 +1,13 @@
 {
-  "name": "zap",
-  "version": "1.0.0",
+  "name": "@thoughtbase/zap",
+  "version": "0.0.1",
   "description": "",
   "scripts": {
-    "test": "npm run build && vitest --run",
+    "test": "bun run build && vitest --run",
     "clean": "rimraf ./dist ./build",
-    "build": "npm run clean && tsc",
-    "dev": "npm run build -- --watch",
-    "_zapier-build": "npm run build"
+    "build": "bun run clean && tsc",
+    "dev": "bun run build -- --watch",
+    "_zapier-build": "bun run build"
   },
   "dependencies": {
     "zapier-platform-core": "18.0.6"
