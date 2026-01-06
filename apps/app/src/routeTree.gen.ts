@@ -28,12 +28,14 @@ import { Route as ApiWidgetChangelogRouteImport } from './routes/api/widget/chan
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as authenticatedDashboardOrgSlugRouteRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/route'
 import { Route as authenticatedDashboardOrgSlugIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/index'
+import { Route as ApiZapierWebhooksSubscribeRouteImport } from './routes/api/zapier/webhooks/subscribe'
 import { Route as authenticatedDashboardOrgSlugSettingsIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/settings/index'
 import { Route as authenticatedDashboardOrgSlugRoadmapIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/roadmap/index'
 import { Route as authenticatedDashboardOrgSlugMembersIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/members/index'
 import { Route as authenticatedDashboardOrgSlugIdeasIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/ideas/index'
 import { Route as authenticatedDashboardOrgSlugChangelogIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/changelog/index'
 import { Route as authenticatedDashboardOrgSlugAccountIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/account/index'
+import { Route as ApiZapierWebhooksSubscribeIdRouteImport } from './routes/api/zapier/webhooks/subscribe/$id'
 import { Route as authenticatedDashboardOrgSlugIdeasIdeaIdRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/ideas/$ideaId'
 import { Route as authenticatedDashboardOrgSlugChangelogNewRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/changelog/new'
 import { Route as authenticatedDashboardOrgSlugChangelogChangelogIdRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
@@ -136,6 +138,12 @@ const authenticatedDashboardOrgSlugIndexRoute =
     path: '/',
     getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
   } as any)
+const ApiZapierWebhooksSubscribeRoute =
+  ApiZapierWebhooksSubscribeRouteImport.update({
+    id: '/api/zapier/webhooks/subscribe',
+    path: '/api/zapier/webhooks/subscribe',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const authenticatedDashboardOrgSlugSettingsIndexRoute =
   authenticatedDashboardOrgSlugSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -171,6 +179,12 @@ const authenticatedDashboardOrgSlugAccountIndexRoute =
     id: '/account/',
     path: '/account/',
     getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
+  } as any)
+const ApiZapierWebhooksSubscribeIdRoute =
+  ApiZapierWebhooksSubscribeIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiZapierWebhooksSubscribeRoute,
   } as any)
 const authenticatedDashboardOrgSlugIdeasIdeaIdRoute =
   authenticatedDashboardOrgSlugIdeasIdeaIdRouteImport.update({
@@ -208,10 +222,12 @@ export interface FileRoutesByFullPath {
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard/': typeof authenticatedDashboardIndexRoute
   '/org/$slug/': typeof OrgSlugIndexRoute
+  '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
   '/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
   '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
   '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
+  '/api/zapier/webhooks/subscribe/$id': typeof ApiZapierWebhooksSubscribeIdRoute
   '/dashboard/$orgSlug/account': typeof authenticatedDashboardOrgSlugAccountIndexRoute
   '/dashboard/$orgSlug/changelog': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   '/dashboard/$orgSlug/ideas': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
@@ -233,10 +249,12 @@ export interface FileRoutesByTo {
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/dashboard': typeof authenticatedDashboardIndexRoute
   '/org/$slug': typeof OrgSlugIndexRoute
+  '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugIndexRoute
   '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
   '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
+  '/api/zapier/webhooks/subscribe/$id': typeof ApiZapierWebhooksSubscribeIdRoute
   '/dashboard/$orgSlug/account': typeof authenticatedDashboardOrgSlugAccountIndexRoute
   '/dashboard/$orgSlug/changelog': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   '/dashboard/$orgSlug/ideas': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
@@ -264,10 +282,12 @@ export interface FileRoutesById {
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
   '/org/$slug/': typeof OrgSlugIndexRoute
+  '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
   '/(authenticated)/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
   '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
   '/(authenticated)/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/(authenticated)/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
+  '/api/zapier/webhooks/subscribe/$id': typeof ApiZapierWebhooksSubscribeIdRoute
   '/(authenticated)/dashboard/$orgSlug/account/': typeof authenticatedDashboardOrgSlugAccountIndexRoute
   '/(authenticated)/dashboard/$orgSlug/changelog/': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
   '/(authenticated)/dashboard/$orgSlug/ideas/': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
@@ -294,10 +314,12 @@ export interface FileRouteTypes {
     | '/org/$slug/roadmap'
     | '/dashboard/'
     | '/org/$slug/'
+    | '/api/zapier/webhooks/subscribe'
     | '/dashboard/$orgSlug/'
     | '/dashboard/$orgSlug/changelog/$changelogId'
     | '/dashboard/$orgSlug/changelog/new'
     | '/dashboard/$orgSlug/ideas/$ideaId'
+    | '/api/zapier/webhooks/subscribe/$id'
     | '/dashboard/$orgSlug/account'
     | '/dashboard/$orgSlug/changelog'
     | '/dashboard/$orgSlug/ideas'
@@ -319,10 +341,12 @@ export interface FileRouteTypes {
     | '/org/$slug/roadmap'
     | '/dashboard'
     | '/org/$slug'
+    | '/api/zapier/webhooks/subscribe'
     | '/dashboard/$orgSlug'
     | '/dashboard/$orgSlug/changelog/$changelogId'
     | '/dashboard/$orgSlug/changelog/new'
     | '/dashboard/$orgSlug/ideas/$ideaId'
+    | '/api/zapier/webhooks/subscribe/$id'
     | '/dashboard/$orgSlug/account'
     | '/dashboard/$orgSlug/changelog'
     | '/dashboard/$orgSlug/ideas'
@@ -349,10 +373,12 @@ export interface FileRouteTypes {
     | '/org/$slug/roadmap'
     | '/(authenticated)/dashboard/'
     | '/org/$slug/'
+    | '/api/zapier/webhooks/subscribe'
     | '/(authenticated)/dashboard/$orgSlug/'
     | '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
     | '/(authenticated)/dashboard/$orgSlug/changelog/new'
     | '/(authenticated)/dashboard/$orgSlug/ideas/$ideaId'
+    | '/api/zapier/webhooks/subscribe/$id'
     | '/(authenticated)/dashboard/$orgSlug/account/'
     | '/(authenticated)/dashboard/$orgSlug/changelog/'
     | '/(authenticated)/dashboard/$orgSlug/ideas/'
@@ -371,6 +397,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiWidgetChangelogRoute: typeof ApiWidgetChangelogRoute
   ApiWidgetIdeasRoute: typeof ApiWidgetIdeasRoute
+  ApiZapierWebhooksSubscribeRoute: typeof ApiZapierWebhooksSubscribeRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -508,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedDashboardOrgSlugIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
+    '/api/zapier/webhooks/subscribe': {
+      id: '/api/zapier/webhooks/subscribe'
+      path: '/api/zapier/webhooks/subscribe'
+      fullPath: '/api/zapier/webhooks/subscribe'
+      preLoaderRoute: typeof ApiZapierWebhooksSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(authenticated)/dashboard/$orgSlug/settings/': {
       id: '/(authenticated)/dashboard/$orgSlug/settings/'
       path: '/settings'
@@ -549,6 +583,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/$orgSlug/account'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugAccountIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
+    }
+    '/api/zapier/webhooks/subscribe/$id': {
+      id: '/api/zapier/webhooks/subscribe/$id'
+      path: '/$id'
+      fullPath: '/api/zapier/webhooks/subscribe/$id'
+      preLoaderRoute: typeof ApiZapierWebhooksSubscribeIdRouteImport
+      parentRoute: typeof ApiZapierWebhooksSubscribeRoute
     }
     '/(authenticated)/dashboard/$orgSlug/ideas/$ideaId': {
       id: '/(authenticated)/dashboard/$orgSlug/ideas/$ideaId'
@@ -677,6 +718,20 @@ const OrgSlugRouteRouteWithChildren = OrgSlugRouteRoute._addFileChildren(
   OrgSlugRouteRouteChildren,
 )
 
+interface ApiZapierWebhooksSubscribeRouteChildren {
+  ApiZapierWebhooksSubscribeIdRoute: typeof ApiZapierWebhooksSubscribeIdRoute
+}
+
+const ApiZapierWebhooksSubscribeRouteChildren: ApiZapierWebhooksSubscribeRouteChildren =
+  {
+    ApiZapierWebhooksSubscribeIdRoute: ApiZapierWebhooksSubscribeIdRoute,
+  }
+
+const ApiZapierWebhooksSubscribeRouteWithChildren =
+  ApiZapierWebhooksSubscribeRoute._addFileChildren(
+    ApiZapierWebhooksSubscribeRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authPagesRouteRoute: authPagesRouteRouteWithChildren,
@@ -687,6 +742,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiWidgetChangelogRoute: ApiWidgetChangelogRoute,
   ApiWidgetIdeasRoute: ApiWidgetIdeasRoute,
+  ApiZapierWebhooksSubscribeRoute: ApiZapierWebhooksSubscribeRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { waitUntil } from "@vercel/functions";
 import { and, count, desc, eq, inArray, not, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
@@ -6,6 +7,7 @@ import { db } from "~/lib/db";
 import { board, comment, idea, reaction } from "~/lib/db/schema";
 import { $getOrganizationBySlug } from "./organizations";
 import { getUnifiedUser } from "./unified-user";
+import { triggerWebhooks } from "./webhooks";
 
 // Context helper for auth - organizationId comes from URL params, not session
 async function getAuthContext() {
@@ -334,6 +336,29 @@ export const $createIdea = createServerFn({ method: "POST" })
         status: data.status,
       })
       .returning();
+
+    // Trigger webhooks for new idea
+    // Don't await to avoid blocking the response
+    waitUntil(
+      triggerWebhooks(organization.id, "idea.created", {
+        id: newIdea.id,
+        title: newIdea.title,
+        description: newIdea.description,
+        status: newIdea.status,
+        organizationId: newIdea.organizationId,
+        createdAt: newIdea.createdAt.toISOString(),
+        updatedAt: newIdea.updatedAt.toISOString(),
+        author: user
+          ? {
+              id: user.id,
+              name: user.name || undefined,
+              email: user.email || undefined,
+            }
+          : null,
+      }).catch((error) => {
+        console.error("Error triggering webhooks:", error);
+      }),
+    );
 
     return newIdea;
   });

@@ -72,6 +72,7 @@
     "@tiptap/starter-kit": "^3.13.0",
     "@unpic/react": "^1.0.2",
     "@vercel/blob": "^2.0.0",
+    "@vercel/functions": "^3.3.5",
     "@vitejs/plugin-react": "^5.1.1",
     "avvvatars-react": "^0.4.2",
     "better-auth": "1.4.1",
