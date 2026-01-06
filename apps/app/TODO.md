@@ -1,12 +1,9 @@
 MVP:
 
-- Docs
+- Docs walkthrough/check
 - Terms & Privacy
-- Onboarding
-- Landing page
-- Favicons
+- Decide and fix pricing everywhere
 - Turn off dark mode
-- Login on public facing is broken. Logging in with 404 says success. So does signup
 
 Future:
 
@@ -38,6 +35,8 @@ Future:
 - Delete workspace/org
 - Customize status names and colors
 - Make widget accessible with dialog etc.
+- Merge (similar) ideas
+- Import from Canny / Others
 
 Paid:
 
@@ -46,8 +45,9 @@ Paid:
 - SSO
 - Private boards
 - Integrations
-- no thoughtbase branding
+- Remove thoughtbase branding / White label
 - Guest post (enable disable)
+- Private boards
 
 Enterprise:
 
