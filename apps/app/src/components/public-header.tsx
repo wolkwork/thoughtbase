@@ -81,9 +81,11 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
                 <Button
                   variant="ghost"
                   render={
-                    <Link to="/dashboard/$orgSlug/ideas" params={{ orgSlug: org.slug }}>
+                    <a
+                      href={`${process.env.NODE_ENV === "development" ? "http://thoughtbase.localhost:3000" : "https://app.thoughtbase.app"}/dashboard/${org.slug}/ideas`}
+                    >
                       Dashboard
-                    </Link>
+                    </a>
                   }
                 />
               )}
