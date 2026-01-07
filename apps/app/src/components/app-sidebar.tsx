@@ -352,13 +352,11 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
         orgSlug={orgSlug}
         organizationId={organizationId}
       />
-      {organizationId && (
-        <FeedbackWidget
-          isOpen={widgetOpen}
-          onClose={() => setWidgetOpen(false)}
-          organizationSlug={orgSlug}
-        />
-      )}
+      <FeedbackWidget
+        isOpen={widgetOpen}
+        onClose={() => setWidgetOpen(false)}
+        organizationSlug="wolk"
+      />
     </Sidebar>
   );
 }

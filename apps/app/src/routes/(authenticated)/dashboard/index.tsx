@@ -4,7 +4,6 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { CreateOrganizationDialog } from "~/components/create-organization-dialog";
-import { WorkspaceAvatar } from "~/components/workspace-avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -14,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { WorkspaceAvatar } from "~/components/workspace-avatar";
 import { auth } from "~/lib/auth/auth";
 
 const $getOrganizations = createServerFn().handler(async () => {
