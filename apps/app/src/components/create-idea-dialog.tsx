@@ -1,5 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { $createIdea } from "~/lib/api/ideas";
@@ -32,7 +31,7 @@ export function CreateIdeaDialog({
   orgSlug,
   onSuccess,
 }: CreateIdeaDialogProps) {
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -40,6 +39,11 @@ export function CreateIdeaDialog({
     mutationFn: $createIdea,
     onSuccess: (newIdea) => {
       toast.success("Idea created successfully");
+      // Invalidate sidebar counts and ideas list
+      if (organizationId) {
+        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
+        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
+      }
       onOpenChange(false);
       setTitle("");
       setDescription("");

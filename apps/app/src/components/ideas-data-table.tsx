@@ -349,7 +349,6 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
               }
             />
             <DropdownMenuContent align="start" className="w-[200px]">
-              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {[
                 "pending",

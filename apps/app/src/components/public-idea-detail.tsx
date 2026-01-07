@@ -141,6 +141,8 @@ export function PublicIdeaDetail({
     onSuccess: () => {
       setIsEditing(false);
       toast.success("Idea updated");
+      // Invalidate ideas list (public view doesn't need sidebar counts)
+      queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
       router.invalidate();
     },
     onError: () => {

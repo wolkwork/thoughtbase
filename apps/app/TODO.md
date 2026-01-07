@@ -3,11 +3,15 @@ MVP:
 - Docs walkthrough/check
 - Terms & Privacy
 - Decide and fix pricing everywhere
-- Turn off dark mode
-- "No secret generated"
+- Email invites not working
+- Email verified confirmation
+- Slow AF
+- Update ideas lists after editing
 
 Future:
 
+- Pending invitations also show accepted invitations
+- Show toast that email verification succeeded
 - Only allow users to view their own pending ideas
 - Fix dark mode
 - Fix roadmap drag and drop

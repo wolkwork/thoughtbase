@@ -7,7 +7,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -46,6 +46,7 @@ export function RoadmapBoard({
   organizationId,
 }: RoadmapBoardProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
   // Optimistic state
   const [items, setItems] = useState(initialIdeas);
@@ -73,6 +74,11 @@ export function RoadmapBoard({
       router.invalidate(); // Revert on error
     },
     onSuccess: () => {
+      // Invalidate sidebar counts and ideas list
+      if (organizationId) {
+        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
+        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
+      }
       router.invalidate();
     },
   });

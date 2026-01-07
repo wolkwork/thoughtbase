@@ -137,6 +137,11 @@ export function IdeaDetail({
     },
     onSuccess: () => {
       toast.success("Status updated");
+      // Invalidate sidebar counts and ideas list
+      if (organizationId) {
+        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
+        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
+      }
       router.invalidate();
     },
     onError: () => {
@@ -155,6 +160,8 @@ export function IdeaDetail({
     },
     onSuccess: () => {
       toast.success("ETA updated");
+      // Invalidate ideas list (ETA doesn't affect sidebar counts)
+      queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
       router.invalidate();
     },
     onError: () => {
@@ -167,6 +174,11 @@ export function IdeaDetail({
     mutationFn: $deleteIdea,
     onSuccess: () => {
       toast.success("Idea deleted");
+      // Invalidate sidebar counts and ideas list
+      if (organizationId) {
+        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
+        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
+      }
       navigate({ to: ".." });
     },
     onError: () => {
