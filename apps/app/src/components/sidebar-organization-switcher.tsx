@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { SidebarMenuButton } from "./ui/sidebar";
+import { WorkspaceAvatar } from "./workspace-avatar";
 
 interface SidebarOrganizationSwitcherProps {
   currentOrgSlug: string;
@@ -55,19 +56,13 @@ export function SidebarOrganizationSwitcher({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border-none! bg-transparent! ring-0! outline-none"
             >
-              <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                {activeOrganization?.logo ? (
-                  <img
-                    src={activeOrganization.logo}
-                    alt={activeOrganization.name}
-                    className="size-8 rounded-lg"
-                  />
-                ) : (
-                  <span className="font-semibold">
-                    {activeOrganization?.name?.substring(0, 2).toUpperCase() || "OR"}
-                  </span>
-                )}
-              </div>
+              <WorkspaceAvatar
+                workspace={{
+                  name: activeOrganization?.name,
+                  logo: activeOrganization?.logo,
+                }}
+                className="text-sidebar-primary-foreground"
+              />
               <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {activeOrganization?.name || "Select Workspace"}
@@ -89,15 +84,10 @@ export function SidebarOrganizationSwitcher({
               className="gap-2 p-2"
               render={
                 <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
-                  <div className="flex size-6 items-center justify-center rounded-sm border">
-                    {org.logo ? (
-                      <img src={org.logo} alt={org.name} className="size-6 rounded-sm" />
-                    ) : (
-                      <span className="text-xs font-medium">
-                        {org.name.substring(0, 2).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
+                  <WorkspaceAvatar
+                    workspace={{ name: org.name, logo: org.logo }}
+                    className="size-6"
+                  />
                   {org.name}
                   {org.slug === currentOrgSlug && <Check className="ml-auto h-4 w-4" />}
                 </Link>

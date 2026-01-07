@@ -4,6 +4,7 @@ import { AuthForm } from "~/components/auth-form";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { UserAvatar } from "./user-avatar";
+import { WorkspaceAvatar } from "./workspace-avatar";
 
 interface PublicHeaderProps {
   org: {
@@ -33,13 +34,10 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
             params={{ slug: org.slug }}
             className="flex items-center gap-2"
           >
-            {org.logo ? (
-              <img src={org.logo} alt={org.name} className="h-8 w-8 rounded" />
-            ) : (
-              <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded text-sm font-bold">
-                {org.name.charAt(0)}
-              </div>
-            )}
+            <WorkspaceAvatar
+              workspace={{ name: org.name, logo: org.logo }}
+              className="h-8 w-8"
+            />
             <span className="text-lg font-bold">{org.name}</span>
           </Link>
 

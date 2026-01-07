@@ -1,9 +1,10 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
-import { Building2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { CreateOrganizationDialog } from "~/components/create-organization-dialog";
+import { WorkspaceAvatar } from "~/components/workspace-avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -59,17 +60,10 @@ function DashboardIndex() {
                 className="h-auto w-full items-center justify-start px-4 py-4"
                 render={
                   <Link to="/dashboard/$orgSlug" params={{ orgSlug: org.slug }}>
-                    {org.logo ? (
-                      <img
-                        src={org.logo}
-                        alt={org.name}
-                        className="mr-1.5 size-8 rounded-md"
-                      />
-                    ) : (
-                      <span className="bg-muted mr-1.5 flex size-8 items-center justify-center rounded-md">
-                        <Building2 className="text-muted-foreground size-5" />
-                      </span>
-                    )}
+                    <WorkspaceAvatar
+                      workspace={{ name: org.name, logo: org.logo }}
+                      className="mr-1.5"
+                    />
 
                     <div className="flex flex-col items-start">
                       <span className="font-medium">{org.name}</span>
