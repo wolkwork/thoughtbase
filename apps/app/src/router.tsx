@@ -85,7 +85,17 @@ export function getRouter() {
         const subdomain = getSubdomain(url.hostname);
 
         if (subdomain) {
-          url.pathname = `/org/${subdomain}${url.pathname}`;
+          if (url.pathname.startsWith("/dashboard")) {
+            if (typeof window !== "undefined") {
+              const baseDomain = getBaseDomain(url.hostname);
+              const newUrl = new URL(url.href);
+              newUrl.hostname = baseDomain;
+              // newUrl.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
+              window.location.replace(newUrl.href);
+            }
+          } else {
+            url.pathname = `/org/${subdomain}${url.pathname}`;
+          }
         } else {
           // Redirect /org/slug paths to subdomain URLs (client-side only)
           const pathParts = url.pathname.split("/");
