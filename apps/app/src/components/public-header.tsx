@@ -81,6 +81,7 @@ export function PublicHeader({ org, user }: PublicHeaderProps) {
                 <Button
                   variant="ghost"
                   render={
+                    // TODO: fix this in router.tsx
                     <a
                       href={`${process.env.NODE_ENV === "development" ? "http://thoughtbase.localhost:3000" : "https://app.thoughtbase.app"}/dashboard/${org.slug}/ideas`}
                     >

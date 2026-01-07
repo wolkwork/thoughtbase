@@ -1,7 +1,8 @@
+import { Image } from "@unpic/react";
 import Avvvatars from "avvvatars-react";
 import { Building2 } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar } from "./ui/avatar";
 
 export function WorkspaceAvatar({
   workspace,
@@ -40,8 +41,12 @@ export function WorkspaceAvatar({
   }
 
   return (
-    <Avatar className={cn("rounded-[6px]", className)}>
-      <AvatarImage src={workspace.logo} alt={workspace.name} />
-    </Avatar>
+    <Image
+      src={workspace.logo}
+      alt={workspace.name}
+      width={32}
+      height={32}
+      className={cn("rounded-[6px]", className)}
+    />
   );
 }

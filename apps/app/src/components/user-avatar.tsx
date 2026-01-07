@@ -1,7 +1,8 @@
+import { Image } from "@unpic/react";
 import Avvvatars from "avvvatars-react";
 import { HatGlasses } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar } from "./ui/avatar";
 
 export function UserAvatar({
   user,
@@ -32,8 +33,12 @@ export function UserAvatar({
   }
 
   return (
-    <Avatar className={className}>
-      <AvatarImage src={user.image} alt={user.name} />
-    </Avatar>
+    <Image
+      src={user.image}
+      alt={user.name}
+      width={32}
+      height={32}
+      className={className}
+    />
   );
 }
