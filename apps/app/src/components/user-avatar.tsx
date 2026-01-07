@@ -25,7 +25,10 @@ export function UserAvatar({
   if (!user.image) {
     return (
       <div
-        className={cn("size-8 [&>div]:size-full! [&>div>span]:size-[50%]!", className)}
+        className={cn(
+          "size-8 [&>div]:size-full! [&>div>span]:size-[50%]! [&>div>span>svg]:size-full!",
+          className,
+        )}
       >
         <Avvvatars value={user.name} style="shape" />
       </div>
@@ -36,6 +39,7 @@ export function UserAvatar({
     <Image
       src={user.image}
       alt={user.name}
+      fallback="wsrv"
       width={32}
       height={32}
       className={className}

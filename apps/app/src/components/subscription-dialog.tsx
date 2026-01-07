@@ -34,21 +34,21 @@ const PLANS: Plan[] = [
     description: "Perfect for testing the waters",
     features: [
       {
-        title: "14-day free trial",
-        description: "Try all features risk-free, cancel anytime",
+        title: "Unlimited ideas",
+        description: "Create as many ideas as you need",
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "1 feedback board",
-        description: "Create 1 public feedback board",
+        title: "1 admin user",
+        description: "Perfect for solo developers",
         icon: <Check className="h-4 w-4" />,
       },
     ],
   },
   {
-    id: "starter",
-    name: "Starter",
-    price: { month: 24, year: 240 },
+    id: "start",
+    name: "Start",
+    price: { month: 49, year: 490 },
     description: "Perfect for small teams and growing startups",
     features: [
       {
@@ -57,8 +57,8 @@ const PLANS: Plan[] = [
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "5 feedback boards",
-        description: "Create up to 5 public and private boards",
+        title: "3 admin users",
+        description: "Perfect for small teams",
         icon: <Check className="h-4 w-4" />,
       },
       {
@@ -70,29 +70,29 @@ const PLANS: Plan[] = [
     popular: true,
   },
   {
-    id: "growth",
-    name: "Growth",
-    price: { month: 49, year: 490 },
+    id: "business",
+    name: "Business",
+    price: { month: 99, year: 990 },
     description: "For larger organizations with advanced needs",
     features: [
       {
-        title: "Everything in Starter",
-        description: "All starter features included",
+        title: "Everything in Start",
+        description: "All start features included",
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "Unlimited boards",
+        title: "Unlimited admins",
         description: "Create as many boards as you need",
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "White-label",
-        description: "Complete removal of ThoughtBase branding",
+        title: "Custom domain",
+        description: "Use your own domain for your workspace",
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "Guest posting",
-        description: "Let users submit feedback without creating an account",
+        title: "White-label",
+        description: "Customization and removal of ThoughtBase branding",
         icon: <Check className="h-4 w-4" />,
       },
     ],
@@ -105,7 +105,7 @@ interface SubscriptionDialogProps {
 }
 
 export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogProps) {
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("starter");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("start");
   const [billingInterval, setBillingInterval] = useState<"month" | "year">("month");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -196,7 +196,9 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
                     </div>
                     <div className="text-sm font-medium">
                       ${plan.price[billingInterval]}{" "}
-                      <span className="text-muted-foreground font-normal">/ month</span>
+                      <span className="text-muted-foreground font-normal">
+                        / {billingInterval === "month" ? "month" : "year"}
+                      </span>
                     </div>
                   </div>
                 </div>

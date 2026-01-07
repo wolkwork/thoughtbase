@@ -42,12 +42,12 @@ function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="billing" className="w-full">
+      <Tabs defaultValue="branding" className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-4">
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="sso">SSO</TabsTrigger>
+          {/* <TabsTrigger value="billing">Billing</TabsTrigger> */}
+          {/* <TabsTrigger value="sso">SSO</TabsTrigger> */}
           <TabsTrigger value="branding">Branding</TabsTrigger>
-          <TabsTrigger value="team">Team</TabsTrigger>
+          {/* <TabsTrigger value="team">Team</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="billing" className="mt-6">

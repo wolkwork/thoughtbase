@@ -13,10 +13,14 @@ import { Polar } from "@polar-sh/sdk";
 import { apiKey, organization } from "better-auth/plugins";
 import { getBaseUrl } from "../base-url";
 
-const polarClient = new Polar({
-  accessToken: env.POLAR_ACCESS_TOKEN,
-  server: "sandbox",
+const getPolarClient = createServerOnlyFn(() => {
+  return new Polar({
+    accessToken: env.POLAR_ACCESS_TOKEN,
+    server: "sandbox",
+  });
 });
+
+export const polarClient = getPolarClient();
 
 const getAuthConfig = createServerOnlyFn(() => {
   return betterAuth({
@@ -82,12 +86,12 @@ const getAuthConfig = createServerOnlyFn(() => {
           checkout({
             products: [
               {
-                productId: env.POLAR_STARTER_ID,
-                slug: "starter",
+                productId: env.POLAR_START_ID,
+                slug: "start",
               },
               {
-                productId: env.POLAR_GROWTH_ID,
-                slug: "growth",
+                productId: env.POLAR_BUSINESS_ID,
+                slug: "business",
               },
             ],
             authenticatedUsersOnly: true,

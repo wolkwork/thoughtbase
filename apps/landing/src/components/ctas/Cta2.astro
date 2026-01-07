@@ -3,6 +3,8 @@
 import Text from "@/components/fundations/elements/Text.astro";
 import Wrapper from "@/components/fundations/containers/Wrapper.astro";
 import Link from "@/components/fundations/elements/Link.astro";
+
+const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
 ---
 
 <section class="border-t border-base-200 border-dashed">
@@ -26,7 +28,7 @@ import Link from "@/components/fundations/elements/Link.astro";
         </Text>
       </div>
       <div class="flex lg:ml-auto">
-        <Link gap="sm" size="sm" variant="default" href="#pricing-section">
+        <Link gap="sm" size="sm" variant="default" href={SIGNUP_URL}>
           Get started
         </Link>
       </div>

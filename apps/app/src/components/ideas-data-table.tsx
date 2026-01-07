@@ -172,7 +172,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       const author = row.original.author;
       return (
         <div className="flex items-center gap-2">
-          <UserAvatar user={author} className="size-6" />
+          <UserAvatar user={author} className="size-6!" />
           <span className="max-w-[120px] truncate text-sm" title={author.name}>
             {author.name}
           </span>

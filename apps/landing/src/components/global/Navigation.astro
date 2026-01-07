@@ -7,9 +7,11 @@ import Wrapper from "@/components/fundations/containers/Wrapper.astro";
 const navigationLinks = [
   {
     title: "Docs",
-    href: "https://docs.thoughtbase.app",
+    href: import.meta.env.PUBLIC_DOCS_URL,
   },
 ];
+
+const SIGNIN_URL = import.meta.env.PUBLIC_APP_URL + "/login";
 ---
 
 <div
@@ -100,13 +102,7 @@ const navigationLinks = [
             }
           </div>
           <div class="flex flex-wrap items-center mt-auto gap-2">
-            <Link
-              size="xs"
-              variant="accent"
-              href="https://app.thoughtbase.app/dashboard"
-            >
-              Sign in
-            </Link>
+            <Link size="xs" variant="accent" href={SIGNIN_URL}> Sign in </Link>
           </div>
         </div>
       </nav>

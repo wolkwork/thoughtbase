@@ -1,10 +1,7 @@
 import {
   CheckIcon,
-  GlobeIcon,
-  KeyIcon,
   LinkSimpleIcon,
   PaletteIcon,
-  UsersThreeIcon,
   WrenchIcon,
 } from "@phosphor-icons/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,7 +18,6 @@ import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
-import { authClient } from "~/lib/auth/auth-client";
 import { cn } from "~/lib/utils";
 import { CopyButton } from "./ui/shadcn-io/copy-button";
 
@@ -47,35 +43,38 @@ const STEPS: Step[] = [
     description: "Embed ThoughtBase in your product",
     icon: <WrenchIcon className="h-5 w-5" weight="duotone" />,
   },
-  {
-    id: "enable-auto-login",
-    title: "Enable auto login",
-    description: "SSO so users are signed in automatically",
-    icon: <KeyIcon className="h-5 w-5" weight="duotone" />,
-  },
-  {
-    id: "invite-team",
-    title: "Invite your team",
-    description: "Bring teammates into this workspace",
-    icon: <UsersThreeIcon className="h-5 w-5" weight="duotone" />,
-  },
+  // TODO: Business plan
+  // {
+  //   id: "enable-auto-login",
+  //   title: "Enable auto login",
+  //   description: "SSO so users are signed in automatically",
+  //   icon: <KeyIcon className="h-5 w-5" weight="duotone" />,
+  // },
+  // TODO: Start plan
+  // {
+  //   id: "invite-team",
+  //   title: "Invite your team",
+  //   description: "Bring teammates into this workspace",
+  //   icon: <UsersThreeIcon className="h-5 w-5" weight="duotone" />,
+  // },
   {
     id: "customize-branding",
     title: "Customize branding",
     description: "Upload logo + set workspace name",
     icon: <PaletteIcon className="h-5 w-5" weight="duotone" />,
   },
+  // TODO: Start plan
+  // {
+  //   id: "setup-custom-domain",
+  //   title: "Setup custom domain",
+  //   description: "Use your own domain (paid feature)",
+  //   icon: <GlobeIcon className="h-5 w-5" weight="duotone" />,
+  // },
   {
     id: "share-board",
     title: "Share your board",
     description: "Send the public link to customers",
     icon: <LinkSimpleIcon className="h-5 w-5" weight="duotone" />,
-  },
-  {
-    id: "setup-custom-domain",
-    title: "Setup custom domain",
-    description: "Use your own domain (paid feature)",
-    icon: <GlobeIcon className="h-5 w-5" weight="duotone" />,
   },
 ];
 
@@ -484,65 +483,25 @@ function SetupCustomDomainStep({
   organizationId?: string;
   onUpgrade: () => void;
 }) {
-  const { data: subscriptions, isPending } = useQuery({
-    queryKey: ["subscriptions", organizationId],
-    queryFn: async () => {
-      if (!organizationId) return null;
-      const result = await authClient.customer.subscriptions.list({
-        query: {
-          referenceId: organizationId,
-          active: true,
-          limit: 1,
-        },
-      });
-      return result.data;
-    },
-    enabled: !!organizationId,
-  });
-
-  const activeSubscription = subscriptions?.result?.items?.[0];
-  const planName = activeSubscription?.product?.name ?? "Free";
+  // const { data: subscriptions, isPending } = useQuery({
+  //   queryKey: ["subscriptions", organizationId],
+  //   queryFn: async () => {
+  //     if (!organizationId) return null;
+  //     const result = await authClient.customer.subscriptions.list({
+  //       query: {
+  //         referenceId: organizationId,
+  //         active: true,
+  //         limit: 1,
+  //       },
+  //     });
+  //     return result.data;
+  //   },
+  //   enabled: !!organizationId,
+  // });
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg border p-4">
-        <div className="text-sm font-medium">Custom domain</div>
-        <div className="text-muted-foreground mt-1 text-sm">
-          Map your public board to a domain you own (e.g.{" "}
-          <code className="bg-muted rounded px-1 py-0.5 text-xs">
-            feedback.yourcompany.com
-          </code>
-          ).
-        </div>
-
-        <div className="mt-4 rounded-lg border border-dashed p-4">
-          {isPending ? (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Checking subscription...
-            </div>
-          ) : activeSubscription ? (
-            <div className="space-y-2">
-              <div className="text-sm">
-                You’re on <span className="font-medium">{planName}</span>.
-              </div>
-              <div className="text-muted-foreground text-sm">
-                Custom domain setup UI is coming soon.
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="text-sm font-medium">Upgrade required</div>
-              <div className="text-muted-foreground text-sm">
-                Custom domains are available on paid plans.
-              </div>
-              <Button type="button" onClick={onUpgrade}>
-                Upgrade plan
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+      Coming soon
+    </span>
   );
 }

@@ -3,6 +3,8 @@
 import Text from "@/components/fundations/elements/Text.astro";
 import Link from "@/components/fundations/elements/Link.astro";
 import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
+const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
 ---
 
 <section class="border-t border-base-200 border-dashed">
@@ -27,8 +29,8 @@ import Wrapper from "@/components/fundations/containers/Wrapper.astro";
         </Text>
       </div>
       <div class="flex justify-center mt-8">
-        <Link gap="sm" size="base" variant="muted" href="#">
-          Coming soon!
+        <Link gap="sm" size="base" variant="muted" href={SIGNUP_URL}>
+          Get started
         </Link>
       </div>
     </div>

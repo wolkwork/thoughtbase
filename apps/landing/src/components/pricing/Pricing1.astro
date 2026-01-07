@@ -9,6 +9,8 @@ import Wrapper from "@/components/fundations/containers/Wrapper.astro";
 // Icons
 import Check from "@/components/fundations/icons/Check.astro";
 
+const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
+
 const pricingOptions = [
   {
     id: "free",
@@ -20,9 +22,9 @@ const pricingOptions = [
     monthly: "$0",
     description: "Perfect for testing the waters.",
     button: {
-      text: "Coming soon!",
-      variant: "muted",
-      href: "#",
+      text: "Get started!",
+      variant: "accent",
+      href: SIGNUP_URL,
     },
     features: [
       { text: "Unlimited tracked users" },
@@ -34,37 +36,35 @@ const pricingOptions = [
     ],
   },
   {
-    id: "Starter",
+    id: "Start",
     cardClass: "bg-sand-100",
     primaryTextColor: "text-base-900",
     secondaryTextColor: "text-base-500",
     featuresBorderColor: "border-base-200",
-    title: "Starter",
-    monthly: "$29",
+    title: "Start",
+    monthly: "$49",
     description: "Perfect for small teams.",
     button: {
       text: "Coming soon!",
-      variant: "accent",
+      variant: "muted",
       href: "#",
     },
     features: [
       { text: "Everything in Free" },
       { text: "Private boards" },
       { text: "Custom domain" },
-      { text: "Remove ThoughtBase branding" },
-      { text: "Anonymous posting" },
-      { text: "5 Admin users" },
+      { text: "3 Admin users" },
     ],
   },
   {
-    id: "Pro",
+    id: "Business",
     cardClass: "bg-sand-50 ",
     primaryTextColor: "text-base-900",
     secondaryTextColor: "text-base-500",
     featuresBorderColor: "border-base-200",
-    title: "Pro",
-    monthly: "$59",
-    description: "Perfect for growing teams.",
+    title: "Business",
+    monthly: "$99",
+    description: "Perfect for larger teams.",
     button: {
       text: "Coming soon!",
       variant: "muted",
@@ -74,7 +74,6 @@ const pricingOptions = [
       { text: "Everything in Starter" },
       { text: "Single sign-on" },
       { text: "Unlimited admin users" },
-      { text: "Identity masking" },
       { text: "Integrations" },
     ],
   },

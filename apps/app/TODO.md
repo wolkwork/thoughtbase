@@ -5,6 +5,7 @@ MVP:
 - Decide and fix pricing everywhere
 - Slow AF
 - Fill board with ideas
+- Resume application and refresh router after succesful subscription
 
 Future:
 
@@ -42,18 +43,26 @@ Future:
 - Merge (similar) ideas
 - Import from Canny / Others
 
-Paid:
+# Pricing plans
 
-- Custom domain
-- Anonymous posting
+## Free
+
+- Unlimited ideas
+- 1 Admin
+
+## Start: $49/month
+
+- 3 Admins
+- Custom Domain
+- Private boards
+
+## Business: $99/month
+
 - SSO
-- Private boards
+- White label
 - Integrations
-- Remove thoughtbase branding / White label
-- Guest post (enable disable)
-- Private boards
+- Unlimited Admins
 
-Enterprise:
+## Enterprise
 
 - Dedicated support
-- SOC2 compliance

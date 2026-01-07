@@ -1,11 +1,10 @@
 ---
-// Assets
-import { Image } from "astro:assets";
-import Dashboard from "@/images/assets/dashboard.jpg";
 // Fundations
 import Text from "@/components/fundations/elements/Text.astro";
 import Link from "@/components/fundations/elements/Link.astro";
 import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+
+const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
 ---
 
 <section>
@@ -33,14 +32,10 @@ import Wrapper from "@/components/fundations/containers/Wrapper.astro";
       <Link
         size="sm"
         variant="accent"
-        href="#"
+        href={SIGNUP_URL}
         class="opacity-70 relative group"
       >
         Get started for free
-        <span
-          class="pointer-events-none absolute inset-0 flex items-center justify-center z-10 px-3 py-1.5 rounded-full bg-black text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity"
-          >Coming soon!
-        </span>
       </Link>
       <!-- <Image
       src={Dashboard}

@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { AlertCircle, MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,7 +20,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
@@ -38,8 +39,18 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+// import { $getPermissions } from "~/lib/api/permissions";
+import { z } from "zod";
+import { getPermissions } from "~/lib/api/permissions";
 import { authClient } from "~/lib/auth/auth-client";
 import { UserAvatar } from "./user-avatar";
+
+export const $getPermissions = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ organizationId: z.string() }))
+  .handler(async ({ data }) => {
+    return await getPermissions(data.organizationId);
+  });
 
 export function TeamSettings() {
   const { organization } = useRouteContext({
@@ -80,6 +91,19 @@ export function TeamSettings() {
     enabled: !!organizationId,
   });
 
+  const getPermissions = useServerFn($getPermissions);
+
+  const { data: permissions } = useQuery({
+    queryKey: ["permissions", organizationId],
+    queryFn: () => {
+      return getPermissions({ data: { organizationId } });
+    },
+    enabled: !!organizationId,
+  });
+
+  const isLimitReached =
+    permissions && !permissions.canAddAdmin && permissions.maxAdmins !== null;
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -89,11 +113,27 @@ export function TeamSettings() {
             Manage your organization members and invitations.
           </p>
         </div>
-        <InviteMemberDialog organizationId={organizationId} />
+        <InviteMemberDialog organizationId={organizationId} permissions={permissions} />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-md font-semibold">Active Members</h3>
+        {isLimitReached && permissions && (
+          <Alert
+            variant="default"
+            className="border-amber-400 bg-amber-50/50 text-amber-900"
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-amber-900">
+              You've reached the admin limit for your <strong>{permissions.tier}</strong>{" "}
+              plan (
+              {permissions.maxAdmins === null
+                ? "unlimited"
+                : `${permissions.maxAdmins} admin${permissions.maxAdmins !== 1 ? "s" : ""}`}
+              ).
+            </AlertDescription>
+          </Alert>
+        )}
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -222,7 +262,6 @@ function MemberRow({ member }: { member: TeamMember }) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="member">Member</SelectItem>
             <SelectItem value="owner">Owner</SelectItem>
           </SelectContent>
         </Select>
@@ -239,7 +278,6 @@ function MemberRow({ member }: { member: TeamMember }) {
             }
           />
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={handleRemoveMember} className="text-red-600">
               <UserMinus className="mr-2 h-4 w-4" />
               Remove Member
@@ -299,19 +337,47 @@ function InvitationRow({ invitation }: { invitation: TeamInvitation }) {
   );
 }
 
-export function InviteMemberDialog({ organizationId }: { organizationId: string }) {
+export function InviteMemberDialog({
+  organizationId,
+  permissions,
+}: {
+  organizationId: string;
+  permissions?: {
+    tier: string;
+    maxAdmins: number | null;
+    currentAdminCount: number;
+    canAddAdmin: boolean;
+  } | null;
+}) {
   const [open, setOpen] = useState(false);
+
+  const isDisabled = permissions && !permissions.canAddAdmin;
+  const tooltipMessage =
+    permissions && !permissions.canAddAdmin && permissions.maxAdmins !== null
+      ? `Admin limit reached. Your ${permissions.tier} plan allows ${permissions.maxAdmins} admin${permissions.maxAdmins !== 1 ? "s" : ""}. You currently have ${permissions.currentAdminCount} admin${permissions.currentAdminCount !== 1 ? "s" : ""} (including owners).${permissions.tier !== "business" ? " Upgrade to Business for unlimited admins." : ""}`
+      : undefined;
+
+  const button = (
+    <Button disabled={isDisabled}>
+      <UserPlus className="mr-2 h-4 w-4" />
+      Invite Member
+    </Button>
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite Member
-          </Button>
-        }
-      />
+      {tooltipMessage ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger render={button} />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-xs">{tooltipMessage}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <DialogTrigger render={button} />
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Invite Member</DialogTitle>
@@ -323,6 +389,7 @@ export function InviteMemberDialog({ organizationId }: { organizationId: string 
           organizationId={organizationId}
           onSuccess={() => setOpen(false)}
           submitLabel="Send Invitation"
+          permissions={permissions}
         />
       </DialogContent>
     </Dialog>
@@ -333,18 +400,38 @@ export function InviteMemberForm({
   organizationId,
   onSuccess,
   submitLabel = "Invite Member",
+  permissions,
 }: {
   organizationId: string;
   onSuccess?: () => void;
   submitLabel?: string;
+  permissions?: {
+    tier: string;
+    maxAdmins: number | null;
+    currentAdminCount: number;
+    canAddAdmin: boolean;
+  } | null;
 }) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"member" | "admin" | "owner">("member");
+  const [role, setRole] = useState<"admin" | "owner">("member");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if trying to invite admin/owner and limit is reached
+    if (
+      (role === "admin" || role === "owner") &&
+      permissions &&
+      !permissions.canAddAdmin
+    ) {
+      toast.error(
+        `Admin limit reached. Your ${permissions.tier} plan allows ${permissions.maxAdmins} admin${permissions.maxAdmins !== 1 ? "s" : ""}.`,
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       await authClient.organization.inviteMember({
@@ -380,18 +467,28 @@ export function InviteMemberForm({
         </div>
         <div className="grid gap-2">
           <Label htmlFor="role">Role</Label>
-          <Select
-            value={role}
-            onValueChange={(val) => setRole(val as "member" | "admin" | "owner")}
-          >
+          <Select value={role} onValueChange={(val) => setRole(val as "admin" | "owner")}>
             <SelectTrigger>
               <SelectValue data-placeholder="Select role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="member">Member</SelectItem>
+              <SelectItem
+                value="admin"
+                disabled={permissions && !permissions.canAddAdmin && role !== "admin"}
+              >
+                Admin
+                {permissions && !permissions.canAddAdmin && role !== "admin"
+                  ? " (limit reached)"
+                  : ""}
+              </SelectItem>
             </SelectContent>
           </Select>
+          {permissions && !permissions.canAddAdmin && (
+            <p className="text-muted-foreground text-xs">
+              Admin limit reached. Your {permissions.tier} plan allows{" "}
+              {permissions.maxAdmins} admin{permissions.maxAdmins !== 1 ? "s" : ""}.
+            </p>
+          )}
         </div>
       </div>
       <DialogFooter>

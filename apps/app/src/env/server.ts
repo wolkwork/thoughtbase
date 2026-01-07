@@ -18,8 +18,8 @@ export const env = createEnv({
     POLAR_ACCESS_TOKEN: z.string().min(1),
     POLAR_WEBHOOK_SECRET: z.string().min(1),
 
-    POLAR_STARTER_ID: z.string().min(1),
-    POLAR_GROWTH_ID: z.string().min(1),
+    POLAR_START_ID: z.string().min(1),
+    POLAR_BUSINESS_ID: z.string().min(1),
 
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
 

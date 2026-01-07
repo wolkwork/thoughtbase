@@ -31,7 +31,7 @@ export function WorkspaceAvatar({
     return (
       <div
         className={cn(
-          "size-8 rounded-[6px] [&>div]:size-full! [&>div>span]:size-[50%]!",
+          "size-8 rounded-[6px] [&>div]:size-full! [&>div>span]:size-[50%]! [&>div>span]:text-sm! [&>div>span>svg]:size-full!",
           className,
         )}
       >
@@ -44,6 +44,7 @@ export function WorkspaceAvatar({
     <Image
       src={workspace.logo}
       alt={workspace.name}
+      fallback="wsrv"
       width={32}
       height={32}
       className={cn("rounded-[6px]", className)}
