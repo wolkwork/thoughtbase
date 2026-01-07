@@ -288,7 +288,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                     <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
                       <span className="truncate font-medium">{user?.name}</span>
                       <span className="text-muted-foreground truncate text-xs">
-                        {user?.email} kak
+                        {user?.email}
                       </span>
                     </div>
                     <ChevronsUpDown className="ml-auto size-4!" />
