@@ -3,13 +3,12 @@ MVP:
 - Docs walkthrough/check
 - Terms & Privacy
 - Decide and fix pricing everywhere
-- Email invites not working
-- Email verified confirmation
 - Slow AF
-- Update ideas lists after editing
+- Fill board with ideas
 
 Future:
 
+- Status button doesn't work when deselecting everything
 - Pending invitations also show accepted invitations
 - Show toast that email verification succeeded
 - Only allow users to view their own pending ideas
