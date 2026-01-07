@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { Copy, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { BillingSettings } from "~/components/billing-settings";
 import { BrandingSettings } from "~/components/branding-settings";
@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { CopyButton } from "~/components/ui/shadcn-io/copy-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 
@@ -107,36 +108,26 @@ function SSOSettings({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {organization?.id && (
-          <div className="text-muted-foreground mb-2 text-xs">
-            Org ID: {organization.id}
+        {secretData?.secret && (
+          <div className="flex gap-2">
+            <Input
+              value={secretData.secret}
+              readOnly
+              type="password"
+              className="font-mono"
+            />
+            <CopyButton variant="outline" content={secretData.secret} />
           </div>
         )}
-        <div className="flex gap-2">
-          <Input
-            value={secretData?.secret || "No secret generated"}
-            readOnly
-            type="password"
-            className="font-mono"
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={copyToClipboard}
-            disabled={!secretData?.secret}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-        </div>
 
-        <div className="flex justify-end">
+        <div className="flex">
           <Button
             variant="destructive"
             onClick={() => generateSecret()}
             disabled={isPending}
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
-            {secretData?.secret ? "Rotate Secret" : "Generate Secret"}
+            {secretData?.secret ? "Generate New Secret" : "Generate Secret"}
           </Button>
         </div>
       </CardContent>
