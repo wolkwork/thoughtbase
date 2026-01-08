@@ -7,21 +7,30 @@ import Wrapper from "@/components/fundations/containers/Wrapper.astro";
 import BlogEntry from "@/components/blog/BlogEntry.astro";
 // Content
 import { getCollection } from "astro:content";
+
 export async function getStaticPaths() {
   const allPosts = await getCollection("posts");
   const uniqueTags = [
-    ...new Set(allPosts.map((post) => post.data.tags).flat()),
+    ...new Set(
+      allPosts
+        .map((post) => post.data.tags)
+        .flat()
+        .filter(Boolean)
+    ),
   ];
+
   return uniqueTags.map((tag) => {
     const filteredPosts = allPosts.filter((post) =>
-      post.data.tags.includes(tag)
+      post.data.tags?.includes(tag)
     );
+
     return {
       params: { tag },
       props: { posts: filteredPosts },
     };
   });
 }
+
 const { tag } = Astro.params;
 const { posts } = Astro.props;
 ---
