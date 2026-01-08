@@ -5,10 +5,11 @@ MVP:
 - Decide and fix pricing everywhere
 - Slow AF
 - Fill board with ideas
-- Resume application and refresh router after succesful subscription
+- Polar environment variables
 
 Future:
 
+- Resume application and refresh router after succesful subscription
 - Status button doesn't work when deselecting everything
 - Pending invitations also show accepted invitations
 - Show toast that email verification succeeded
