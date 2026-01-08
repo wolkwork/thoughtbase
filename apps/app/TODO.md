@@ -1,11 +1,3 @@
-MVP:
-
-- Slow AF (Neon?)
-- Fill board with ideas
-- Remove Archived ideas from portal landing
-
-Future:
-
 Features:
 
 - Dark mode
@@ -43,6 +35,7 @@ Bugs/Internal:
 - Delete workspace/org
 - Make widget accessible with dialog etc.
 - Import from Canny / Others
+- Meta tags and images
 
 # Pricing plans
 
