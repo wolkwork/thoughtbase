@@ -4,7 +4,7 @@ import { auth } from "~/lib/auth/auth";
 // TODO: Make production ready. Include custom domains
 const allowedOriginRegexes = [
   /^http:\/\/(?:[^.]+\.)?thoughtbase\.localhost:3000$/,
-  /^http:\/\/(?:[^.]+\.)?thoughtbase\.app$/,
+  /^https:\/\/(?:[^.]+\.)?thoughtbase\.app$/,
   /^https:\/\/(?:[^.]+\.)?vercel\.app$/,
 ];
 
