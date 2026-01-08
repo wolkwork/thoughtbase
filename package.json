@@ -5,6 +5,8 @@
   ],
   "packageManager": "bun@1.3.3",
   "devDependencies": {
+    "sharp": "^0.34.5",
+    "to-ico": "^1.1.5",
     "turbo": "^2.6.3"
   },
   "scripts": {

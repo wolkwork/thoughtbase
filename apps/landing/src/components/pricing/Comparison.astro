@@ -34,13 +34,13 @@ const comparisonData = [
     <!-- Comparison Table -->
     <div class="w-full overflow-x-auto">
       <div class="text-center mb-8">
-           <Text
-            tag="h2"
-            variant="displaySM"
-            class="font-serif font-medium tracking-tight text-black"
-          >
-            Comparison
-          </Text>
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Comparison
+        </Text>
       </div>
       <div
         class="min-w-[600px] border border-base-200 rounded-xl overflow-hidden"
@@ -48,18 +48,30 @@ const comparisonData = [
         <table class="w-full text-sm">
           <thead class="text-center border-b border-base-200 bg-sand-50">
             <tr>
-              <th class="px-4 py-4 font-medium text-left text-base-900">Feature</th>
-              <th class="px-4 py-4 font-medium text-left text-base-900">ThoughtBase</th>
-              <th class="px-4 py-4 font-medium text-left text-base-900">The "Enterprise" Standard</th>
+              <th class="px-4 py-4 font-medium text-left text-base-900"
+                >Feature</th
+              >
+              <th class="px-4 py-4 font-medium text-left text-base-900"
+                >Thoughtbase</th
+              >
+              <th class="px-4 py-4 font-medium text-left text-base-900"
+                >The "Enterprise" Standard</th
+              >
             </tr>
           </thead>
           <tbody>
             {
               comparisonData.map(({ feature, thoughtbase, enterprise }) => (
                 <tr class="border-b border-base-200 last:border-0">
-                  <td class="px-4 py-4 font-medium text-base-900 bg-white">{feature}</td>
-                  <td class="px-4 py-4 text-base-700 bg-white">{thoughtbase}</td>
-                  <td class="px-4 py-4 text-base-500 bg-sand-50">{enterprise}</td>
+                  <td class="px-4 py-4 font-medium text-base-900 bg-white">
+                    {feature}
+                  </td>
+                  <td class="px-4 py-4 text-base-700 bg-white">
+                    {thoughtbase}
+                  </td>
+                  <td class="px-4 py-4 text-base-500 bg-sand-50">
+                    {enterprise}
+                  </td>
                 </tr>
               ))
             }
@@ -69,4 +81,3 @@ const comparisonData = [
     </div>
   </Wrapper>
 </section>
-

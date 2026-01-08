@@ -92,7 +92,7 @@ const PLANS: Plan[] = [
       },
       {
         title: "White-label",
-        description: "Customization and removal of ThoughtBase branding",
+        description: "Customization and removal of Thoughtbase branding",
         icon: <Check className="h-4 w-4" />,
       },
     ],

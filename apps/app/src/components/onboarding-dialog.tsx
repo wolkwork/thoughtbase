@@ -40,7 +40,7 @@ const STEPS: Step[] = [
   {
     id: "install-widget",
     title: "Install the widget",
-    description: "Embed ThoughtBase in your product",
+    description: "Embed Thoughtbase in your product",
     icon: <WrenchIcon className="h-5 w-5" weight="duotone" />,
   },
   // TODO: Business plan

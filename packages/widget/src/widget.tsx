@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { FeedbackWidget } from "./components/feedback-widget";
 import styles from "./styles.css?inline";
 import { Button } from "./components/ui/button";
+import { Logo } from "./components/logo";
 
 interface WidgetProps {
   organizationSlug: string;
@@ -52,7 +53,7 @@ export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
           onClick={() => setIsOpen(true)}
           className="fixed right-4 bottom-4 z-50"
         >
-          <MessageCircleHeart className="size-6" />
+          <Logo className="size-6" />
           Submit Feedback
         </Button>
       )}
