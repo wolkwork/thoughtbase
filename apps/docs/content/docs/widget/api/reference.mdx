@@ -9,10 +9,10 @@ The Thoughtbase widget exposes a JavaScript API that you can use to initialize t
 
 ## Functions
 
-### `initFeedbackWidget(config)`
+### `initWidget(config)`
 
 Initializes the widget on your page. This function must be called before using any other widget functions.
-
+  
 #### Parameters
 
 - `config` (object, required): Configuration object
@@ -26,7 +26,7 @@ Initializes the widget on your page. This function must be called before using a
 #### Example
 
 ```javascript
-window.initFeedbackWidget({
+window.thoughtbase.initWidget({
   organizationId: 'org-123',
   selector: '#my-button'
 });
@@ -41,7 +41,7 @@ window.initFeedbackWidget({
 
 ---
 
-### `feedbackWidget.identify(token)`
+### `thoughtbase.identify(token)`
 
 Identifies a user in the widget using an SSO token. This allows you to track which users submitted feedback and maintain user context.
 
@@ -59,7 +59,7 @@ Identifies a user in the widget using an SSO token. This allows you to track whi
 #### Example
 
 ```javascript
-window.feedbackWidget.identify('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+window.thoughtbase.identify('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
 ```
 
 #### Notes
@@ -81,11 +81,11 @@ console.error("Feedback Widget: Initialize widget before calling identify");
 
 ## Global Objects
 
-### `window.initFeedbackWidget`
+### `window.thoughtbase.initWidget`
 
 The initialization function is available on the `window` object after the widget script loads.
 
-### `window.feedbackWidget`
+### `window.thoughtbase.identify`
 
 An object containing widget functions, available after initialization:
 - `identify(token)`: Identify a user with an SSO token
@@ -94,7 +94,7 @@ An object containing widget functions, available after initialization:
 
 ### Initialization
 
-When `initFeedbackWidget` is called:
+When `initWidget` is called:
 1. A container element is created in the document body
 2. A Shadow DOM is attached to the container
 3. The widget React component is rendered inside the Shadow DOM
@@ -136,7 +136,7 @@ The widget requires:
 ```html
 <script src="https://app.thoughtbase.app/widget.js"></script>
 <script>
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationId: 'your-org-id'
   });
 </script>
@@ -148,7 +148,7 @@ The widget requires:
 <button id="feedback-btn">Give Feedback</button>
 <script src="https://app.thoughtbase.app/widget.js"></script>
 <script>
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationId: 'your-org-id',
     selector: '#feedback-btn'
   });
@@ -160,14 +160,14 @@ The widget requires:
 ```html
 <script src="https://app.thoughtbase.app/widget.js"></script>
 <script>
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationId: 'your-org-id'
   });
   
   // After user login
   async function onLogin(userId) {
     const token = await getSSOToken(userId);
-    window.feedbackWidget.identify(token);
+    window.thoughtbase.identify(token);
   }
 </script>
 ```

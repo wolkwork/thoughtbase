@@ -1,0 +1,202 @@
+---
+title: Advanced SSO Integration
+description: Advanced SSO integration with user metadata, avatars, and revenue tracking
+---
+
+## Overview
+
+Beyond basic user identification, you can enhance your SSO integration by including additional user information such as:
+- **User avatars** - Display user profile pictures in the portal
+- **Custom metadata** - Store any additional user data (plan type, preferences, etc.) This will be visibleonly in the admin dashboard.
+- **Revenue tracking** - Track customer lifetime value or subscription revenue, it's up to you how to use it! This will be visible only in the admin dashboard and is used to calculate the business value of ideas.
+
+This enables richer user experiences and better analytics in your Thoughtbase dashboard.
+
+## Advanced Token Payload
+
+Your SSO token can include the following optional fields:
+
+```json
+{
+  "id": "user-id-from-your-system", // Required
+  "email": "user@example.com", // Required
+  "name": "John Doe", // Required
+  "organizationId": "your-thoughtbase-org-id", // Required
+  "avatarUrl": "https://example.com/avatar.jpg", // Optional
+  "image": "https://example.com/avatar.jpg", // Optional
+  "metadata": { // Optional
+    "plan": "premium",
+    "signupDate": "2024-01-15",
+    "features": ["feature1", "feature2"], // Optional
+    "customField": "value" // Optional
+  },
+  "revenue": 99.99 // Optional
+}
+```
+
+## Complete Backend Example
+
+Here's a complete example showing how to generate an advanced SSO token with all optional fields:
+
+```typescript
+import { SignJWT } from "jose";
+import express from "express";
+
+const app = express();
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+  plan?: string;
+  signupDate?: Date;
+  monthlyRevenue?: number;
+  features?: string[];
+}
+
+app.post("/api/generate-sso-token", authenticateUser, async (req, res) => {
+  const { user } = req as { user: User };
+
+  const secret = new TextEncoder().encode(
+    process.env.THOUGHTBASE_SSO_SECRET
+  );
+
+  // Build metadata object with any custom fields
+  const metadata: Record<string, unknown> = {};
+  
+  if (user.plan) {
+    metadata.plan = user.plan;
+  }
+  
+  if (user.signupDate) {
+    metadata.signupDate = user.signupDate.toISOString();
+  }
+  
+  if (user.features) {
+    metadata.features = user.features;
+  }
+
+  // You can add any additional custom fields
+  metadata.accountStatus = "active";
+  metadata.lastLogin = new Date().toISOString();
+
+  const token = await new SignJWT({
+    sub: user.id, // or use 'id' - both work
+    email: user.email,
+    name: user.name,
+    avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`,
+    organizationId: process.env.THOUGHTBASE_ORG_ID,
+    metadata: metadata,
+    revenue: user.monthlyRevenue || 0,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(secret);
+
+  res.json({ token });
+});
+```
+
+## Metadata Examples
+
+The `metadata` field can contain any JSON-serializable data. Here are some common use cases:
+
+### Subscription Information
+
+```typescript
+const metadata = {
+  plan: "enterprise",
+  subscriptionTier: "pro",
+  billingCycle: "monthly",
+  subscriptionStartDate: "2024-01-15",
+  subscriptionEndDate: "2025-01-15",
+};
+```
+
+### User Preferences
+
+```typescript
+const metadata = {
+  language: "en",
+  timezone: "America/New_York",
+  theme: "dark",
+  notificationsEnabled: true,
+};
+```
+
+### Business Context
+
+```typescript
+const metadata = {
+  companyName: "Acme Corp",
+  companySize: "50-100",
+  industry: "SaaS",
+  role: "Product Manager",
+  department: "Engineering",
+};
+```
+
+### Complex Nested Objects
+
+```typescript
+const metadata = {
+  preferences: {
+    notifications: {
+      email: true,
+      push: false,
+      sms: false,
+    },
+    display: {
+      theme: "dark",
+      language: "en",
+    },
+  },
+  activity: {
+    lastLogin: new Date().toISOString(),
+    loginCount: 42,
+    featuresUsed: ["feature1", "feature2", "feature3"],
+  },
+  custom: {
+    nested: {
+      key: "value",
+      array: [1, 2, 3],
+      boolean: true,
+      number: 123,
+    },
+  },
+};
+```
+
+## Revenue Tracking
+
+The `revenue` field should be a number representing the user's revenue value. It can be monthly, yearly, or whatever you like:
+
+```typescript
+const token = await new SignJWT({
+  sub: user.id,
+  email: user.email,
+  name: user.name,
+  organizationId: process.env.THOUGHTBASE_ORG_ID,
+  revenue: calculateUserRevenue(user), // e.g., 99.99
+})
+  .setProtectedHeader({ alg: "HS256" })
+  .setIssuedAt()
+  .setExpirationTime("1h")
+  .sign(secret);
+```
+
+**Note**: Revenue is only visible in the admin dashboard.
+
+When many users upvoted an idea, the revenue for that idea will be calculated as the sum of all users' revenue. This can be used to sort ideas by business value.
+
+## Avatar URLs
+
+Avatar urls are optional, but if provided should be a fully qualified URL to an image. If none is provided, a nice default avatar will be generated.
+
+## Next Steps
+
+- Review the [Basic SSO Integration](/widget/guides/sso-integration) guide
+- Check the [API Reference](/widget/api/reference) for widget methods
+

@@ -6,7 +6,7 @@ import { member } from "~/lib/db/schema";
 /**
  * Subscription tier types
  */
-export type SubscriptionTier = "free" | "starter" | "business";
+export type SubscriptionTier = "free" | "start" | "business";
 
 /**
  * Permissions matrix mapping subscription tiers to feature limits
@@ -14,7 +14,7 @@ export type SubscriptionTier = "free" | "starter" | "business";
 export const PERMISSIONS_MATRIX: Record<SubscriptionTier, { maxAdmins: number | null }> =
   {
     free: { maxAdmins: 1 },
-    starter: { maxAdmins: 3 },
+    start: { maxAdmins: 3 },
     business: { maxAdmins: null }, // null means unlimited
   };
 
@@ -57,12 +57,11 @@ export async function getSubscriptionTier(
     // The product slug comes from the checkout configuration in auth.ts
     const productSlug = activeSubscription.product.name.toLowerCase();
 
-    if (productSlug === "starter") {
-      return "starter";
+    if (productSlug === "start") {
+      return "start";
     }
 
     if (productSlug === "business") {
-      // Map "growth" to "business" per user preference
       return "business";
     }
 

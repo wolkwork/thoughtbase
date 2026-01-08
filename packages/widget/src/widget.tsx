@@ -13,12 +13,12 @@ interface WidgetProps {
 }
 
 // Global state to hold the SSO token for the widget instance
-let ssoToken: string | null = null;
+let ssoToken: string | undefined = undefined;
 
 export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Force re-render when token changes (though identify is usually called once at start)
-  const [token, setToken] = useState<string | null>(ssoToken);
+  const [token, setToken] = useState<string | undefined>(ssoToken);
 
   useEffect(() => {
     // Expose setter to global scope for identify function
@@ -60,7 +60,7 @@ export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
         organizationSlug={organizationSlug}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        ssoToken={token || undefined} // Pass token to widget
+        ssoToken={token}
       />
     </>
   );
@@ -102,8 +102,8 @@ export function identify(token: string) {
 }
 
 if (typeof window !== "undefined") {
-  (window as any).initFeedbackWidget = initFeedbackWidget;
-  (window as any).feedbackWidget = {
+  (window as any).thoughtbase = {
     identify,
+    initWidget: initFeedbackWidget,
   };
 }

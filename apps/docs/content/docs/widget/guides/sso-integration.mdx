@@ -7,7 +7,6 @@ description: Set up Single Sign-On to identify users in the widget
 
 Single Sign-On (SSO) allows you to identify users who are already logged into your application. This enables you to:
 - Track which users submitted feedback
-- Show personalized content
 - Maintain user context across your app and the widget
 
 ## Setting Up SSO
@@ -24,19 +23,20 @@ Single Sign-On (SSO) allows you to identify users who are already logged into yo
 
 When a user logs into your application, generate a JWT token signed with your SSO secret:
 
-```javascript
-// Example (pseudo-code)
-const jwt = require('jsonwebtoken');
+```typescript
+import { SignJWT } from "jose";
 
-const ssoToken = jwt.sign(
-  {
-    userId: user.id,
-    email: user.email,
-    organizationId: 'your-org-id'
-  },
-  'your-sso-secret',
-  { expiresIn: '1h' }
-);
+const secret = new TextEncoder().encode("your-sso-secret");
+
+const ssoToken = await new SignJWT({
+  userId: user.id,
+  email: user.email,
+  organizationId: "your-org-id",
+})
+  .setProtectedHeader({ alg: "HS256" })
+  .setIssuedAt()
+  .setExpirationTime("1h")
+  .sign(secret);
 ```
 
 ### Step 3: Identify Users in the Widget
@@ -46,7 +46,7 @@ After initializing the widget and when a user logs in, call the identify functio
 ```html
 <script>
   // Initialize widget
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationId: 'your-organization-id-here'
   });
   
@@ -61,7 +61,7 @@ After initializing the widget and when a user logs in, call the identify functio
     .then(response => response.json())
     .then(data => {
       // Identify user in widget
-      window.feedbackWidget.identify(data.token);
+      window.thoughtbase.identify(data.token);
     });
   }
 </script>
@@ -85,24 +85,29 @@ The token should be signed with your SSO secret using HS256 algorithm.
 
 You'll need to create an endpoint in your backend to generate SSO tokens. Here's an example using Node.js:
 
-```javascript
-const jwt = require('jsonwebtoken');
-const express = require('express');
+```typescript
+import { SignJWT } from "jose";
+import express from "express";
+
 const app = express();
 
-app.post('/api/generate-sso-token', authenticateUser, (req, res) => {
+app.post("/api/generate-sso-token", authenticateUser, async (req, res) => {
   const { user } = req; // Your authenticated user
-  
-  const token = jwt.sign(
-    {
-      userId: user.id,
-      email: user.email,
-      organizationId: process.env.THOUGHTBASE_ORG_ID
-    },
-    process.env.THOUGHTBASE_SSO_SECRET, // Your SSO secret from Thoughtbase
-    { expiresIn: '1h' }
+
+  const secret = new TextEncoder().encode(
+    process.env.THOUGHTBASE_SSO_SECRET // Your SSO secret from Thoughtbase
   );
-  
+
+  const token = await new SignJWT({
+    userId: user.id,
+    email: user.email,
+    organizationId: process.env.THOUGHTBASE_ORG_ID,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(secret);
+
   res.json({ token });
 });
 ```
@@ -129,7 +134,7 @@ Here's a complete example of integrating the widget with SSO:
   <!-- Initialize widget -->
   <script>
     // Initialize widget with custom button
-    window.initFeedbackWidget({
+    window.thoughtbase.initWidget({
       organizationId: 'your-organization-id-here',
       selector: '#feedback-btn'
     });
@@ -147,8 +152,8 @@ Here's a complete example of integrating the widget with SSO:
         const { token } = await response.json();
         
         // Identify user in widget
-        if (window.feedbackWidget) {
-          window.feedbackWidget.identify(token);
+        if (window.thoughtbase) {
+          window.thoughtbase.identify(token);
         }
       } catch (error) {
         console.error('Failed to identify user:', error);
@@ -175,26 +180,12 @@ Here's a complete example of integrating the widget with SSO:
 
 - **Store secrets securely**: Use environment variables
 - **Rotate secrets regularly**: Change your SSO secret periodically
-- **Use different secrets**: Use different secrets for development and production
 
-## Troubleshooting
 
-### SSO Not Working
-
-1. **Verify your SSO secret** matches what's in your Thoughtbase dashboard
-2. **Check token format** - ensure it's a valid JWT
-3. **Verify token expiration** - tokens expire after the set time
-4. **Check browser console** for error messages
-5. **Ensure your backend endpoint** is accessible and working
-
-### Common Issues
-
-- **Token expired**: Generate a new token when the current one expires
-- **Invalid signature**: Verify your SSO secret is correct
-- **Missing fields**: Ensure token includes userId, email, and organizationId
 
 ## Next Steps
 
+- Learn about [Advanced SSO Integration](/widget/guides/sso-advanced) with metadata, avatars, and revenue tracking
 - Review the [API Reference](/widget/api/reference) for detailed function documentation
 - Test your SSO integration in a development environment
 - Monitor token generation and usage

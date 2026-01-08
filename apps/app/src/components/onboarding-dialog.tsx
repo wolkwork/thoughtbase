@@ -236,7 +236,7 @@ function InstallWidgetStep({ organizationSlug }: { organizationSlug: string }) {
   const installScript = `<script src="${scriptSrc}"></script>`;
 
   const initSnippet = `<script>
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationSlug: "${organizationSlug}",
   });
 </script>`;
@@ -245,7 +245,7 @@ function InstallWidgetStep({ organizationSlug }: { organizationSlug: string }) {
 
 <script src="${scriptSrc}"></script>
 <script>
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationSlug: "${organizationSlug}",
     selector: "#feedback-btn",
   });

@@ -1,77 +1,238 @@
 ---
 page: Terms
-pubDate: 2024-01-01
+pubDate: 2026-01-01
 ---
-This privacy policy sets out how Unwrapped AB collects, processes and uses your Personal Information through your use of our Services.
 
-### Definitions
+These Terms of Service ("Terms") govern your access to and use of Thoughtbase ("we," "our," or "us"), a software-as-a-service platform for collecting, managing, and prioritizing user feedback. By accessing or using our Services, you agree to be bound by these Terms.
 
-### DPO
+## 1. Definitions
 
-DPO means Data Protection Officer, and is the person specifically appointed by us to deal with your enquiries with respect to this privacy policy and your Personal Information.
+**Services** means the Thoughtbase platform, including but not limited to our web application, feedback widget, API, and any related services provided by Thoughtbase.
 
-Personal Information means any identifying information about you. This includes, but is not limited to, the following: cookies and usage data.
+**User** or **you** means any individual or entity that accesses or uses our Services.
 
-Services means all services provided by Michael Alexander Web Agency to you, including (but not limited to) this Website.
+**Account** means a user account created to access our Services.
 
-Website means this website and all websites, applications and communications that post a link to this Privacy Policy.
+**Organization** or **Workspace** means a workspace created by a user to organize feedback and manage team members.
 
-### Personal Information Collection
+**Content** means any data, text, information, feedback, ideas, comments, or other materials submitted through our Services.
 
-We only collect and use Personal Information to the extent necessary to provide you with the Services. We collect Personal Information for the Website to provide you with a better online experience.
+**Personal Information** means any information that can be used to identify an individual, including but not limited to name, email address, and usage data.
 
-### Personal Information Retention
+## 2. Acceptance of Terms
 
-We keep Personal Information for the shortest time necessary to provide you with Services and to meet all our legal and compliance obligations. To determine this retention period, we take into account (i) the nature of the Personal Information gathered; and (ii) the nature of our legal and compliance obligations. All Personal Information no longer required by us is destroyed and/or erased.
+By creating an account, accessing, or using our Services, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you may not use our Services.
 
-### Personal Data from Third Parties
+## 3. Description of Services
 
-We may, from time to time, obtain Personal Information from third parties to enable us to better tailor our Services to you (Third Party Personal Information). When we obtain Third Party Personal Information, we will notify you within one month. If we use or share Third Party Personal Information, we will notify you immediately.
+Thoughtbase provides a platform that enables you to:
 
-### Your Rights
+- Collect feedback and ideas from users through an embeddable widget
+- Organize and manage feedback in boards
+- Prioritize feedback and manage roadmaps
+- Publish changelogs and updates
+- Collaborate with team members
+- Integrate with third-party services (where available)
 
-With respect to Personal Information we hold, you have the following rights:
+## 4. Account Registration and Security
 
-*   Access: You may request from us access to your data that we hold on you.
+### 4.1 Account Creation
 
-    li
-*   Rectification: If the data we hold on you is inaccurate, you may request that we correct it. If the data we hold is incomplete, you may request that we complete it.
-*   Erasure: Subject to certain conditions, you may request that we erase all of the data we hold on you. li Restrictions: Subject to certain conditions, you may request that we restrict the processing of data we hold on you.
-*   Portability: Subject to certain conditions, you may request that we transfer all the data we hold on you to a third party (including yourself).
-*   Objections: Subject to certain conditions, you may object to us processing the data we hold on you.
+To use our Services, you must create an account by providing accurate and complete information. You are responsible for maintaining the confidentiality of your account credentials.
 
-### Social Media
+### 4.2 Account Responsibility
 
-You may choose to engage with our Services through a variety of social media sites and platforms, for example Facebook, Instagram and Twitter. When you interact with our Services through these social media platforms, you may allow us to receive Personal Information on how you are interacting with our Services. This will depend on your privacy settings on each social media site and platform. The data we are provided by you through your interaction with our Services on social media sites and platforms will be used by us subject to the terms of this privacy policy. Depending on your social media site’s privacy settings, your Personal Information may become public to a community of users if you choose to engage with our Services through these platforms. For further information on how you can customize your privacy settings on social media sites and how those sites handle your privacy, please refer to the privacy policy of each particular social media site.
+You are responsible for all activities that occur under your account. You agree to:
 
-### Minors
+- Notify us immediately of any unauthorized use of your account
+- Ensure that all information provided is accurate and up to date
+- Maintain the security of your account credentials
 
-We do not knowingly collect information on children under the age of 16 (“Child”). If you become aware that a Child has provided us with Personal Information, please contact us. If we become aware that we have collected Personal Information from a Child without their parent's verifiable authorization to access our Services, we will take steps to remove that information from our servers.
+### 4.3 Age Requirements
 
-### Third Party Links
+You must be at least 16 years old to use our Services. If you are under 16, you may not create an account or use our Services.
 
-Our website contains links to other third-party websites not owned or managed by Unwrapped. This privacy policy applies to this website only. If you click a link to a third-party website, the privacy policy of that website will apply. We highly recommend that you read the privacy policies of other websites as they may be different from ours.
+## 5. Subscription Plans and Payment
 
-### Payment Vendors
+### 5.1 Subscription Tiers
 
-You can make payments via our website. Our vendors are listed below:
+We offer various subscription plans, including:
 
-*   Paypal
+- **Free Plan**: Basic features with limited functionality
+- **Start Plan**: Enhanced features including custom domains and private boards
+- **Business Plan**: Advanced features including SSO, white-label options, and integrations
+- **Enterprise Plan**: Custom solutions with dedicated support
 
-Their privacy policy can be viewed [here](https://www.paypal.com/webapps/mpp/ua/privacy-full)
+### 5.2 Payment Processing
 
-### Merger, acquisition or asset sale
+Payments for subscription services are processed through Polar. By subscribing to a paid plan, you agree to Polar's terms of service and privacy policy. You can view Polar's privacy policy [here](https://polar.sh/legal/privacy).
 
-If we or our subsidiaries are involved in a merger, acquisition, or asset sale, your Personal Information may be transferred.
+### 5.3 Billing
 
-### Updates
+- Subscription fees are billed in advance on a monthly or annual basis, as selected
+- All fees are non-refundable except as required by law
+- We reserve the right to change our pricing with 30 days' notice
+- If payment fails, we may suspend or terminate your access to paid features
 
-We are constantly reviewing our privacy policy and procedures to ensure that they meet best practices. This policy was last updated on August 21, 2021.
+### 5.4 Cancellation
 
-### Contact us
+You may cancel your subscription at any time. Cancellation will take effect at the end of your current billing period. You will continue to have access to paid features until the end of the billing period.
 
-If you have any questions or suggestions about our privacy policy or want to know more information about Personal Information we hold, please contact us at support@unwrapped.design or write to us at Mariehamn, Åland Islands..
+## 6. User Content and Intellectual Property
 
-### Complaints
+### 6.1 Your Content
 
-If you believe that we have breached our obligations to you under this privacy policy or relevant privacy laws, please contact us at email@example If you are not satisfied with our response, you have the right to lodge a complaint at any time to your relevant authority.
+You retain all rights to Content you submit through our Services. By submitting Content, you grant us a worldwide, non-exclusive, royalty-free license to use, store, and display your Content solely for the purpose of providing our Services.
+
+### 6.2 Content Responsibility
+
+You are solely responsible for your Content. You represent and warrant that:
+
+- You have all necessary rights to submit the Content
+- Your Content does not violate any third-party rights
+- Your Content complies with applicable laws and regulations
+- Your Content does not contain malicious code, viruses, or harmful content
+
+### 6.3 Prohibited Content
+
+You may not submit Content that:
+
+- Is illegal, harmful, or violates any laws
+- Infringes on intellectual property rights
+- Contains spam, malware, or malicious code
+- Harasses, abuses, or threatens others
+- Violates privacy rights of others
+
+### 6.4 Content Removal
+
+We reserve the right to remove any Content that violates these Terms or is otherwise objectionable, at our sole discretion.
+
+## 7. Acceptable Use
+
+You agree not to:
+
+- Use our Services for any illegal purpose
+- Attempt to gain unauthorized access to our systems
+- Interfere with or disrupt the Services
+- Use automated systems to access the Services without permission
+- Reverse engineer, decompile, or disassemble any part of our Services
+- Use our Services to compete with us or build a similar service
+
+## 8. Third-Party Services and Integrations
+
+Our Services may integrate with third-party services (such as Zapier, Linear, or other integrations). Your use of third-party services is subject to their respective terms and conditions. We are not responsible for the availability, accuracy, or practices of third-party services.
+
+## 9. Data Protection and Privacy
+
+We collect and process Personal Information in accordance with our Privacy Policy. By using our Services, you consent to our collection and use of Personal Information as described in our Privacy Policy.
+
+## 10. Intellectual Property Rights
+
+### 10.1 Our Rights
+
+All rights, title, and interest in and to our Services, including all intellectual property rights, remain with Thoughtbase and our licensors.
+
+### 10.2 License to Use
+
+We grant you a limited, non-exclusive, non-transferable license to access and use our Services for your internal business purposes, subject to these Terms.
+
+## 11. Service Availability and Modifications
+
+### 11.1 Availability
+
+We strive to maintain high availability of our Services but do not guarantee uninterrupted access. We may perform maintenance, updates, or modifications that temporarily affect availability.
+
+### 11.2 Modifications to Services
+
+We reserve the right to modify, suspend, or discontinue any part of our Services at any time, with or without notice.
+
+## 12. Termination
+
+### 12.1 Termination by You
+
+You may terminate your account at any time by contacting us or using account deletion features (where available).
+
+### 12.2 Termination by Us
+
+We may suspend or terminate your account if:
+
+- You violate these Terms
+- You fail to pay subscription fees
+- You engage in fraudulent or illegal activity
+- We discontinue the Services
+
+### 12.3 Effect of Termination
+
+Upon termination:
+
+- Your right to access and use the Services will immediately cease
+- We may delete your account and Content after a reasonable retention period
+- You remain responsible for any fees incurred before termination
+
+## 13. Disclaimers and Limitation of Liability
+
+### 13.1 Disclaimer of Warranties
+
+OUR SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+### 13.2 Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THOUGHTBASE SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+
+## 14. Indemnification
+
+You agree to indemnify and hold harmless Thoughtbase, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of:
+
+- Your use of the Services
+- Your violation of these Terms
+- Your violation of any third-party rights
+- Your Content
+
+## 15. Dispute Resolution
+
+### 15.1 Governing Law
+
+These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
+
+### 15.2 Dispute Resolution
+
+Any disputes arising out of or relating to these Terms or the Services shall be resolved through binding arbitration in accordance with [Your Arbitration Rules], except where prohibited by law.
+
+## 16. Changes to Terms
+
+We reserve the right to modify these Terms at any time. We will notify you of material changes by:
+
+- Posting the updated Terms on our website
+- Sending an email to the address associated with your account
+- Displaying a notice within the Services
+
+Your continued use of the Services after such modifications constitutes acceptance of the updated Terms.
+
+## 17. Miscellaneous
+
+### 17.1 Entire Agreement
+
+These Terms, together with our Privacy Policy, constitute the entire agreement between you and Thoughtbase regarding the Services.
+
+### 17.2 Severability
+
+If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full effect.
+
+### 17.3 Assignment
+
+You may not assign or transfer these Terms or your account without our prior written consent. We may assign these Terms without restriction.
+
+### 17.4 Waiver
+
+Our failure to enforce any provision of these Terms does not constitute a waiver of that provision.
+
+## 18. Contact Information
+
+If you have any questions about these Terms, please contact us at:
+
+- Email: support@thoughtbase.app
+- Website: https://thoughtbase.app
+
+## 19. Effective Date
+
+These Terms were last updated on January 1, 2024, and are effective as of that date.

@@ -12,7 +12,7 @@ Instead of the default floating button, you can use your own button to open the 
 <button id="feedback-button">Give Feedback</button>
 
 <script>
-  window.initFeedbackWidget({
+  window.thoughtbase.initWidget({
     organizationId: 'your-organization-id-here',
     selector: '#feedback-button'  // CSS selector for your button
   });
@@ -25,56 +25,6 @@ When users click your button, the widget will open. The default floating button 
 
 ### Style Isolation
 
-- The widget's styles are isolated from your website
-- Your website's styles won't affect the widget
-- The widget maintains consistent appearance across different sites
+- The widget's styles are in a shadow DOM, isolated from your website
+- Your website's styles won't affect the widget and vice versa
 
-## Widget Behavior
-
-### Default Behavior
-
-- The widget appears as a floating button in the bottom-right corner
-- Clicking the button opens a modal overlay with the widget
-- Users can switch between Feedback, Roadmap, and Updates tabs
-- The widget closes when clicking outside or using the close button
-
-### With Custom Selector
-
-- The default floating button is hidden
-- Only your custom button triggers the widget
-- All other behavior remains the same
-
-## Best Practices
-
-### Placement
-
-- Place the widget on pages where users are most likely to have feedback
-- Consider using a custom button that matches your site's design
-- Don't place it where it might interfere with important content
-
-### User Experience
-
-- Make it easy to find (but not intrusive)
-- Consider showing the widget after users have had time to use your product
-- Use custom buttons that fit naturally into your design
-
-### Performance
-
-- Load the widget script asynchronously if possible
-- Don't block page rendering
-- Consider lazy-loading the widget until user interaction
-
-## Troubleshooting
-
-### Widget Not Appearing
-
-1. **Check the browser console** for any JavaScript errors
-2. **Verify your Organization ID** is correct
-3. **Ensure the script loaded** - check the Network tab
-4. **Check for ad blockers** that might block the widget
-
-### Styling Issues
-
-- The widget uses Shadow DOM, so it should not conflict with your styles
-- If you see styling issues, check browser compatibility
-- The widget adapts to different screen sizes automatically

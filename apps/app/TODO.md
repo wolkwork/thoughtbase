@@ -1,11 +1,8 @@
 MVP:
 
-- Docs walkthrough/check
 - Terms & Privacy
-- Decide and fix pricing everywhere
-- Slow AF
+- Slow AF (Neon?)
 - Fill board with ideas
-- Polar environment variables
 
 Future:
 
