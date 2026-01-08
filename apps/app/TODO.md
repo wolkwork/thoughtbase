@@ -1,44 +1,47 @@
 MVP:
 
-- Terms & Privacy
 - Slow AF (Neon?)
 - Fill board with ideas
+- Remove Archived ideas from portal landing
 
 Future:
+
+Features:
+
+- Dark mode
+- Add screenshots to ideas
+- Customization (color theme)
+- Ban users
+- Email "subscribers" of ideas
+- AI Assistant for changelogs
+- Report users?
+- Comment "threads"
+- Notifications system (email, in-dashboard, in-portal?)
+- Deduplication
+- Multi lingual
+- Custom domain DNS configs
+- Multiple boards/topics
+- Zapier integration
+- Social login
+- Customize status names and colors
+- Merge (similar) ideas
+
+Bugs/Internal:
 
 - Resume application and refresh router after succesful subscription
 - Status button doesn't work when deselecting everything
 - Pending invitations also show accepted invitations
 - Show toast that email verification succeeded
 - Only allow users to view their own pending ideas
-- Fix dark mode
 - Fix roadmap drag and drop
 - Invitation emails with resend fix styling and flow to be better
 - Email verification
 - Thank you screen after submission (styling)
-- Settings->Branding styling
 - Disallow liking closed ideas
 - Auto-like own ideas
-- Add screenshots to ideas
 - Auto approve
-- Customization (color theme)
-- Ban users
-- Email "subscribers" of ideas
-- Integrations (Linear?)
-- AI Assistant
-- Report
-- Comment "threads"
-- Notifications
-- Deduplication
-- Multi lingual
-- Custom domain DNS configs
-- Multiple boards/topics
-- Zapier integrations
-- Social login
 - Delete workspace/org
-- Customize status names and colors
 - Make widget accessible with dialog etc.
-- Merge (similar) ideas
 - Import from Canny / Others
 
 # Pricing plans

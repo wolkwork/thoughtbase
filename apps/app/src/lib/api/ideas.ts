@@ -138,6 +138,7 @@ export const $getIdeasFeed = createServerFn({ method: "GET" })
     const whereConditions = [
       eq(idea.organizationId, organizationId),
       not(eq(idea.status, "pending")),
+      not(eq(idea.status, "closed")),
     ];
 
     if (data.status) {
