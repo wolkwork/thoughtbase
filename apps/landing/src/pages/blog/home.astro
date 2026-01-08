@@ -21,8 +21,8 @@ const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
 ---
 
 <BaseLayout>
-  <section>
-    <Wrapper variant="standard" class="pt-32 pb-4">
+  <section class="grow flex flex-col">
+    <Wrapper variant="standard" class="pt-32 pb-4 flex-1 grow">
       <div class="max-w-xl text-balance">
         <Text
           tag="h1"
@@ -32,8 +32,8 @@ const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
           Thoughts, Typed Loudly
         </Text>
         <Text tag="p" variant="textBase" class="mt-4 text-base-500">
-            Unfiltered musings, unsolicited advice, and semi-coherent ramblings. Proceed with curiosity (or caffeine).
-
+          Unfiltered musings, unsolicited advice, and semi-coherent ramblings.
+          Proceed with curiosity (or caffeine).
         </Text>
       </div>
       <div class="flex items-center mt-8 gap-2">
@@ -65,5 +65,4 @@ const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
       </div>
     </Wrapper>
   </section>
-  <Subscribe />
 </BaseLayout>

@@ -24,7 +24,7 @@ const { hideNav = false, hideFooter = false } = Astro.props;
   <body class="relative flex flex-col bg-white min-h-svh">
     {!hideNav && <Navigation />}
 
-    <main class="grow">
+    <main class="grow flex flex-col">
       <slot />
     </main>
 

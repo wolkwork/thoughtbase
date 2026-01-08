@@ -16,7 +16,7 @@ const team = await getEntry("team", frontmatter.team);
 import { getCollection } from "astro:content";
 const allPosts = await getCollection("posts");
 const relatedPosts = allPosts.filter((post) =>
-  post.data.tags.some((tag) => frontmatter.tags.includes(tag))
+  post.data.tags?.some((tag) => frontmatter.tags?.includes(tag))
 );
 ---
 
@@ -74,7 +74,7 @@ const relatedPosts = allPosts.filter((post) =>
                 </a>
                 <Text tag="p" variant="textXS" class="text-base-500 ">
                   <span class="">
-                    Written in
+                    Written on
                     <span class="font-medium  text-base-500">
                       <time
                         datetime={new Date(frontmatter.pubDate).toISOString()}
@@ -98,26 +98,23 @@ const relatedPosts = allPosts.filter((post) =>
                   </span>
                   <span class="block">
                     {team.data.role}
-                    in
-                    {frontmatter.tags.map((tag) => (
+                    {frontmatter.tags && (
                       <>
-                        <a href={`/blog/tags/${tag}`} class="capitalize ">
-                          {tag}
-                        </a>
+                        in
+                        {frontmatter.tags.map((tag) => (
+                          <>
+                            <a href={`/blog/tags/${tag}`} class="capitalize ">
+                              {tag}
+                            </a>
+                          </>
+                        ))}
                       </>
-                    ))}
+                    )}
                   </span>
                 </Text>
               </div>
             )
           }
-        </div>
-
-        <div class="flex flex-col mt-12 gap-2">
-          <Text tag="p" variant="textXS" class="text-base-500">
-            Share this article:
-          </Text>
-          <ShareButtons description={frontmatter.description} />
         </div>
       </div>
     </Wrapper>

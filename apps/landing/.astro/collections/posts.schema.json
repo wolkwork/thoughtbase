@@ -60,8 +60,7 @@
         "pubDate",
         "description",
         "team",
-        "image",
-        "tags"
+        "image"
       ],
       "additionalProperties": false
     }

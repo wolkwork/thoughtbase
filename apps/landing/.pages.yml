@@ -5,7 +5,7 @@ media:
   label: Images
   input: src/images
   output: src/images
-  path: ""            # start at src/images
+  path: "" # start at src/images
   extensions: [png, jpg, jpeg, webp, svg]
 
 settings:
@@ -26,9 +26,9 @@ content:
       fields: [customer, partnership]
       sort: [customer]
     fields:
-      - { name: customer,    label: Customer, type: string, required: true }
-      - { name: bgColor,     label: BG Color, type: string }
-      - { name: ctaTitle,    label: CTA Title, type: string }
+      - { name: customer, label: Customer, type: string, required: true }
+      - { name: bgColor, label: BG Color, type: string }
+      - { name: ctaTitle, label: CTA Title, type: string }
       - { name: testimonial, label: Testimonial, type: text }
       - { name: partnership, label: Partnership, type: string }
 
@@ -47,7 +47,7 @@ content:
         type: object
         list: true
         fields:
-          - { name: title,   label: Title,   type: string }
+          - { name: title, label: Title, type: string }
           - { name: content, label: Content, type: text }
 
       - name: results
@@ -63,7 +63,7 @@ content:
         type: object
         list: true
         fields:
-          - { name: key,   label: Key,   type: string }
+          - { name: key, label: Key, type: string }
           - { name: value, label: Value, type: string }
 
       - name: logo
@@ -91,7 +91,7 @@ content:
       fields: [integration, email]
       sort: [integration]
     fields:
-      - { name: email,       label: Contact Email, type: string }
+      - { name: email, label: Contact Email, type: string }
       - { name: integration, label: Integration, type: string, required: true }
       - { name: description, label: Description, type: text }
 
@@ -107,7 +107,7 @@ content:
         fields:
           - { name: title, label: Title, type: string }
           - { name: value, label: Value, type: string }
-          - { name: url,   label: URL,   type: string }
+          - { name: url, label: URL, type: string }
 
       - name: logo
         label: Logo
@@ -139,10 +139,10 @@ content:
       fields: [page, category]
       sort: [page]
     fields:
-      - { name: iconId,     label: Icon ID, type: string }
-      - { name: page,       label: Page, type: string, required: true }
-      - { name: description,label: Description, type: text }
-      - { name: category,   label: Category, type: string }
+      - { name: iconId, label: Icon ID, type: string }
+      - { name: page, label: Page, type: string, required: true }
+      - { name: description, label: Description, type: text }
+      - { name: category, label: Category, type: string }
       - name: keywords
         label: Keywords
         type: string
@@ -154,7 +154,7 @@ content:
         list: true
         fields:
           - { name: question, label: Question, type: string }
-          - { name: answer,   label: Answer,   type: text }
+          - { name: answer, label: Answer, type: text }
       - { name: body, label: Body, type: rich-text }
 
   # ---------------------
@@ -171,9 +171,9 @@ content:
       sort: [pubDate]
       default: { sort: pubDate, order: desc }
     fields:
-      - { name: page,        label: Page, type: string, required: true }
+      - { name: page, label: Page, type: string, required: true }
       - { name: description, label: Description, type: text }
-      - { name: pubDate,     label: Publication Date, type: date }
+      - { name: pubDate, label: Publication Date, type: date }
       - name: image
         label: Image
         type: object
@@ -198,9 +198,9 @@ content:
       fields: [page, pubDate]
       sort: [page]
     fields:
-      - { name: page,    label: Page, type: string, required: true }
+      - { name: page, label: Page, type: string, required: true }
       - { name: pubDate, label: Publication Date, type: date }
-      - { name: body,    label: Body, type: rich-text }
+      - { name: body, label: Body, type: rich-text }
 
   # ---------------------
   # TEAM
@@ -217,7 +217,7 @@ content:
     fields:
       - { name: name, label: Name, type: string, required: true }
       - { name: role, label: Role, type: string }
-      - { name: bio,  label: Bio,  type: text }
+      - { name: bio, label: Bio, type: text }
       - name: image
         label: Image
         type: object
@@ -231,10 +231,10 @@ content:
         label: Socials
         type: object
         fields:
-          - { name: twitter,  label: Twitter,  type: string }
-          - { name: website,  label: Website,  type: string }
+          - { name: twitter, label: Twitter, type: string }
+          - { name: website, label: Website, type: string }
           - { name: linkedin, label: LinkedIn, type: string }
-          - { name: email,    label: Email,    type: string }
+          - { name: email, label: Email, type: string }
       - { name: body, label: Body, type: rich-text }
 
   # ---------------------
@@ -251,10 +251,10 @@ content:
       sort: [pubDate]
       default: { sort: pubDate, order: desc }
     fields:
-      - { name: title,       label: Title, type: string, required: true }
-      - { name: pubDate,     label: Publication Date, type: date }
+      - { name: title, label: Title, type: string, required: true }
+      - { name: pubDate, label: Publication Date, type: date }
       - { name: description, label: Description, type: text }
-      - { name: team,        label: Team (author), type: string }
+      - { name: team, label: Team (author), type: string }
       - name: image
         label: Cover Image
         type: object
@@ -264,5 +264,5 @@ content:
             type: image
             options: { media: images, path: blog }
           - { name: alt, label: Alt text, type: string }
-      - { name: tags, label: Tags, type: string, list: true }
+      - { name: tags, label: Tags, type: string, list: true, required: false }
       - { name: body, label: Body, type: rich-text }
