@@ -14,7 +14,7 @@ import {
   $updateIdeaStatus,
 } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
-import { StatusBadge } from "./status-badge";
+import { IdeaStatus, StatusPill } from "./status-badge";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -403,19 +403,13 @@ export function IdeaDetail({
           <Select value={idea.status} onValueChange={handleUpdateStatus}>
             <SelectTrigger className="w-full" aria-label="Status">
               <SelectValue>
-                <StatusBadge
-                  status={idea.status}
-                  className="text-muted-foreground text-sm font-medium"
-                />
+                <StatusPill variant={idea.status as IdeaStatus} />
               </SelectValue>
             </SelectTrigger>
             <SelectContent align="start">
               {STATUS_OPTIONS.map((status) => (
                 <SelectItem key={status.slug} value={status.slug}>
-                  <StatusBadge
-                    status={status.slug}
-                    className="text-muted-foreground text-sm font-medium"
-                  />
+                  <StatusPill variant={status.slug as IdeaStatus} />
                 </SelectItem>
               ))}
             </SelectContent>

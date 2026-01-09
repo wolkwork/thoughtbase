@@ -77,13 +77,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        reviewing: "bg-orange-50 text-orange-500 hover:bg-orange-50/90",
-        planned: "bg-sky-50 text-sky-500 hover:bg-sky-50/90",
-        in_progress: "bg-fuchsia-50 text-fuchsia-500 hover:bg-fuchsia-50/90",
-        completed: "bg-emerald-50 text-emerald-500 hover:bg-emerald-50/90",
-        closed: "bg-gray-50 text-gray-500 hover:bg-gray-50/90",
-        pending: "bg-yellow-50 text-yellow-600 hover:bg-yellow-50/90",
-        unknown: "bg-gray-50 text-gray-500 hover:bg-gray-50/90",
+        reviewing:
+          "bg-orange-50 text-orange-500 hover:bg-orange-50/90 hover:text-orange-500",
+        planned: "bg-sky-50 text-sky-500 hover:bg-sky-50/90 hover:text-sky-500",
+        in_progress:
+          "bg-fuchsia-50 text-fuchsia-500 hover:bg-fuchsia-50/90 hover:text-fuchsia-500",
+        completed:
+          "bg-emerald-50 text-emerald-500 hover:bg-emerald-50/90 hover:text-emerald-500",
+        closed: "bg-gray-50 text-gray-500 hover:bg-gray-50/90 hover:text-gray-500",
+        pending:
+          "bg-yellow-50 text-yellow-600 hover:bg-yellow-50/90 hover:text-yellow-600",
+        unknown: "bg-gray-50 text-gray-500 hover:bg-gray-50/90 hover:text-gray-500",
       } satisfies Record<IdeaStatus | "unknown", string>,
     },
     defaultVariants: {
