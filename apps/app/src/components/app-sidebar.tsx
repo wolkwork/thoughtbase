@@ -355,7 +355,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
       <FeedbackWidget
         isOpen={widgetOpen}
         onClose={() => setWidgetOpen(false)}
-        organizationSlug="wolk"
+        organizationSlug="feedback"
       />
     </Sidebar>
   );
