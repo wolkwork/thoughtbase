@@ -447,7 +447,7 @@ function CustomizeBrandingStep({ organizationId }: { organizationId?: string }) 
 function ShareBoardStep({ orgSlug }: { orgSlug: string }) {
   const location = useLocation();
   const url = new URL(location.url);
-  const boardUrl = `${url.protocol}//${orgSlug}.${url.host}`;
+  const boardUrl = `${url.protocol}//${orgSlug}.thoughtbase.app`;
 
   return (
     <div className="space-y-6">
