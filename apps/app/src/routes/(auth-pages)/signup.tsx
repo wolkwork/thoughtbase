@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { LoaderCircle, MessageCircleHeart } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
-import { SignInSocialButton } from "~/components/sign-in-social-button";
+import { Logo } from "~/components/logo";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -64,8 +64,8 @@ function SignupForm() {
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a href="#" className="flex flex-col items-center gap-2 font-medium">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                <MessageCircleHeart className="size-6" />
+              <div className="mb-2 flex size-10 items-center justify-center">
+                <Logo />
               </div>
               <span className="sr-only">Thoughtbase</span>
             </a>
@@ -121,12 +121,12 @@ function SignupForm() {
               {isPending ? "Signing up..." : "Sign up"}
             </Button>
           </div>
-          <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+          {/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
               Or
             </span>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          </div> */}
+          {/* <div className="grid gap-4 sm:grid-cols-2">
             <SignInSocialButton
               provider="github"
               callbackURL={redirectUrl}
@@ -154,7 +154,7 @@ function SignupForm() {
                 </svg>
               }
             />
-          </div>
+          </div> */}
         </div>
       </form>
 
