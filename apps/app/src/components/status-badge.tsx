@@ -1,3 +1,5 @@
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 import {
   CheckCircle2,
   Circle,
@@ -7,6 +9,7 @@ import {
   XCircle,
   type LucideIcon,
 } from "lucide-react";
+import * as React from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { cn } from "~/lib/utils";
 
@@ -67,4 +70,52 @@ export function StatusBadge({
   }
 
   return content;
+}
+
+const buttonVariants = cva(
+  "text-xs font-medium rounded-full flex items-center px-2.5 py-0.5 h-5 whitespace-nowrap w-fit",
+  {
+    variants: {
+      variant: {
+        reviewing: "bg-orange-50 text-orange-500 hover:bg-orange-50/90",
+        planned: "bg-sky-50 text-sky-500 hover:bg-sky-50/90",
+        in_progress: "bg-fuchsia-50 text-fuchsia-500 hover:bg-fuchsia-50/90",
+        completed: "bg-emerald-50 text-emerald-500 hover:bg-emerald-50/90",
+        closed: "bg-gray-50 text-gray-500 hover:bg-gray-50/90",
+        pending: "bg-yellow-50 text-yellow-600 hover:bg-yellow-50/90",
+        unknown: "bg-gray-50 text-gray-500 hover:bg-gray-50/90",
+      } satisfies Record<IdeaStatus | "unknown", string>,
+    },
+    defaultVariants: {
+      variant: "unknown",
+    },
+  },
+);
+
+export function StatusPill({
+  className,
+  variant,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"span"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  }) {
+  const Comp = asChild ? Slot : "span";
+
+  return (
+    <Comp
+      data-slot="status-pill"
+      className={cn(buttonVariants({ variant, className }))}
+      {...props}
+    >
+      {getStatusFromVariant(variant)}
+    </Comp>
+  );
+}
+
+function getStatusFromVariant(
+  variant: IdeaStatus | "unknown" | null = "unknown",
+): string {
+  return STATUSES[(variant || "unknown") as IdeaStatus]?.label || "Unknown";
 }

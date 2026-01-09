@@ -1,33 +1,14 @@
-import { LightbulbIcon } from "@phosphor-icons/react";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import {
-  createFileRoute,
-  Link,
-  useLoaderData,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { HeartIcon } from "@phosphor-icons/react";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, useLoaderData, useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ArrowDown, ArrowUp, Flame } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AuthForm } from "~/components/auth-form";
-import { CreateIdeaDialog } from "~/components/create-idea-dialog";
-import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
-import { ProfileForm } from "~/components/profile-form";
-import { StatusBadge } from "~/components/status-badge";
+import { CommentBadge } from "~/components/engagement-badges";
+import { IdeaStatus, StatusPill } from "~/components/status-badge";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogContent } from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,21 +16,19 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { UserAvatar } from "~/components/user-avatar";
-import { $getIdeasFeed, $getPublicCounts, $toggleReaction } from "~/lib/api/ideas";
+import { $getIdeasFeed, $toggleReaction } from "~/lib/api/ideas";
+import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/org/$slug/")({
   component: OrganizationIndexPage,
 });
 
 function OrganizationIndexPage() {
-  const { org, user, profile } = useLoaderData({ from: "/org/$slug" });
+  const { org, user } = useLoaderData({ from: "/org/$slug" });
   const router = useRouter();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const [loginOpen, setLoginOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "top" | "trending">("newest");
 
   const {
@@ -93,11 +72,6 @@ function OrganizationIndexPage() {
 
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const { data: counts } = useQuery({
-    queryKey: ["public-counts", org.id],
-    queryFn: () => $getPublicCounts({ data: { organizationId: org.id } }),
-  });
 
   const { mutate: toggleReaction } = useMutation({
     mutationFn: $toggleReaction,
@@ -171,25 +145,9 @@ function OrganizationIndexPage() {
     toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
   };
 
-  const handleSubmitClick = () => {
-    if (!user) {
-      setLoginOpen(true);
-    } else if (!profile) {
-      setProfileOpen(true);
-    } else {
-      setCreateOpen(true);
-    }
-  };
-
   const handleLoginSuccess = () => {
     setLoginOpen(false);
     router.invalidate();
-  };
-
-  const handleProfileSuccess = () => {
-    setProfileOpen(false);
-    router.invalidate();
-    setCreateOpen(true); // Auto open create after profile setup
   };
 
   const getSortLabel = (sort: typeof sortBy) => {
@@ -205,10 +163,10 @@ function OrganizationIndexPage() {
 
   return (
     <>
-      <div className="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 border-r border-l lg:grid-cols-3">
+      <div className="mx-auto w-full max-w-3xl flex-1 border-r border-l">
         {/* Main Content */}
-        <div className="space-y-6 border-r py-8 lg:col-span-2">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="py-8">
+          <div className="flex flex-col justify-between gap-4 border-b pb-8 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2 px-6">
               <h1 className="text-2xl font-bold">All Feedback</h1>
             </div>
@@ -266,43 +224,57 @@ function OrganizationIndexPage() {
                   params={{ slug: org.slug, ideaId: idea.id }}
                   className="block"
                 >
-                  <div className="group flex flex-col items-start gap-4 p-6 transition-colors">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="group-hover:text-primary mb-1 font-medium transition-colors">
-                        {idea.title}
-                      </h3>
-                      <p className="text-muted-foreground mb-3 line-clamp-3 text-sm text-ellipsis">
-                        {idea.description}
-                      </p>
+                  <div className="group flex gap-6 p-6 py-8 transition-colors">
+                    <div>
+                      <button
+                        onClick={(e) => handleUpvote(e, idea)}
+                        className={cn(
+                          "hover:bg-accent text-muted-foreground flex aspect-6/5 flex-col items-center gap-1 rounded-sm border px-3 py-1.5 pt-2 text-xs transition-colors",
+                          "cursor-pointer",
+                        )}
+                      >
+                        <HeartIcon
+                          weight={hasReacted ? "fill" : "bold"}
+                          className={cn("size-4", hasReacted && "fill-red-500")}
+                        />
+                        <span className="mt-px font-mono text-xs font-medium">
+                          {idea.reactionCount}
+                        </span>
+                      </button>
                     </div>
-
-                    <div className="flex w-full items-center gap-3">
-                      <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
-                        {/* TODO: fix */}
-                        {/* @ts-expect-error - user is not typed */}
-                        <UserAvatar user={idea.author} />
-                        <div className="flex flex-col gap-0.5">
-                          <div className="text-foreground flex items-center gap-2 font-medium">
-                            <span>
-                              {"name" in idea.author ? idea.author.name : "Unknown"}
-                            </span>
-                          </div>
-                          <span className="text-xs">
-                            {format(new Date(idea.createdAt), "MMM d, yyyy")}
-                          </span>
-                        </div>
+                    <div className="flex flex-1 flex-col items-start gap-4">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="group-hover:text-primary mb-1 font-medium transition-colors">
+                          {idea.title}
+                        </h3>
+                        <p className="text-muted-foreground mb-3 line-clamp-3 text-sm text-ellipsis">
+                          {idea.description}
+                        </p>
                       </div>
 
-                      <div className="ml-auto flex gap-1.5">
-                        <StatusBadge showLabel={false} status={idea.status} />
+                      <div className="flex w-full items-center gap-3">
+                        <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
+                          {/* TODO: fix */}
+                          {/* @ts-expect-error - user is not typed */}
+                          <UserAvatar user={idea.author} />
+                          <div className="flex flex-col gap-0.5">
+                            <div className="text-foreground flex items-center gap-2 font-medium">
+                              <span>
+                                {"name" in idea.author ? idea.author.name : "Unknown"}
+                              </span>
+                            </div>
+                            <span className="text-xs">
+                              {format(new Date(idea.createdAt), "MMM d, yyyy")}
+                            </span>
+                          </div>
+                        </div>
 
-                        <CommentBadge count={idea.commentCount} />
+                        <div className="ml-auto flex items-center gap-1.5">
+                          {/* TODO: narrow types */}
+                          <StatusPill variant={idea.status as IdeaStatus} />
 
-                        <LikeBadge
-                          count={idea.reactionCount}
-                          hasReacted={hasReacted}
-                          onClick={(e) => handleUpvote(e, idea)}
-                        />
+                          <CommentBadge count={idea.commentCount} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -336,27 +308,6 @@ function OrganizationIndexPage() {
             ) : null}
           </div>
         </div>
-
-        {/* Sidebar */}
-        <div className="sticky top-16 h-fit space-y-6 px-6 py-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <LightbulbIcon className="size-5" weight="bold" />
-              <h3 className="font-medium">Got an idea?</h3>
-            </div>
-
-            <Button className="w-full" onClick={handleSubmitClick}>
-              Submit an idea
-            </Button>
-          </div>
-
-          <div className="text-muted-foreground bg-muted/20 border-t py-3 text-center text-xs">
-            Powered by{" "}
-            <a href="https://thoughtbase.app" className="font-medium">
-              Thoughtbase
-            </a>
-          </div>
-        </div>
       </div>
 
       {/* Submission Flow Dialogs */}
@@ -370,35 +321,6 @@ function OrganizationIndexPage() {
           />
         </DialogContent>
       </Dialog>
-
-      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Complete Profile</DialogTitle>
-            <DialogDescription>
-              Please set your display name to continue.
-            </DialogDescription>
-          </DialogHeader>
-          <ProfileForm
-            orgId={org.id}
-            initialName={user?.name || ""}
-            onSuccess={handleProfileSuccess}
-          />
-        </DialogContent>
-      </Dialog>
-
-      <CreateIdeaDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        organizationId={org.id}
-        orgSlug={org.slug}
-        onSuccess={(newIdea) => {
-          navigate({
-            to: "/org/$slug/$ideaId",
-            params: { slug: org.slug, ideaId: newIdea.id },
-          });
-        }}
-      />
     </>
   );
 }

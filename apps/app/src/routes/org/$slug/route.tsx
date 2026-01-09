@@ -71,11 +71,11 @@ export const Route = createFileRoute("/org/$slug")({
 });
 
 function PublicLayout() {
-  const { org, user } = Route.useLoaderData();
+  const { org, user, profile } = Route.useLoaderData();
 
   return (
     <div className="bg-background text-foreground relative flex min-h-screen flex-col">
-      <PublicHeader org={org} user={user} />
+      <PublicHeader org={org} user={user} profile={profile} />
       <Outlet />
     </div>
   );
