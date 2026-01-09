@@ -9,18 +9,19 @@ interface SubmitViewProps {
 }
 
 export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description) return;
+    if (!description || !title) return;
 
     setIsPending(true);
     try {
       await createWidgetIdea({
-        title: description.slice(0, 50),
+        title,
         description,
         organizationSlug,
         token: ssoToken,
@@ -58,27 +59,33 @@ export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-8">
+    <div className="flex flex-1 flex-col">
       <div className="border-b px-6 pb-6">
         <h2 className="text-2xl font-bold">Tell us your ideas</h2>
         <p className="text-muted-foreground">We'd love to hear them</p>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-1 flex-col gap-8 px-6 pb-6"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-1 flex-col pb-6">
+        <textarea
+          aria-label="Idea title"
+          placeholder="Title of your idea..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="placeholder:text-muted-foreground field-sizing-content w-full resize-none text-base outline-none md:text-sm px-6 border-b py-6"
+          required
+        />
+
         <textarea
           aria-label="Idea description"
           placeholder="Type your idea here..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="placeholder:text-muted-foreground field-sizing-content w-full resize-none text-base outline-none md:text-sm"
+          className="placeholder:text-muted-foreground field-sizing-content w-full resize-none text-base outline-none md:text-sm px-6 py-6"
           required
         />
 
-        {description.length > 0 && (
-          <div className="animate-in fade-in mt-auto pt-2 duration-200">
+        {description.length > 0 && title.length > 0 && (
+          <div className="animate-in fade-in mt-auto duration-200 px-6 pt-2">
             <Button
               type="submit"
               className="w-full"
