@@ -27,7 +27,7 @@ const getAuthConfig = createServerOnlyFn(() => {
     telemetry: {
       enabled: false,
     },
-    trustedOrigins: [getBaseUrl()],
+    trustedOrigins: [getBaseUrl(), "http://*.thoughtbase.localhost:3000"],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {

@@ -312,17 +312,7 @@ export function IdeaDetail({
                       )}
 
                       <div className="bg-muted h-8 w-8 shrink-0 overflow-hidden rounded-full">
-                        {comment.author.image ? (
-                          <img
-                            src={comment.author.image}
-                            alt={comment.author.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-[10px]">
-                            {comment.author.name.charAt(0)}
-                          </div>
-                        )}
+                        <UserAvatar user={comment.author} />
                       </div>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
