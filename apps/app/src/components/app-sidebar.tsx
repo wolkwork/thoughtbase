@@ -191,7 +191,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                         weight="duotone"
                         color="#7d7d7d"
                       />
-                      <span>Users</span>
+                      <span>Contributors</span>
                     </Link>
                   }
                   isActive={location.pathname.includes("/members")}

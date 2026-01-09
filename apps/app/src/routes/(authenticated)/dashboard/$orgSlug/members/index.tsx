@@ -41,7 +41,7 @@ function MembersPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       <div className="mb-6 flex flex-col justify-between">
-        <h1 className="text-2xl font-bold">Users</h1>
+        <h1 className="text-2xl font-bold">Contributors</h1>
         <p className="text-muted-foreground text-sm">
           People that have participated in your workspace.
         </p>
