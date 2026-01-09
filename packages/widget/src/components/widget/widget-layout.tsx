@@ -2,6 +2,7 @@ import { Gift, Map as MapIcon, MessageCircleHeart, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { AnimatedShinyText } from "../ui/animated-shiny-text";
+import { Logo } from "../logo";
 
 export type Tab = "feedback" | "roadmap" | "updates";
 
@@ -51,8 +52,8 @@ export function WidgetLayout({
                 : "text-muted-foreground"
             )}
           >
-            <MessageCircleHeart className="size-5" />
-            Feedback
+            <Logo className="size-5" />
+            Ideas
           </button>
           <button
             onClick={() => onTabChange("roadmap")}

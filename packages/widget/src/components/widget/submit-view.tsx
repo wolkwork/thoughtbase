@@ -60,8 +60,8 @@ export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
   return (
     <div className="flex flex-1 flex-col gap-8">
       <div className="border-b px-6 pb-6">
-        <h2 className="text-2xl font-bold">Submit Idea</h2>
-        <p className="text-muted-foreground">Share your ideas or suggestions</p>
+        <h2 className="text-2xl font-bold">Tell us your ideas</h2>
+        <p className="text-muted-foreground">We'd love to hear them</p>
       </div>
 
       <form

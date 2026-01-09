@@ -88,8 +88,8 @@ export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
     return (
       <div className="flex flex-col">
         <div className="border-b px-6 pb-6">
-          <h2 className="text-2xl font-bold">Updates</h2>
-          <p className="text-muted-foreground">Latest changelog</p>
+          <h2 className="text-2xl font-bold">Changelog</h2>
+          <p className="text-muted-foreground">Our latest updates</p>
         </div>
         <div className="text-muted-foreground py-12 text-center text-sm">
           Loading updates...
@@ -102,8 +102,8 @@ export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
     return (
       <div className="flex flex-col">
         <div className="border-b px-6 pb-6">
-          <h2 className="text-2xl font-bold">Updates</h2>
-          <p className="text-muted-foreground">Latest changelog</p>
+          <h2 className="text-2xl font-bold">Changelog</h2>
+          <p className="text-muted-foreground">Our latest updates</p>
         </div>
         <div className="text-muted-foreground py-12 text-center text-sm">
           {error}
@@ -116,8 +116,8 @@ export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
     return (
       <div className="flex flex-col">
         <div className="border-b px-6 pb-6">
-          <h2 className="text-2xl font-bold">Updates</h2>
-          <p className="text-muted-foreground">Latest changelog</p>
+          <h2 className="text-2xl font-bold">Changelog</h2>
+          <p className="text-muted-foreground">Our latest updates</p>
         </div>
         <div className="text-muted-foreground py-12 text-center text-sm">
           No updates yet.
@@ -129,8 +129,8 @@ export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
   return (
     <div className="flex flex-col overflow-hidden">
       <div className="border-b px-6 pb-6">
-        <h2 className="text-2xl font-bold">Updates</h2>
-        <p className="text-muted-foreground">Latest changelog</p>
+        <h2 className="text-2xl font-bold">Changelog</h2>
+        <p className="text-muted-foreground">Our latest updates</p>
       </div>
 
       <div className="flex-1 overflow-y-auto">

@@ -39,7 +39,7 @@ function MembersPage() {
   }));
 
   return (
-    <div className="px-4 py-6">
+    <div className="mx-auto max-w-7xl px-4 py-6">
       <div className="mb-6 flex flex-col justify-between">
         <h1 className="text-2xl font-bold">Users</h1>
         <p className="text-muted-foreground text-sm">
@@ -47,7 +47,7 @@ function MembersPage() {
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="">
         <MembersDataTable data={tableData} />
       </div>
     </div>
