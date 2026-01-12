@@ -12,6 +12,7 @@
         "POLAR_SUCCESS_URL",
         "POLAR_WEBHOOK_SECRET",
         "POLAR_START_ID",
+        "POLAR_PRO_ID",
         "POLAR_BUSINESS_ID",
         "BLOB_READ_WRITE_TOKEN",
         "RESEND_API_KEY",

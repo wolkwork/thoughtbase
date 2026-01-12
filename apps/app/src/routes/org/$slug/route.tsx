@@ -1,30 +1,28 @@
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
 import { PublicHeader } from "~/components/public-header";
 import { $signInWithSSO } from "~/lib/api/sso";
 import { $getUnifiedProfile, $getUnifiedUser } from "~/lib/auth/unified-auth-functions";
-import { db } from "~/lib/db";
-import { organization } from "~/lib/db/schema";
+import { $getOrganizationBySlugOrDomain, $getPlanPermissions } from "~/lib/domains";
 
-const getOrganization = createServerFn({ method: "GET" })
-  .inputValidator((slug: string) => slug)
-  .handler(async ({ data: slug }) => {
-    const org = await db.query.organization.findFirst({
-      where: eq(organization.slug, slug),
-    });
-    if (!org) {
-      throw notFound();
-    }
-    return org;
-  });
+// Known base domains for subdomain detection (must match router.tsx)
 
 export const Route = createFileRoute("/org/$slug")({
   loaderDeps: ({ search: { sso_token } }: { search: { sso_token?: string } }) => ({
     sso_token,
   }),
   loader: async ({ params, deps: { sso_token }, location }) => {
-    const org = await getOrganization({ data: params.slug });
+    // Get hostname from request headers for custom domain detection
+    const url = new URL(location.url);
+    const hostname = url.hostname;
+
+    // If slug is _custom, this is a custom domain request
+    // Otherwise, use the slug normally
+    const slug = params.slug === "_custom" ? "" : params.slug;
+
+    const org = await $getOrganizationBySlugOrDomain({
+      data: { slug, hostname },
+    });
+
     if (!org) {
       throw notFound();
     }
@@ -65,7 +63,9 @@ export const Route = createFileRoute("/org/$slug")({
       profile = await $getUnifiedProfile({ data: { organizationId: org.id } });
     }
 
-    return { org, user, profile };
+    const plan = await $getPlanPermissions({ data: { organizationId: org.id } });
+
+    return { org, user, profile, plan };
   },
   component: PublicLayout,
 });

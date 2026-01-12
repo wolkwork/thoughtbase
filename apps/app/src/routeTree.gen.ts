@@ -23,6 +23,7 @@ import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authe
 import { Route as OrgSlugRoadmapRouteImport } from './routes/org/$slug/roadmap'
 import { Route as OrgSlugChangelogRouteImport } from './routes/org/$slug/changelog'
 import { Route as OrgSlugIdeaIdRouteImport } from './routes/org/$slug/$ideaId'
+import { Route as ApiWidgetOrganizationRouteImport } from './routes/api/widget/organization'
 import { Route as ApiWidgetIdeasRouteImport } from './routes/api/widget/ideas'
 import { Route as ApiWidgetChangelogRouteImport } from './routes/api/widget/changelog'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -110,6 +111,11 @@ const OrgSlugIdeaIdRoute = OrgSlugIdeaIdRouteImport.update({
   id: '/$ideaId',
   path: '/$ideaId',
   getParentRoute: () => OrgSlugRouteRoute,
+} as any)
+const ApiWidgetOrganizationRoute = ApiWidgetOrganizationRouteImport.update({
+  id: '/api/widget/organization',
+  path: '/api/widget/organization',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiWidgetIdeasRoute = ApiWidgetIdeasRouteImport.update({
   id: '/api/widget/ideas',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
+  '/api/widget/organization': typeof ApiWidgetOrganizationRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
   '/org/$slug/changelog': typeof OrgSlugChangelogRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
+  '/api/widget/organization': typeof ApiWidgetOrganizationRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
   '/org/$slug/changelog': typeof OrgSlugChangelogRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
+  '/api/widget/organization': typeof ApiWidgetOrganizationRoute
   '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
   '/org/$slug/changelog': typeof OrgSlugChangelogRoute
   '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
@@ -309,6 +318,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/widget/changelog'
     | '/api/widget/ideas'
+    | '/api/widget/organization'
     | '/org/$slug/$ideaId'
     | '/org/$slug/changelog'
     | '/org/$slug/roadmap'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/widget/changelog'
     | '/api/widget/ideas'
+    | '/api/widget/organization'
     | '/org/$slug/$ideaId'
     | '/org/$slug/changelog'
     | '/org/$slug/roadmap'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/widget/changelog'
     | '/api/widget/ideas'
+    | '/api/widget/organization'
     | '/org/$slug/$ideaId'
     | '/org/$slug/changelog'
     | '/org/$slug/roadmap'
@@ -397,6 +409,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiWidgetChangelogRoute: typeof ApiWidgetChangelogRoute
   ApiWidgetIdeasRoute: typeof ApiWidgetIdeasRoute
+  ApiWidgetOrganizationRoute: typeof ApiWidgetOrganizationRoute
   ApiZapierWebhooksSubscribeRoute: typeof ApiZapierWebhooksSubscribeRouteWithChildren
 }
 
@@ -499,6 +512,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/org/$slug/$ideaId'
       preLoaderRoute: typeof OrgSlugIdeaIdRouteImport
       parentRoute: typeof OrgSlugRouteRoute
+    }
+    '/api/widget/organization': {
+      id: '/api/widget/organization'
+      path: '/api/widget/organization'
+      fullPath: '/api/widget/organization'
+      preLoaderRoute: typeof ApiWidgetOrganizationRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/widget/ideas': {
       id: '/api/widget/ideas'
@@ -742,6 +762,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiWidgetChangelogRoute: ApiWidgetChangelogRoute,
   ApiWidgetIdeasRoute: ApiWidgetIdeasRoute,
+  ApiWidgetOrganizationRoute: ApiWidgetOrganizationRoute,
   ApiZapierWebhooksSubscribeRoute: ApiZapierWebhooksSubscribeRouteWithChildren,
 }
 export const routeTree = rootRouteImport

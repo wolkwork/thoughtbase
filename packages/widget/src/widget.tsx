@@ -1,4 +1,3 @@
-import { MessageCircleHeart } from "lucide-react";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { FeedbackWidget } from "./components/feedback-widget";
@@ -9,6 +8,7 @@ import { Logo } from "./components/logo";
 interface WidgetProps {
   organizationSlug: string;
   selector?: string;
+  thoughtbaseBranding?: boolean;
   // TODO: Maybe in the future
   // radius?: RadiusKey;
 }
@@ -16,7 +16,11 @@ interface WidgetProps {
 // Global state to hold the SSO token for the widget instance
 let ssoToken: string | undefined = undefined;
 
-export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
+export function WidgetContainer({
+  organizationSlug,
+  selector,
+  thoughtbaseBranding,
+}: WidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Force re-render when token changes (though identify is usually called once at start)
   const [token, setToken] = useState<string | undefined>(ssoToken);
@@ -62,6 +66,7 @@ export function WidgetContainer({ organizationSlug, selector }: WidgetProps) {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         ssoToken={token}
+        thoughtbaseBranding={thoughtbaseBranding}
       />
     </>
   );

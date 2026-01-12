@@ -74,15 +74,26 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const organization = pgTable("organization", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  logo: text("logo"),
-  secret: text("secret"),
-  createdAt: timestamp("created_at").notNull(),
-  metadata: text("metadata"),
-});
+export const organization = pgTable(
+  "organization",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    logo: text("logo"),
+    secret: text("secret"),
+    createdAt: timestamp("created_at").notNull(),
+    metadata: text("metadata"),
+    customDomain: text("custom_domain"),
+    domainVerificationToken: text("domain_verification_token"),
+    domainVerifiedAt: timestamp("domain_verified_at"),
+    domainVerificationStatus: text("domain_verification_status"),
+  },
+  (table) => [
+    // Index for custom domain lookups (only verified domains are queried)
+    index("organization_custom_domain_idx").on(table.customDomain),
+  ],
+);
 
 export const member = pgTable(
   "member",

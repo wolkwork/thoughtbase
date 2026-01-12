@@ -5,7 +5,9 @@ import { z } from "zod";
 import { getUnifiedAuthContext } from "~/lib/auth/external-auth";
 import { db } from "~/lib/db";
 import { board, comment, idea, reaction } from "~/lib/db/schema";
+import { Permission } from "~/plans";
 import { $getOrganizationBySlug } from "./organizations";
+import { requirePermission } from "./permissions";
 import { getUnifiedUser } from "./unified-user";
 import { triggerWebhooks } from "./webhooks";
 
@@ -319,6 +321,9 @@ export const $createIdea = createServerFn({ method: "POST" })
       throw new Error("Organization not found");
     }
 
+    // Check write permission
+    await requirePermission(organization.id, Permission.WRITE);
+
     const user = await getUnifiedUser({
       token: data.token,
       organizationId: organization.id,
@@ -376,6 +381,9 @@ export const $updateIdeaStatus = createServerFn({ method: "POST" })
     const ctx = await getAuthContext();
     if (!ctx.user) throw new Error("Unauthorized");
 
+    // Check write permission
+    await requirePermission(data.organizationId, Permission.WRITE);
+
     const [updatedIdea] = await db
       .update(idea)
       .set({ status: data.status, updatedAt: new Date() })
@@ -396,6 +404,9 @@ export const $updateIdeaEta = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
     if (!ctx.user) throw new Error("Unauthorized");
+
+    // Check write permission
+    await requirePermission(data.organizationId, Permission.WRITE);
 
     const [updatedIdea] = await db
       .update(idea)
@@ -419,6 +430,19 @@ export const $createComment = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
     if (!ctx.user) throw new Error("Unauthorized");
+
+    // Get the idea to find organizationId
+    const existingIdea = await db.query.idea.findFirst({
+      where: eq(idea.id, data.ideaId),
+      columns: { organizationId: true },
+    });
+
+    if (!existingIdea) {
+      throw new Error("Idea not found");
+    }
+
+    // Check write permission
+    await requirePermission(existingIdea.organizationId, Permission.WRITE);
 
     const [newComment] = await db
       .insert(comment)
@@ -537,6 +561,9 @@ export const $updateIdea = createServerFn({ method: "POST" })
       throw new Error("Idea not found");
     }
 
+    // Check write permission
+    await requirePermission(existingIdea.organizationId, Permission.WRITE);
+
     // Check if user is the author (either internal or external)
     const isAuthor =
       (ctx.type === "internal" && existingIdea.authorId === ctx.user.id) ||
@@ -569,6 +596,9 @@ export const $deleteIdea = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const ctx = await getAuthContext();
     if (!ctx.user) throw new Error("Unauthorized");
+
+    // Check write permission
+    await requirePermission(data.organizationId, Permission.WRITE);
 
     // Delete the idea (cascading will handle related records)
     await db

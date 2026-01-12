@@ -6,6 +6,7 @@ import { lowerCase } from "lodash";
 import { ArrowLeftIcon, CalendarIcon, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { usePermissions } from "~/hooks/use-permissions";
 import {
   $createComment,
   $deleteIdea,
@@ -14,6 +15,7 @@ import {
   $updateIdeaStatus,
 } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
+import { Permission } from "~/plans";
 import { IdeaStatus, StatusPill } from "./status-badge";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -27,6 +29,7 @@ import {
 } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { UserAvatar } from "./user-avatar";
 
 interface IdeaDetailProps {
@@ -56,6 +59,8 @@ export function IdeaDetail({
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [activeTab, setActiveTab] = useState("comments");
+  const { hasPermission } = usePermissions(organizationId);
+  const canWrite = hasPermission(Permission.WRITE);
 
   const { mutate: addComment, isPending: isCommentPending } = useMutation({
     mutationFn: $createComment,
@@ -231,15 +236,29 @@ export function IdeaDetail({
           />
 
           {organizationId && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              aria-label="Delete idea"
-            >
-              <Trash2 className="size-4" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleDelete}
+                      disabled={isDeleting || !canWrite}
+                      aria-label="Delete idea"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  }
+                />
+
+                {!canWrite && (
+                  <TooltipContent>
+                    <p>Upgrade to delete ideas</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
         <div className="mx-auto max-w-4xl px-8">
@@ -284,24 +303,30 @@ export function IdeaDetail({
             </TabsList>
 
             <TabsContent value="comments">
-              <div className="relative mb-8 flex-1">
-                <Textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Write a comment..."
-                  className="field-sizing-content min-h-[100px] w-full resize-none"
-                />
-                <Button
-                  size="sm"
-                  className="absolute right-2 bottom-2"
-                  disabled={!comment.trim() || isCommentPending}
-                  onClick={() =>
-                    addComment({ data: { ideaId: idea.id, content: comment } })
-                  }
-                >
-                  Comment
-                </Button>
-              </div>
+              {canWrite ? (
+                <div className="relative mb-8 flex-1">
+                  <Textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Write a comment..."
+                    className="field-sizing-content min-h-[100px] w-full resize-none"
+                  />
+                  <Button
+                    size="sm"
+                    className="absolute right-2 bottom-2"
+                    disabled={!comment.trim() || isCommentPending}
+                    onClick={() =>
+                      addComment({ data: { ideaId: idea.id, content: comment } })
+                    }
+                  >
+                    Comment
+                  </Button>
+                </div>
+              ) : (
+                <div className="bg-muted/50 text-muted-foreground mb-8 rounded-lg border border-dashed p-4 text-center text-sm">
+                  Upgrade to add comments
+                </div>
+              )}
 
               <div className="relative">
                 <div className="mt-8">
@@ -400,20 +425,37 @@ export function IdeaDetail({
         </div>
 
         <div>
-          <Select value={idea.status} onValueChange={handleUpdateStatus}>
-            <SelectTrigger className="w-full" aria-label="Status">
-              <SelectValue>
-                <StatusPill variant={idea.status as IdeaStatus} />
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent align="start">
-              {STATUS_OPTIONS.map((status) => (
-                <SelectItem key={status.slug} value={status.slug}>
-                  <StatusPill variant={status.slug as IdeaStatus} />
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Select
+                    value={idea.status}
+                    onValueChange={handleUpdateStatus}
+                    disabled={!canWrite}
+                  >
+                    <SelectTrigger className="w-full" aria-label="Status">
+                      <SelectValue>
+                        <StatusPill variant={idea.status as IdeaStatus} />
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent align="start">
+                      {STATUS_OPTIONS.map((status) => (
+                        <SelectItem key={status.slug} value={status.slug}>
+                          <StatusPill variant={status.slug as IdeaStatus} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                }
+              />
+              {!canWrite && (
+                <TooltipContent>
+                  <p>Upgrade to change idea status</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <div>
@@ -421,30 +463,48 @@ export function IdeaDetail({
             ETA
           </h4>
           <div className="flex items-center gap-2">
-            <Popover>
-              <PopoverTrigger
-                render={
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full shrink justify-start text-left font-normal",
-                      !idea.eta && "text-muted-foreground",
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
-                  </Button>
-                }
-              />
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={idea.eta ? new Date(idea.eta) : undefined}
-                  onSelect={(date) => handleUpdateEta(date ? date.toISOString() : null)}
-                />
-              </PopoverContent>
-            </Popover>
-            {idea.eta && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Popover>
+                      <PopoverTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            disabled={!canWrite}
+                            className={cn(
+                              "w-full shrink justify-start text-left font-normal",
+                              !idea.eta && "text-muted-foreground",
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
+                          </Button>
+                        }
+                      />
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={idea.eta ? new Date(idea.eta) : undefined}
+                          onSelect={(date) =>
+                            canWrite
+                              ? handleUpdateEta(date ? date.toISOString() : null)
+                              : undefined
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </span>
+                </TooltipTrigger>
+                {!canWrite && (
+                  <TooltipContent>
+                    <p>Upgrade to set ETA</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+            {idea.eta && canWrite && (
               <button
                 onClick={() => handleUpdateEta(null)}
                 className="text-muted-foreground hover:text-foreground hover:bg-accent rounded p-1 transition-colors"

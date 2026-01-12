@@ -2,20 +2,23 @@ import { and, count, eq, or } from "drizzle-orm";
 import { polarClient } from "~/lib/auth/auth";
 import { db } from "~/lib/db";
 import { member } from "~/lib/db/schema";
+import { Permission, plans } from "~/plans";
 
 /**
- * Subscription tier types
+ * Subscription tier types - matches plans.ts structure
  */
-export type SubscriptionTier = "free" | "start" | "business";
+export type SubscriptionTier = (typeof plans)[keyof typeof plans]["slug"];
 
+// TODO: move to plans.ts
 /**
  * Permissions matrix mapping subscription tiers to feature limits
  */
 export const PERMISSIONS_MATRIX: Record<SubscriptionTier, { maxAdmins: number | null }> =
   {
-    free: { maxAdmins: 1 },
-    start: { maxAdmins: 3 },
-    business: { maxAdmins: null }, // null means unlimited
+    [plans.free.slug]: { maxAdmins: null },
+    [plans.start.slug]: { maxAdmins: null },
+    [plans.pro.slug]: { maxAdmins: null },
+    [plans.business.slug]: { maxAdmins: null }, // null means unlimited
   };
 
 /**
@@ -27,22 +30,15 @@ export async function getSubscriptionTier(
   organizationId: string,
 ): Promise<SubscriptionTier> {
   try {
-    // First, find the customer by external_id (which is the organization ID)
-    const customers = await polarClient.customers.list({
-      organizationId,
-      limit: 1,
+    const subscriptions = await polarClient.subscriptions.list({
+      metadata: {
+        referenceId: organizationId,
+      },
     });
 
-    const customer = customers.result?.items?.[0];
-
-    if (!customer) {
+    if (!subscriptions.result?.items?.length) {
       return "free";
     }
-
-    // Then, get subscriptions for this customer
-    const subscriptions = await polarClient.subscriptions.list({
-      customerId: customer.id,
-    });
 
     // Find the first active subscription
     const activeSubscription = subscriptions.result?.items?.find(
@@ -59,6 +55,10 @@ export async function getSubscriptionTier(
 
     if (productSlug === "start") {
       return "start";
+    }
+
+    if (productSlug === "pro") {
+      return "pro";
     }
 
     if (productSlug === "business") {
@@ -130,4 +130,50 @@ export async function getPermissions(organizationId: string): Promise<{
     currentAdminCount,
     canAddAdmin: canAdd,
   };
+}
+
+/**
+ * Get the plan object for an organization based on subscription tier
+ * Returns the plan from plans.ts with its permissions array
+ */
+export async function getPlanPermissions(
+  organizationId: string,
+): Promise<(typeof plans)[SubscriptionTier]> {
+  const tier = await getSubscriptionTier(organizationId);
+  const plan = plans[tier];
+  return plan;
+}
+
+/**
+ * Check if an organization has a specific permission
+ * @param organizationId The organization ID
+ * @param permission The permission to check
+ * @returns true if the organization has the permission, false otherwise
+ */
+export async function hasPermission(
+  organizationId: string,
+  permission: Permission,
+): Promise<boolean> {
+  const plan = await getPlanPermissions(organizationId);
+  return (plan.permissions as readonly Permission[]).includes(permission);
+}
+
+/**
+ * Require a specific permission for an organization
+ * Throws an error if the organization doesn't have the permission
+ * @param organizationId The organization ID
+ * @param permission The permission to require
+ * @throws Error if permission is missing
+ */
+export async function requirePermission(
+  organizationId: string,
+  permission: Permission,
+): Promise<void> {
+  const hasAccess = await hasPermission(organizationId, permission);
+
+  if (!hasAccess) {
+    throw new Error(
+      "Your trial has ended. Upgrade to continue creating and editing ideas.",
+    );
+  }
 }

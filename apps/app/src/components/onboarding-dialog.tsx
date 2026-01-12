@@ -1,24 +1,31 @@
 import {
   CheckIcon,
+  GlobeIcon,
+  KeyIcon,
   LinkSimpleIcon,
   PaletteIcon,
+  UsersThreeIcon,
   WrenchIcon,
 } from "@phosphor-icons/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Copy, ExternalLink, Loader2 } from "lucide-react";
+import { AlertCircle, Copy, ExternalLink, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import type { BundledLanguage } from "shiki";
 import { toast } from "sonner";
 import { BrandingSettings } from "~/components/branding-settings";
+import { CustomDomainSettings } from "~/components/custom-domain-settings";
 import { SubscriptionDialog } from "~/components/subscription-dialog";
 import { InviteMemberForm } from "~/components/team-settings";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
+import { usePermissions } from "~/hooks/use-permissions";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 import { cn } from "~/lib/utils";
+import { Permission } from "~/plans";
 import { CopyButton } from "./ui/shadcn-io/copy-button";
 
 type StepId =
@@ -43,33 +50,30 @@ const STEPS: Step[] = [
     description: "Embed Thoughtbase in your product",
     icon: <WrenchIcon className="h-5 w-5" weight="duotone" />,
   },
-  // TODO: Business plan
-  // {
-  //   id: "enable-auto-login",
-  //   title: "Enable auto login",
-  //   description: "SSO so users are signed in automatically",
-  //   icon: <KeyIcon className="h-5 w-5" weight="duotone" />,
-  // },
-  // TODO: Start plan
-  // {
-  //   id: "invite-team",
-  //   title: "Invite your team",
-  //   description: "Bring teammates into this workspace",
-  //   icon: <UsersThreeIcon className="h-5 w-5" weight="duotone" />,
-  // },
+  {
+    id: "invite-team",
+    title: "Invite your team",
+    description: "Bring teammates into this workspace",
+    icon: <UsersThreeIcon className="h-5 w-5" weight="duotone" />,
+  },
   {
     id: "customize-branding",
     title: "Customize branding",
     description: "Upload logo + set workspace name",
     icon: <PaletteIcon className="h-5 w-5" weight="duotone" />,
   },
-  // TODO: Start plan
-  // {
-  //   id: "setup-custom-domain",
-  //   title: "Setup custom domain",
-  //   description: "Use your own domain (paid feature)",
-  //   icon: <GlobeIcon className="h-5 w-5" weight="duotone" />,
-  // },
+  {
+    id: "setup-custom-domain",
+    title: "Setup custom domain",
+    description: "Use your own domain (paid feature)",
+    icon: <GlobeIcon className="h-5 w-5" weight="duotone" />,
+  },
+  {
+    id: "enable-auto-login",
+    title: "Enable auto login",
+    description: "SSO so users are signed in automatically",
+    icon: <KeyIcon className="h-5 w-5" weight="duotone" />,
+  },
   {
     id: "share-board",
     title: "Share your board",
@@ -174,7 +178,10 @@ export function OnboardingDialog({
                     <InstallWidgetStep organizationSlug={orgSlug} />
                   )}
                   {activeStepId === "enable-auto-login" && (
-                    <EnableAutoLoginStep organizationId={organizationId} />
+                    <EnableAutoLoginStep
+                      organizationId={organizationId}
+                      onUpgrade={() => setSubscriptionOpen(true)}
+                    />
                   )}
                   {activeStepId === "invite-team" && (
                     <InviteTeamStep orgSlug={orgSlug} organizationId={organizationId} />
@@ -186,6 +193,7 @@ export function OnboardingDialog({
                   {activeStepId === "setup-custom-domain" && (
                     <SetupCustomDomainStep
                       organizationId={organizationId}
+                      orgSlug={orgSlug}
                       onUpgrade={() => setSubscriptionOpen(true)}
                     />
                   )}
@@ -290,8 +298,16 @@ function InstallWidgetStep({ organizationSlug }: { organizationSlug: string }) {
   );
 }
 
-function EnableAutoLoginStep({ organizationId }: { organizationId?: string }) {
+function EnableAutoLoginStep({
+  organizationId,
+  onUpgrade,
+}: {
+  organizationId?: string;
+  onUpgrade?: () => void;
+}) {
   const queryClient = useQueryClient();
+  const { hasPermission } = usePermissions();
+  const canUseSSO = hasPermission(Permission.SSO);
 
   const { data, isPending } = useQuery({
     queryKey: ["org-secret", organizationId],
@@ -299,7 +315,7 @@ function EnableAutoLoginStep({ organizationId }: { organizationId?: string }) {
       if (!organizationId) return { secret: null as string | null };
       return await $getOrgSecret({ data: { organizationId } });
     },
-    enabled: !!organizationId,
+    enabled: !!organizationId && canUseSSO,
   });
 
   const { mutate: generateSecret, isPending: isGenerating } = useMutation({
@@ -331,6 +347,28 @@ const token = await new SignJWT({
   .sign(secret);
 
 // Pass token into the widget as ssoToken`;
+
+  if (!canUseSSO) {
+    return (
+      <div className="space-y-6">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Auto-login is available on the Business plan.{" "}
+            {onUpgrade && (
+              <Button
+                variant="link"
+                className="h-auto p-0 font-semibold"
+                onClick={onUpgrade}
+              >
+                Upgrade now
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -478,30 +516,24 @@ function ShareBoardStep({ orgSlug }: { orgSlug: string }) {
 
 function SetupCustomDomainStep({
   organizationId,
+  orgSlug,
   onUpgrade,
 }: {
   organizationId?: string;
+  orgSlug: string;
   onUpgrade: () => void;
 }) {
-  // const { data: subscriptions, isPending } = useQuery({
-  //   queryKey: ["subscriptions", organizationId],
-  //   queryFn: async () => {
-  //     if (!organizationId) return null;
-  //     const result = await authClient.customer.subscriptions.list({
-  //       query: {
-  //         referenceId: organizationId,
-  //         active: true,
-  //         limit: 1,
-  //       },
-  //     });
-  //     return result.data;
-  //   },
-  //   enabled: !!organizationId,
-  // });
+  if (!organizationId) {
+    return <div className="text-muted-foreground text-sm">No organization selected.</div>;
+  }
 
   return (
-    <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
-      Coming soon
-    </span>
+    <div className="space-y-6">
+      <CustomDomainSettings
+        organizationId={organizationId}
+        orgSlug={orgSlug}
+        onUpgrade={onUpgrade}
+      />
+    </div>
   );
 }

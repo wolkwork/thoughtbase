@@ -14,12 +14,8 @@ import {
 } from "~/components/ui/card";
 import { authClient } from "~/lib/auth/auth-client";
 
-interface BillingSettingsProps {
-  defaultOpen?: boolean;
-}
-
-export function BillingSettings({ defaultOpen = false }: BillingSettingsProps) {
-  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(defaultOpen);
+export function BillingSettings() {
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const { organization } = useRouteContext({
     from: "/(authenticated)/dashboard/$orgSlug",
@@ -45,6 +41,11 @@ export function BillingSettings({ defaultOpen = false }: BillingSettingsProps) {
   const status = activeSubscription?.status;
   const currentPeriodEnd = activeSubscription?.currentPeriodEnd
     ? new Date(activeSubscription.currentPeriodEnd)
+    : null;
+  const isTrialing = status === "trialing";
+  const trialEndDate = isTrialing && currentPeriodEnd ? currentPeriodEnd : null;
+  const daysRemaining = trialEndDate
+    ? Math.ceil((trialEndDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
   const handleOpenPortal = async () => {
@@ -83,44 +84,60 @@ export function BillingSettings({ defaultOpen = false }: BillingSettingsProps) {
                 </Badge>
                 {status && (
                   <Badge
-                    variant={status === "active" ? "outline" : "destructive"}
+                    variant={
+                      status === "active"
+                        ? "outline"
+                        : status === "trialing"
+                          ? "outline"
+                          : "destructive"
+                    }
                     className="capitalize"
                   >
                     {status}
                   </Badge>
                 )}
               </div>
-              {currentPeriodEnd && (
+              {isTrialing && daysRemaining !== null && (
+                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                  Trial ends in {daysRemaining} day{daysRemaining !== 1 ? "s" : ""}
+                </p>
+              )}
+              {!isTrialing && currentPeriodEnd && (
                 <p className="text-muted-foreground text-sm">
                   {activeSubscription?.cancelAtPeriodEnd ? "Cancels on" : "Renews on"}{" "}
                   {currentPeriodEnd.toLocaleDateString()}
                 </p>
               )}
+              {!activeSubscription && (
+                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                  Trial Expired - Upgrade to continue
+                </p>
+              )}
             </div>
           )}
-          {activeSubscription ? (
-            <Button onClick={handleOpenPortal} disabled={isPortalLoading}>
-              {isPortalLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <ExternalLink className="mr-2 h-4 w-4" />
-              )}
-              Customer Portal
-            </Button>
-          ) : (
+          <div className="flex items-center gap-2">
+            {activeSubscription && (
+              <Button onClick={handleOpenPortal} disabled={isPortalLoading}>
+                {isPortalLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                )}
+                Manage Subscription
+              </Button>
+            )}
+
             <Button onClick={() => setIsSubscriptionOpen(true)}>
               <CreditCard className="mr-2 h-4 w-4" />
               Upgrade Plan
             </Button>
-          )}
+          </div>
         </CardContent>
       </Card>
-      {!activeSubscription && (
-        <SubscriptionDialog
-          open={isSubscriptionOpen}
-          onOpenChange={setIsSubscriptionOpen}
-        />
-      )}
+      <SubscriptionDialog
+        open={isSubscriptionOpen}
+        onOpenChange={setIsSubscriptionOpen}
+      />
     </>
   );
 }

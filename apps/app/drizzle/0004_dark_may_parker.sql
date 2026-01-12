@@ -1,0 +1,1 @@
+ALTER TABLE "organization" ADD COLUMN "show_thoughtbase_branding" boolean DEFAULT true NOT NULL;

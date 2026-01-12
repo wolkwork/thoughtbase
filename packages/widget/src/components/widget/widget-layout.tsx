@@ -11,6 +11,7 @@ interface WidgetLayoutProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
   onClose: () => void;
+  showThoughtbaseBranding?: boolean;
 }
 
 export function WidgetLayout({
@@ -18,6 +19,7 @@ export function WidgetLayout({
   activeTab,
   onTabChange,
   onClose,
+  showThoughtbaseBranding = true,
 }: WidgetLayoutProps) {
   return (
     <div
@@ -33,6 +35,7 @@ export function WidgetLayout({
             size="icon"
             className="size-7"
             onClick={onClose}
+            type="button"
           >
             <X />
           </Button>
@@ -45,6 +48,7 @@ export function WidgetLayout({
         <div className="flex justify-around">
           <button
             onClick={() => onTabChange("feedback")}
+            type="button"
             className={cn(
               "hover:bg-muted flex flex-col items-center gap-1 rounded-lg p-2 text-xs font-medium transition-colors",
               activeTab === "feedback"
@@ -57,6 +61,7 @@ export function WidgetLayout({
           </button>
           <button
             onClick={() => onTabChange("roadmap")}
+            type="button"
             className={cn(
               "hover:bg-muted flex flex-col items-center gap-1 rounded-lg p-2 text-xs font-medium transition-colors",
               activeTab === "roadmap"
@@ -69,6 +74,7 @@ export function WidgetLayout({
           </button>
           <button
             onClick={() => onTabChange("updates")}
+            type="button"
             className={cn(
               "hover:bg-muted flex flex-col items-center gap-1 rounded-lg p-2 text-xs font-medium transition-colors",
               activeTab === "updates"
@@ -82,14 +88,16 @@ export function WidgetLayout({
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground text-center py-2 bg-muted/20 border-t">
-        Powered by{" "}
-        <AnimatedShinyText>
-          <a href="https://thoughtbase.app" className="font-medium">
-            Thoughtbase
-          </a>
-        </AnimatedShinyText>
-      </div>
+      {showThoughtbaseBranding && (
+        <div className="text-xs text-muted-foreground text-center py-2 bg-muted/20 border-t">
+          Powered by{" "}
+          <AnimatedShinyText>
+            <a href="https://thoughtbase.app" className="font-medium">
+              Thoughtbase
+            </a>
+          </AnimatedShinyText>
+        </div>
+      )}
     </div>
   );
 }

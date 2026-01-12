@@ -12,7 +12,10 @@ import { useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { STATUSES, type IdeaStatus } from "~/components/status-badge";
+import { usePermissions } from "~/hooks/use-permissions";
+import { usePermissionsPublic } from "~/hooks/use-permissions-public";
 import { $updateIdeaStatus } from "~/lib/api/ideas";
+import { Permission } from "~/plans";
 import { RoadmapCard } from "./roadmap-card";
 import { RoadmapColumn } from "./roadmap-column";
 
@@ -50,6 +53,9 @@ export function RoadmapBoard({
   const [activeId, setActiveId] = useState<string | null>(null);
   // Optimistic state
   const [items, setItems] = useState(initialIdeas);
+  const { hasPermission } = isPublic ? usePermissionsPublic() : usePermissions();
+  const canWrite = hasPermission(Permission.WRITE);
+  const effectiveReadOnly = readOnly || !canWrite;
 
   // Update local state when props change (e.g. real data refresh)
   useMemo(() => {
@@ -69,8 +75,12 @@ export function RoadmapBoard({
     onMutate: async (variables) => {
       // Optimistic update handled in onDragEnd, this is just for rollback/sync
     },
-    onError: () => {
-      toast.error("Failed to update status");
+    onError: (error: Error) => {
+      if (error.message.includes("trial has ended")) {
+        toast.error("Upgrade to change idea status");
+      } else {
+        toast.error("Failed to update status");
+      }
       router.invalidate(); // Revert on error
     },
     onSuccess: () => {
@@ -97,12 +107,15 @@ export function RoadmapBoard({
   }, [items]);
 
   const handleDragStart = (event: DragStartEvent) => {
-    if (readOnly) return;
+    if (effectiveReadOnly) {
+      toast.error("Upgrade to change idea status");
+      return;
+    }
     setActiveId(event.active.id as string);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    if (readOnly) return;
+    if (effectiveReadOnly) return;
     const { active, over } = event;
     setActiveId(null);
 
@@ -146,7 +159,7 @@ export function RoadmapBoard({
 
   const activeIdea = activeId ? items.find((i) => i.id === activeId) : null;
 
-  if (readOnly) {
+  if (effectiveReadOnly) {
     // Hide pending column in public view
     const publicColumns = COLUMNS.filter(
       (col) => !["pending", "closed"].includes(col.id),
@@ -168,7 +181,11 @@ export function RoadmapBoard({
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={effectiveReadOnly ? [] : sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="flex w-fit gap-4 overflow-x-auto pb-4">
         {COLUMNS.map((col) => (
           <RoadmapColumn

@@ -19,7 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { usePermissions } from "~/hooks/use-permissions";
 import { authClient } from "~/lib/auth/auth-client";
+import { Permission } from "~/plans";
 import { CreateIdeaDialog } from "./create-idea-dialog";
 import { SidebarOrganizationSwitcher } from "./sidebar-organization-switcher";
 import { Button } from "./ui/button";
@@ -59,6 +61,9 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
 
   const location = useLocation();
 
+  const { hasPermission } = usePermissions();
+  const canWrite = hasPermission(Permission.WRITE);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -72,6 +77,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
               className="w-full justify-start"
               variant="outline"
               onClick={() => setCreateDialogOpen(true)}
+              disabled={!canWrite}
             >
               Create Idea
               <Plus className="ml-auto" />

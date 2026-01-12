@@ -20,6 +20,7 @@ Features:
 
 Bugs/Internal:
 
+- Refactor to use better-auth anonymous instead of DIY anonymous posts
 - Resume application and refresh router after succesful subscription
 - Status button doesn't work when deselecting everything
 - Pending invitations also show accepted invitations
@@ -39,23 +40,21 @@ Bugs/Internal:
 
 # Pricing plans
 
-## Free
+## Start: $25/month
 
 - Unlimited ideas
-- 1 Admin
+- Unlimited admins
 
-## Start: $49/month
+## Pro: $49/month
 
-- 3 Admins
 - Custom Domain
 - Private boards
+- White label
 
 ## Business: $99/month
 
 - SSO
-- White label
 - Integrations
-- Unlimited Admins
 
 ## Enterprise
 

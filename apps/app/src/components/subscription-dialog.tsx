@@ -1,12 +1,13 @@
-import { useRouteContext } from "@tanstack/react-router";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { Switch } from "~/components/ui/switch";
 import { authClient } from "~/lib/auth/auth-client";
 import { cn } from "~/lib/utils";
+import { plans } from "~/plans";
+import { Badge } from "./ui/badge";
 
 interface PlanFeature {
   title: string;
@@ -26,63 +27,41 @@ interface Plan {
   popular?: boolean;
 }
 
+// Map plans.ts to UI format, excluding free plan
 const PLANS: Plan[] = [
   {
-    id: "free",
-    name: "Free",
-    price: { month: 0, year: 0 },
-    description: "Perfect for testing the waters",
+    id: plans.start.slug,
+    name: plans.start.name,
+    price: plans.start.price,
+    description: "Perfect for getting up and running",
     features: [
       {
         title: "Unlimited ideas",
-        description: "Create as many ideas as you need",
+        description: "As many ideas as you need",
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "1 admin user",
-        description: "Perfect for solo developers",
-        icon: <Check className="h-4 w-4" />,
-      },
-    ],
-  },
-  {
-    id: "start",
-    name: "Start",
-    price: { month: 49, year: 490 },
-    description: "Perfect for small teams and growing startups",
-    features: [
-      {
-        title: "Everything in Free",
-        description: "All free features included",
+        title: "Unlimited contributors",
+        description: "As many participants as you want",
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "3 admin users",
-        description: "Perfect for small teams",
-        icon: <Check className="h-4 w-4" />,
-      },
-      {
-        title: "Private boards",
-        description: "Collect internal feedback that only your team can see",
+        title: "Unlimited admins",
+        description: "Work together with your team",
         icon: <Check className="h-4 w-4" />,
       },
     ],
     popular: true,
   },
   {
-    id: "business",
-    name: "Business",
-    price: { month: 99, year: 990 },
-    description: "For larger organizations with advanced needs",
+    id: plans.pro.slug,
+    name: plans.pro.name,
+    price: plans.pro.price,
+    description: "For teams that need more features",
     features: [
       {
         title: "Everything in Start",
         description: "All start features included",
-        icon: <Check className="h-4 w-4" />,
-      },
-      {
-        title: "Unlimited admins",
-        description: "Create as many boards as you need",
         icon: <Check className="h-4 w-4" />,
       },
       {
@@ -91,8 +70,36 @@ const PLANS: Plan[] = [
         icon: <Check className="h-4 w-4" />,
       },
       {
-        title: "White-label",
-        description: "Customization and removal of Thoughtbase branding",
+        title: "Private boards",
+        description: "Collect internal feedback that only your team can see",
+        icon: <Check className="h-4 w-4" />,
+      },
+      {
+        title: "White label",
+        description: "Remove Thoughtbase branding",
+        icon: <Check className="h-4 w-4" />,
+      },
+    ],
+  },
+  {
+    id: plans.business.slug,
+    name: plans.business.name,
+    price: plans.business.price,
+    description: "For larger organizations with advanced needs",
+    features: [
+      {
+        title: "Everything in Pro",
+        description: "All pro features included",
+        icon: <Check className="h-4 w-4" />,
+      },
+      {
+        title: "Automatic login",
+        description: "Automatically login your users",
+        icon: <Check className="h-4 w-4" />,
+      },
+      {
+        title: "Integrations",
+        description: "Connect with your favorite tools through Zapier",
         icon: <Check className="h-4 w-4" />,
       },
     ],
@@ -105,21 +112,17 @@ interface SubscriptionDialogProps {
 }
 
 export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogProps) {
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("start");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(plans.start.slug);
   const [billingInterval, setBillingInterval] = useState<"month" | "year">("month");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const selectedPlan = PLANS.find((p) => p.id === selectedPlanId) || PLANS[0];
-  const { organization } = useRouteContext({
+  const { organization, plan: currentPlan } = useRouteContext({
     from: "/(authenticated)/dashboard/$orgSlug",
   });
 
   const handleSubscribe = async () => {
-    if (selectedPlan.id === "free") {
-      onOpenChange(false);
-      return;
-    }
-
     setIsLoading(true);
     try {
       if (!organization) {
@@ -134,7 +137,15 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
 
       checkout.addEventListener("success", (event) => {
         if (!event.detail.redirect) {
-          console.log("Succes jonge", event);
+          onOpenChange(false);
+          router.invalidate();
+          router.navigate({
+            to: "/dashboard/$orgSlug/settings",
+            params: { orgSlug: organization.slug },
+            search: {
+              success: true,
+            },
+          });
         }
       });
     } catch (error) {
@@ -188,10 +199,8 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
                         )}
                       />
                       <span className="font-medium">{plan.name}</span>
-                      {plan.id === "free" && (
-                        <span className="rounded bg-green-600 px-1.5 py-0.5 text-[10px] text-white">
-                          Current
-                        </span>
+                      {currentPlan.slug === plan.id && (
+                        <Badge className="bg-green-100 text-green-600">Current</Badge>
                       )}
                     </div>
                     <div className="text-sm font-medium">
@@ -205,7 +214,8 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
               ))}
             </div>
 
-            <div className="bg-background/50 mt-6 rounded-lg border border-dashed p-4">
+            {/* TODO: Implement yearly billing */}
+            {/* <div className="bg-background/50 mt-6 rounded-lg border border-dashed p-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium">Yearly billing</div>
                 <Switch
@@ -218,7 +228,7 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
               <div className="text-muted-foreground mt-1 text-xs">
                 Save up to 17% with yearly billing
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Main Content */}
@@ -255,19 +265,24 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
               <div className="mb-4 flex items-center justify-between">
                 <div className="text-sm">Total due today</div>
                 <div className="text-2xl font-bold">
-                  ${selectedPlan.price[billingInterval]}
+                  $
+                  {currentPlan.slug === "free"
+                    ? "0"
+                    : `${selectedPlan.price[billingInterval]}`}
                 </div>
               </div>
               <Button
                 className="w-full bg-green-600 text-white hover:bg-green-700"
                 size="lg"
                 onClick={handleSubscribe}
-                disabled={isLoading || selectedPlan.id === "free"}
+                disabled={isLoading || currentPlan.slug === selectedPlan.id}
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {selectedPlan.id === "free"
-                  ? "Current Plan"
-                  : "Upgrade to " + selectedPlan.name}
+                {currentPlan.slug === "free"
+                  ? "Start 14-day free trial"
+                  : currentPlan.slug === selectedPlan.id
+                    ? "Current Plan"
+                    : "Upgrade to " + selectedPlan.name}
               </Button>
               <p className="text-muted-foreground mt-3 text-center text-xs">
                 Secure checkout via Polar. Cancel anytime.

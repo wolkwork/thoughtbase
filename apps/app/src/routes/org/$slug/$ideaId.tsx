@@ -67,6 +67,7 @@ function PublicIdeaDetailPage() {
         <PublicIdeaDetail
           idea={idea}
           currentUser={user}
+          organizationId={org.id}
           onLoginRequired={handleLoginRequired}
         />
       </div>

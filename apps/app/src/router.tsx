@@ -87,16 +87,31 @@ export function getRouter() {
         if (subdomain) {
           url.pathname = `/org/${subdomain}${url.pathname}`;
         } else {
-          // Redirect /org/slug paths to subdomain URLs (client-side only)
-          const pathParts = url.pathname.split("/");
-          if (pathParts[1] === "org" && pathParts[2]) {
-            const orgSlug = pathParts[2];
-            if (typeof window !== "undefined") {
-              const baseDomain = getBaseDomain(url.hostname);
-              const newUrl = new URL(url.href);
-              newUrl.hostname = `${orgSlug}.${baseDomain}`;
-              newUrl.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
-              window.location.replace(newUrl.href);
+          // Check if this is a custom domain (not a base domain)
+          const parsed = parse(url.hostname);
+          const domain = parsed.domain;
+          const isCustomDomain =
+            !domain || !BASE_DOMAINS.includes(domain as (typeof BASE_DOMAINS)[number]);
+
+          if (isCustomDomain) {
+            // For custom domains, we need to look up the org slug from the database
+            // This will be handled in the route loader, so we pass through the hostname
+            // The route will need to extract the slug from the custom domain lookup
+            // For now, we'll use a placeholder slug that the route loader will handle
+            // The actual lookup happens in the route loader via getOrganizationBySlugOrDomain
+            url.pathname = `/org/_custom${url.pathname}`;
+          } else {
+            // Redirect /org/slug paths to subdomain URLs (client-side only)
+            const pathParts = url.pathname.split("/");
+            if (pathParts[1] === "org" && pathParts[2]) {
+              const orgSlug = pathParts[2];
+              if (typeof window !== "undefined") {
+                const baseDomain = getBaseDomain(url.hostname);
+                const newUrl = new URL(url.href);
+                newUrl.hostname = `${orgSlug}.${baseDomain}`;
+                newUrl.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
+                window.location.replace(newUrl.href);
+              }
             }
           }
         }
@@ -112,9 +127,23 @@ export function getRouter() {
           const pathParts = url.pathname.split("/");
           if (pathParts[1] === "org" && pathParts[2]) {
             const orgSlug = pathParts[2];
-            const baseDomain = getBaseDomain(url.hostname);
-            url.hostname = `${orgSlug}.${baseDomain}`;
-            url.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
+
+            // Check if this is a custom domain request
+            const parsed = parse(url.hostname);
+            const domain = parsed.domain;
+            const isCustomDomain =
+              !domain || !BASE_DOMAINS.includes(domain as (typeof BASE_DOMAINS)[number]);
+
+            if (isCustomDomain && orgSlug === "_custom") {
+              // For custom domains, keep the hostname as-is and remove the /org/_custom prefix
+              url.pathname = url.pathname.replace(`/org/_custom`, "") || "/";
+            } else if (!isCustomDomain) {
+              // For base domains, rewrite to subdomain format
+              const baseDomain = getBaseDomain(url.hostname);
+              url.hostname = `${orgSlug}.${baseDomain}`;
+              url.pathname = url.pathname.replace(`/org/${orgSlug}`, "") || "/";
+            }
+            // If it's a custom domain but slug is not _custom, leave as-is (shouldn't happen)
           }
         }
 

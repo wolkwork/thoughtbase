@@ -11,6 +11,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { usePermissionsPublic } from "~/hooks/use-permissions-public";
+import { Permission } from "~/plans";
 import { CreateIdeaDialog } from "./create-idea-dialog";
 import { ProfileForm } from "./profile-form";
 import { UserAvatar } from "./user-avatar";
@@ -56,6 +58,10 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
     router.invalidate();
     setCreateOpen(true); // Auto open create after profile setup
   };
+
+  const { hasPermission } = usePermissionsPublic();
+  const canWrite = hasPermission(Permission.WRITE);
+  const hasWhiteLabel = hasPermission(Permission.WHITE_LABEL);
 
   return (
     <>
@@ -105,10 +111,12 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
 
           <div className="flex items-center gap-4">
             {/* TODO: Make reusable component that handles login, profile, and create idea */}
-            <Button variant="outline" onClick={handleSubmitIdeaClick}>
-              <SparkleIcon weight="duotone" className="size-4" />
-              <span>Submit Idea</span>
-            </Button>
+            {canWrite && (
+              <Button variant="outline" onClick={handleSubmitIdeaClick}>
+                <SparkleIcon weight="duotone" className="size-4" />
+                <span>Submit Idea</span>
+              </Button>
+            )}
 
             {user ? (
               <div className="flex items-center gap-3">
@@ -172,6 +180,20 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
           });
         }}
       />
+
+      {!hasWhiteLabel && (
+        <div className="text-muted-foreground fixed right-0 bottom-0 left-0 border-t bg-white px-4 py-2 text-center text-xs">
+          Powered by{" "}
+          <a
+            href="https://thoughtbase.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground font-medium transition-colors"
+          >
+            Thoughtbase
+          </a>
+        </div>
+      )}
     </>
   );
 }

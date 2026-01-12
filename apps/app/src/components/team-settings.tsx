@@ -40,6 +40,8 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import { usePermissions } from "~/hooks/use-permissions";
+import { Permission } from "~/plans";
 // import { $getPermissions } from "~/lib/api/permissions";
 import { z } from "zod";
 import { getPermissions } from "~/lib/api/permissions";
@@ -159,7 +161,11 @@ export function TeamSettings() {
                 </TableRow>
               ) : (
                 members?.members.map((member) => (
-                  <MemberRow key={member.id} member={member} />
+                  <MemberRow
+                    key={member.id}
+                    member={member}
+                    organizationId={organization.id}
+                  />
                 ))
               )}
             </TableBody>
@@ -214,11 +220,23 @@ type TeamInvitation = {
   expiresAt: string | Date;
 };
 
-function MemberRow({ member }: { member: TeamMember }) {
+function MemberRow({
+  member,
+  organizationId,
+}: {
+  member: TeamMember;
+  organizationId?: string;
+}) {
   const user = member.user;
   const router = useRouter();
+  const { hasPermission } = usePermissions();
+  const canWrite = hasPermission(Permission.WRITE);
 
   const handleRemoveMember = async () => {
+    if (!canWrite) {
+      toast.error("Your trial has ended. Upgrade to manage team members.");
+      return;
+    }
     try {
       await authClient.organization.removeMember({
         memberIdOrEmail: member.userId,
@@ -232,6 +250,10 @@ function MemberRow({ member }: { member: TeamMember }) {
 
   const handleUpdateRole = async (newRole: string | null) => {
     if (!newRole) return;
+    if (!canWrite) {
+      toast.error("Your trial has ended. Upgrade to manage team members.");
+      return;
+    }
     try {
       await authClient.organization.updateMemberRole({
         memberId: member.userId,
@@ -256,7 +278,11 @@ function MemberRow({ member }: { member: TeamMember }) {
         </div>
       </TableCell>
       <TableCell>
-        <Select defaultValue={member.role} onValueChange={handleUpdateRole}>
+        <Select
+          defaultValue={member.role}
+          onValueChange={handleUpdateRole}
+          disabled={!canWrite}
+        >
           <SelectTrigger className="h-8 w-[110px]">
             <SelectValue />
           </SelectTrigger>
@@ -278,7 +304,11 @@ function MemberRow({ member }: { member: TeamMember }) {
             }
           />
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleRemoveMember} className="text-red-600">
+            <DropdownMenuItem
+              onClick={handleRemoveMember}
+              disabled={!canWrite}
+              className="text-red-600"
+            >
               <UserMinus className="mr-2 h-4 w-4" />
               Remove Member
             </DropdownMenuItem>
@@ -351,7 +381,7 @@ export function InviteMemberDialog({
 }) {
   const [open, setOpen] = useState(false);
 
-  const isDisabled = permissions && !permissions.canAddAdmin;
+  const isDisabled = !!permissions && !permissions.canAddAdmin;
   const tooltipMessage =
     permissions && !permissions.canAddAdmin && permissions.maxAdmins !== null
       ? `Admin limit reached. Your ${permissions.tier} plan allows ${permissions.maxAdmins} admin${permissions.maxAdmins !== 1 ? "s" : ""}. You currently have ${permissions.currentAdminCount} admin${permissions.currentAdminCount !== 1 ? "s" : ""} (including owners).${permissions.tier !== "business" ? " Upgrade to Business for unlimited admins." : ""}`
@@ -368,9 +398,8 @@ export function InviteMemberDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {tooltipMessage ? (
         <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger render={button} />
-          </TooltipTrigger>
+          <TooltipTrigger render={<DialogTrigger render={button} />} />
+
           <TooltipContent>
             <p className="max-w-xs">{tooltipMessage}</p>
           </TooltipContent>
@@ -413,22 +442,16 @@ export function InviteMemberForm({
   } | null;
 }) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"admin" | "owner">("member");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { hasPermission } = usePermissions();
+  const canWrite = hasPermission(Permission.WRITE);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check if trying to invite admin/owner and limit is reached
-    if (
-      (role === "admin" || role === "owner") &&
-      permissions &&
-      !permissions.canAddAdmin
-    ) {
-      toast.error(
-        `Admin limit reached. Your ${permissions.tier} plan allows ${permissions.maxAdmins} admin${permissions.maxAdmins !== 1 ? "s" : ""}.`,
-      );
+    if (!canWrite) {
+      toast.error("Your trial has ended. Upgrade to invite team members.");
       return;
     }
 
@@ -437,7 +460,7 @@ export function InviteMemberForm({
       await authClient.organization.inviteMember({
         organizationId,
         email,
-        role,
+        role: "admin",
       });
       toast.success("Invitation sent");
       setEmail("");
@@ -465,34 +488,14 @@ export function InviteMemberForm({
             required
           />
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="role">Role</Label>
-          <Select value={role} onValueChange={(val) => setRole(val as "admin" | "owner")}>
-            <SelectTrigger>
-              <SelectValue data-placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                value="admin"
-                disabled={permissions && !permissions.canAddAdmin && role !== "admin"}
-              >
-                Admin
-                {permissions && !permissions.canAddAdmin && role !== "admin"
-                  ? " (limit reached)"
-                  : ""}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          {permissions && !permissions.canAddAdmin && (
-            <p className="text-muted-foreground text-xs">
-              Admin limit reached. Your {permissions.tier} plan allows{" "}
-              {permissions.maxAdmins} admin{permissions.maxAdmins !== 1 ? "s" : ""}.
-            </p>
-          )}
-        </div>
       </div>
+      {!canWrite && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-100">
+          Your trial has ended. Upgrade to invite team members.
+        </div>
+      )}
       <DialogFooter>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading || !canWrite}>
           {isLoading ? "Sending..." : submitLabel}
         </Button>
       </DialogFooter>

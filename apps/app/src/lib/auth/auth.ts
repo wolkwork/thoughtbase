@@ -10,7 +10,7 @@ import { sendEmail } from "~/lib/email";
 
 import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
-import { apiKey, organization } from "better-auth/plugins";
+import { apiKey, openAPI, organization } from "better-auth/plugins";
 import { getBaseUrl } from "../base-url";
 
 const getPolarClient = createServerOnlyFn(() => {
@@ -27,6 +27,9 @@ const getAuthConfig = createServerOnlyFn(() => {
     telemetry: {
       enabled: false,
     },
+    // Note: Custom domains are handled dynamically in /api/auth/$ route CORS
+    // Better Auth's trustedOrigins is static, so we can't add custom domains here
+    // The auth API route checks verified custom domains separately
     trustedOrigins: [getBaseUrl(), "http://*.thoughtbase.localhost:3000"],
     database: drizzleAdapter(db, {
       provider: "pg",
@@ -58,6 +61,7 @@ const getAuthConfig = createServerOnlyFn(() => {
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [
       tanstackStartCookies(),
+      openAPI(),
       organization({
         // https://www.better-auth.com/docs/plugins/organization#setup-invitation-email
         async sendInvitationEmail(data) {
@@ -88,6 +92,10 @@ const getAuthConfig = createServerOnlyFn(() => {
               {
                 productId: env.POLAR_START_ID,
                 slug: "start",
+              },
+              {
+                productId: env.POLAR_PRO_ID,
+                slug: "pro",
               },
               {
                 productId: env.POLAR_BUSINESS_ID,

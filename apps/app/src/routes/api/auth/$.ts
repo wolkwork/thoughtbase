@@ -1,15 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { $isVerifiedCustomDomain } from "~/lib/api/organizations";
 import { auth } from "~/lib/auth/auth";
 
-// TODO: Make production ready. Include custom domains
 const allowedOriginRegexes = [
   /^http:\/\/(?:[^.]+\.)?thoughtbase\.localhost:3000$/,
   /^https:\/\/(?:[^.]+\.)?thoughtbase\.app$/,
   /^https:\/\/(?:[^.]+\.)?vercel\.app$/,
 ];
 
-function isAllowedOrigin(origin: string) {
-  return allowedOriginRegexes.some((regex) => regex.test(origin));
+async function isAllowedOrigin(origin: string): Promise<boolean> {
+  // Check against base domain patterns
+  if (allowedOriginRegexes.some((regex) => regex.test(origin))) {
+    return true;
+  }
+
+  // Check if it's a verified custom domain
+  return await $isVerifiedCustomDomain({ data: origin });
 }
 
 export const Route = createFileRoute("/api/auth/$")({
@@ -18,7 +24,7 @@ export const Route = createFileRoute("/api/auth/$")({
       OPTIONS: async ({ request }) => {
         const origin = request.headers.get("origin");
 
-        if (origin && isAllowedOrigin(origin)) {
+        if (origin && (await isAllowedOrigin(origin))) {
           return new Response(null, {
             status: 200,
             headers: {
@@ -39,7 +45,7 @@ export const Route = createFileRoute("/api/auth/$")({
 
         const response = await auth.handler(request);
 
-        if (origin && isAllowedOrigin(origin)) {
+        if (origin && (await isAllowedOrigin(origin))) {
           response.headers.set("Access-Control-Allow-Origin", origin);
         }
         response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -54,7 +60,7 @@ export const Route = createFileRoute("/api/auth/$")({
         const origin = request.headers.get("origin");
 
         const response = await auth.handler(request);
-        if (origin && isAllowedOrigin(origin)) {
+        if (origin && (await isAllowedOrigin(origin))) {
           response.headers.set("Access-Control-Allow-Origin", origin);
         }
         response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");

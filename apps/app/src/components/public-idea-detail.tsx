@@ -1,12 +1,14 @@
-import { ChatsCircleIcon, CheckIcon, HeartIcon, XIcon } from "@phosphor-icons/react";
+import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { format, formatDistanceToNow } from "date-fns";
 import { PencilIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { usePermissionsPublic } from "~/hooks/use-permissions-public";
 import { $createComment, $toggleReaction, $updateIdea } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
+import { Permission } from "~/plans";
 import { StatusBadge } from "./status-badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,22 +19,14 @@ import { UserAvatar } from "./user-avatar";
 interface PublicIdeaDetailProps {
   idea: any;
   currentUser: any;
+  organizationId?: string;
   onLoginRequired?: () => void;
 }
-
-// Simplified statuses for public view if needed, but reuse full list for now or read-only
-const STATUS_OPTIONS = [
-  { slug: "pending", name: "Pending" },
-  { slug: "reviewing", name: "Reviewing" },
-  { slug: "planned", name: "Planned" },
-  { slug: "in_progress", name: "In Progress" },
-  { slug: "completed", name: "Completed" },
-  { slug: "closed", name: "Closed" },
-];
 
 export function PublicIdeaDetail({
   idea,
   currentUser,
+  organizationId,
   onLoginRequired,
 }: PublicIdeaDetailProps) {
   const queryClient = useQueryClient();
@@ -41,6 +35,8 @@ export function PublicIdeaDetail({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(idea.title);
   const [editDescription, setEditDescription] = useState(idea.description || "");
+  const { hasPermission } = usePermissionsPublic();
+  const canWrite = hasPermission(Permission.WRITE);
 
   // Check if current user is the author
   const isAuthor =
@@ -141,7 +137,6 @@ export function PublicIdeaDetail({
     onSuccess: () => {
       setIsEditing(false);
       toast.success("Idea updated");
-      // Invalidate ideas list (public view doesn't need sidebar counts)
       queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
       router.invalidate();
     },
@@ -171,12 +166,13 @@ export function PublicIdeaDetail({
     setIsEditing(false);
   };
 
-  // We generally don't allow public users to change status unless they are admins,
-  // but for this implementation we'll assume read-only status for public detail.
-
   const handleUpvote = () => {
     if (!currentUser) {
       onLoginRequired?.();
+      return;
+    }
+    if (!canWrite) {
+      toast.error("Your trial has ended. Upgrade to interact with ideas.");
       return;
     }
     toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
@@ -224,7 +220,6 @@ export function PublicIdeaDetail({
                 onClick={handleSaveEdit}
                 disabled={isUpdatePending || !editTitle.trim()}
               >
-                <CheckIcon />
                 Save
               </Button>
               <Button
@@ -233,7 +228,6 @@ export function PublicIdeaDetail({
                 onClick={handleCancelEdit}
                 disabled={isUpdatePending}
               >
-                <XIcon />
                 Cancel
               </Button>
             </div>
@@ -242,7 +236,7 @@ export function PublicIdeaDetail({
           <>
             <div className="mb-2 flex items-center gap-2">
               <h1 className="text-foreground text-2xl font-bold">{idea.title}</h1>
-              {isAuthor && (
+              {isAuthor && canWrite && (
                 <Tooltip>
                   <TooltipTrigger
                     render={
@@ -278,9 +272,11 @@ export function PublicIdeaDetail({
           </div>
 
           <button
-            onClick={(e) => handleUpvote()}
+            onClick={handleUpvote}
+            disabled={!canWrite}
             className={cn(
-              "hover:bg-accent flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-colors",
+              "flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-colors",
+              canWrite ? "hover:bg-accent" : "cursor-not-allowed",
             )}
           >
             <HeartIcon
@@ -291,23 +287,25 @@ export function PublicIdeaDetail({
           </button>
         </div>
 
-        <div className="relative mt-8 flex-1">
-          <Textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder={currentUser ? "Write a comment..." : "Login to comment..."}
-            disabled={!currentUser}
-            className="field-sizing-content min-h-[100px] w-full resize-none"
-          />
-          <Button
-            size="sm"
-            className="absolute right-2 bottom-2"
-            disabled={!comment.trim() || isCommentPending || !currentUser}
-            onClick={handleSubmitComment}
-          >
-            Comment
-          </Button>
-        </div>
+        {canWrite ? (
+          <div className="relative mt-8 flex-1">
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={currentUser ? "Write a comment..." : "Login to comment..."}
+              disabled={!currentUser}
+              className="field-sizing-content min-h-[100px] w-full resize-none"
+            />
+            <Button
+              size="sm"
+              className="absolute right-2 bottom-2"
+              disabled={!comment.trim() || isCommentPending || !currentUser}
+              onClick={handleSubmitComment}
+            >
+              Comment
+            </Button>
+          </div>
+        ) : null}
 
         <div className="relative">
           <div className="mt-8">

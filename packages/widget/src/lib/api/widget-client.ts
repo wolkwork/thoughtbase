@@ -79,3 +79,23 @@ export async function getWidgetChangelogs(
   }
   return res.json();
 }
+
+export interface OrganizationBranding {
+  showThoughtbaseBranding: boolean;
+}
+
+export async function getWidgetOrganization(
+  organizationSlug: string
+): Promise<OrganizationBranding> {
+  const res = await fetch(
+    `${BASE_URL}/api/widget/organization?organizationSlug=${organizationSlug}`,
+    {
+      mode: "cors",
+    }
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch organization: ${text}`);
+  }
+  return res.json();
+}

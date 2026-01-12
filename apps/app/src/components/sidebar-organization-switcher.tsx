@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
+import { usePermissions } from "~/hooks/use-permissions";
 import { authClient } from "~/lib/auth/auth-client";
+import { cn } from "~/lib/utils";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import {
   DropdownMenu,
@@ -28,24 +29,7 @@ export function SidebarOrganizationSwitcher({
   const { data: organizations } = authClient.useListOrganizations();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-  const { data: subscriptions } = useQuery({
-    queryKey: ["subscriptions", activeOrganization?.id],
-    queryFn: async () => {
-      const result = await authClient.customer.subscriptions.list({
-        query: {
-          referenceId: activeOrganization!.id,
-          active: true,
-          limit: 1,
-        },
-      });
-      return result.data;
-    },
-    enabled: !!activeOrganization?.id,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
-
-  const activeSubscription = subscriptions?.result?.items?.[0];
-  const planName = activeSubscription?.product?.name ?? "Free";
+  const { plan } = usePermissions();
 
   return (
     <>
@@ -67,7 +51,17 @@ export function SidebarOrganizationSwitcher({
                 <span className="truncate font-medium">
                   {activeOrganization?.name || "Select Workspace"}
                 </span>
-                <span className="truncate text-xs text-emerald-600">{planName}</span>
+                <span
+                  className={cn(
+                    "truncate text-xs",
+                    plan.slug === "free" && "text-amber-600 dark:text-amber-400",
+                    plan.slug === "start" && "text-emerald-600",
+                    plan.slug === "pro" && "text-emerald-600",
+                    plan.slug === "business" && "text-emerald-600",
+                  )}
+                >
+                  {plan.slug === "free" ? "Trial Expired" : plan.name}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4!" />
             </SidebarMenuButton>
