@@ -48,18 +48,13 @@ const STATUS_OPTIONS = [
   { slug: "closed", name: "Closed" },
 ];
 
-export function IdeaDetail({
-  idea,
-  currentUser,
-  orgSlug,
-  organizationId,
-}: IdeaDetailProps) {
+export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [activeTab, setActiveTab] = useState("comments");
-  const { hasPermission } = usePermissions(organizationId);
+  const { hasPermission } = usePermissions();
   const canWrite = hasPermission(Permission.WRITE);
 
   const { mutate: addComment, isPending: isCommentPending } = useMutation({
@@ -465,38 +460,42 @@ export function IdeaDetail({
           <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Popover>
-                      <PopoverTrigger
-                        render={
-                          <Button
-                            variant="outline"
-                            disabled={!canWrite}
-                            className={cn(
-                              "w-full shrink justify-start text-left font-normal",
-                              !idea.eta && "text-muted-foreground",
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
-                          </Button>
-                        }
-                      />
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={idea.eta ? new Date(idea.eta) : undefined}
-                          onSelect={(date) =>
-                            canWrite
-                              ? handleUpdateEta(date ? date.toISOString() : null)
-                              : undefined
+                <TooltipTrigger
+                  render={
+                    <span>
+                      <Popover>
+                        <PopoverTrigger
+                          render={
+                            <Button
+                              variant="outline"
+                              disabled={!canWrite}
+                              className={cn(
+                                "w-full shrink justify-start text-left font-normal",
+                                !idea.eta && "text-muted-foreground",
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {idea.eta
+                                ? format(new Date(idea.eta), "PPP")
+                                : "Select ETA"}
+                            </Button>
                           }
                         />
-                      </PopoverContent>
-                    </Popover>
-                  </span>
-                </TooltipTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={idea.eta ? new Date(idea.eta) : undefined}
+                            onSelect={(date) =>
+                              canWrite
+                                ? handleUpdateEta(date ? date.toISOString() : null)
+                                : undefined
+                            }
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </span>
+                  }
+                />
                 {!canWrite && (
                   <TooltipContent>
                     <p>Upgrade to set ETA</p>

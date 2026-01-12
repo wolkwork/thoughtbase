@@ -82,7 +82,7 @@ export function ApiKeysTab() {
   const handleDeleteKey = async (keyId: string) => {
     setIsDeleting(keyId);
     try {
-      await authClient.apiKey.delete({ id: keyId });
+      await authClient.apiKey.delete({ keyId });
       toast.success("API key deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["api-keys"] });
     } catch (error: any) {
@@ -111,23 +111,25 @@ export function ApiKeysTab() {
               </CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create API Key
-                </Button>
-              </DialogTrigger>
+              <DialogTrigger
+                render={
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create API Key
+                  </Button>
+                }
+              />
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create API Key</DialogTitle>
                   <DialogDescription>
-                    Create a new API key to access your account programmatically. Make sure to
-                    copy it now - you won't be able to see it again!
+                    Create a new API key to access your account programmatically. Make
+                    sure to copy it now - you won't be able to see it again!
                   </DialogDescription>
                 </DialogHeader>
                 {newKeyValue ? (
                   <div className="space-y-4">
-                    <div className="rounded-lg border bg-muted p-4">
+                    <div className="bg-muted rounded-lg border p-4">
                       <Label className="text-sm font-medium">Your API Key</Label>
                       <div className="mt-2 flex items-center gap-2">
                         <Input
@@ -137,8 +139,9 @@ export function ApiKeysTab() {
                         />
                         <CopyButton content={newKeyValue} variant="outline" />
                       </div>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        This is the only time you'll see this key. Make sure to copy it now.
+                      <p className="text-muted-foreground mt-2 text-xs">
+                        This is the only time you'll see this key. Make sure to copy it
+                        now.
                       </p>
                     </div>
                     <DialogFooter>
@@ -157,17 +160,14 @@ export function ApiKeysTab() {
                           onChange={(e) => setNewKeyName(e.target.value)}
                           required
                         />
-                        <p className="text-xs text-muted-foreground">
-                          Give your API key a descriptive name to help you identify it later.
+                        <p className="text-muted-foreground text-xs">
+                          Give your API key a descriptive name to help you identify it
+                          later.
                         </p>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleCloseDialog}
-                      >
+                      <Button type="button" variant="outline" onClick={handleCloseDialog}>
                         Cancel
                       </Button>
                       <Button type="submit" disabled={isCreating}>
@@ -184,7 +184,7 @@ export function ApiKeysTab() {
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
             </div>
           ) : !apiKeys || apiKeys.length === 0 ? (
             <div className="py-8 text-center">
@@ -194,7 +194,7 @@ export function ApiKeysTab() {
             </div>
           ) : (
             <div className="space-y-4">
-              {apiKeys.map((key: ApiKey) => (
+              {apiKeys.map((key) => (
                 <div
                   key={key.id}
                   className="flex items-center justify-between rounded-lg border p-4"
@@ -203,18 +203,18 @@ export function ApiKeysTab() {
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{key.name || "Unnamed Key"}</p>
                       {!key.enabled && (
-                        <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        <span className="bg-muted text-muted-foreground rounded px-2 py-0.5 text-xs">
                           Disabled
                         </span>
                       )}
                     </div>
                     <div className="mt-1 space-y-1">
-                      {key.startsWith && (
-                        <p className="text-sm text-muted-foreground font-mono">
-                          {key.startsWith}...
+                      {key.start && (
+                        <p className="text-muted-foreground font-mono text-sm">
+                          {key.start}...
                         </p>
                       )}
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         Created {new Date(key.createdAt).toLocaleDateString()}
                         {key.expiresAt && (
                           <span>
@@ -234,7 +234,7 @@ export function ApiKeysTab() {
                     {isDeleting === key.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="text-destructive h-4 w-4" />
                     )}
                   </Button>
                 </div>
@@ -246,4 +246,3 @@ export function ApiKeysTab() {
     </div>
   );
 }
-
