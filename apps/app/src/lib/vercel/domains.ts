@@ -1,5 +1,8 @@
 import { Vercel } from "@vercel/sdk";
+import { eq } from "drizzle-orm";
 import { env } from "~/env/server";
+import { db } from "../db";
+import { organization } from "../db/schema";
 
 const vercel = new Vercel({
   bearerToken: env.VERCEL_TOKEN,
@@ -60,7 +63,7 @@ export async function getDomainStatusFromVercel(domain: string) {
     });
   }
 
-  return {
+  const result = {
     domain,
     status: configResponse.misconfigured
       ? ("invalid" as const)
@@ -71,6 +74,21 @@ export async function getDomainStatusFromVercel(domain: string) {
           : ("pending" as const),
     dnsRecordsToSet,
   };
+
+  // Save verification info in the database
+  if (domainResponse.verification) {
+    // Import and use db/organization model
+    // (Assuming db and organization are already imported in this file's context)
+    await db
+      .update(organization)
+      .set({
+        domainVerificationStatus: result.status,
+        domainVerifiedAt: new Date(),
+      })
+      .where(eq(organization.customDomain, domain));
+  }
+
+  return result;
 }
 
 /**

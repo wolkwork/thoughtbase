@@ -19,6 +19,8 @@ export const Route = createFileRoute("/subdomain/$slug")({
     // Otherwise, use the slug normally
     const slug = params.slug === "_custom" ? "" : params.slug;
 
+    console.log("FETCHING", { slug: params.slug, hostname });
+
     const org = await $getOrganizationBySlugOrDomain({
       data: { slug, hostname },
     });

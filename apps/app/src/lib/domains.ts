@@ -43,6 +43,7 @@ export const $getOrganizationBySlugOrDomain = createServerFn({ method: "GET" })
       const orgByDomain = await $getOrganizationByCustomDomain({
         data: data.hostname,
       });
+
       if (orgByDomain) {
         return orgByDomain;
       }
