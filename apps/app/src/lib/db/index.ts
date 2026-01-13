@@ -8,6 +8,7 @@ import { env } from "~/env/server";
 import * as schema from "~/lib/db/schema";
 
 const getDatabase = createServerOnlyFn(async () => {
+  console.time("getDatabase");
   if (env.VERCEL_ENV === "production") {
     const client = neon(env.DATABASE_URL);
     return drizzleNeon({ client, schema, casing: "snake_case" });
@@ -15,6 +16,7 @@ const getDatabase = createServerOnlyFn(async () => {
 
   const driver = postgres(env.DATABASE_URL);
 
+  console.timeEnd("getDatabase");
   return drizzlePg({ client: driver, schema, casing: "snake_case" });
 });
 
