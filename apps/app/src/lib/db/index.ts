@@ -19,6 +19,10 @@ const getDatabase = createServerOnlyFn(() => {
     console.time("[DB] drizzleNeon");
     const db = drizzleNeon({ client, schema, casing: "snake_case" });
     console.timeEnd("[DB] drizzleNeon");
+
+    console.time("[DB] Alternative");
+    drizzleNeon({ client, casing: "snake_case" });
+    console.timeEnd("[DB] Alternative");
     return db;
   }
 
@@ -27,6 +31,7 @@ const getDatabase = createServerOnlyFn(() => {
   console.time("[DB] postgres");
   const db = drizzlePg({ client: driver, schema, casing: "snake_case" });
   console.timeEnd("[DB] postgres");
+
   return db;
 });
 
