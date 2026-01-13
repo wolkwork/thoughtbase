@@ -6,6 +6,7 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     VERCEL_BRANCH_URL: z.string(),
     VERCEL_PROJECT_PRODUCTION_URL: z.string(),
+    VERCEL: z.string().default("0"),
     VERCEL_ENV: z.string().default("development"),
     BETTER_AUTH_SECRET: z.string().min(1),
 

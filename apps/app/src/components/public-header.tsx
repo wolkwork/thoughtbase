@@ -63,8 +63,6 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
   const canWrite = hasPermission(Permission.WRITE);
   const hasWhiteLabel = hasPermission(Permission.WHITE_LABEL);
 
-  console.log("hasWhiteLabel", hasWhiteLabel);
-
   return (
     <>
       <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">

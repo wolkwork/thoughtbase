@@ -7,8 +7,6 @@ import { Permission } from "~/plans";
 export function usePermissionsPublic() {
   const { plan } = useLoaderData({ from: "/subdomain/$slug" });
 
-  console.log("plan", plan);
-
   const hasPermission = (permission: Permission): boolean => {
     if (!plan) return false;
 

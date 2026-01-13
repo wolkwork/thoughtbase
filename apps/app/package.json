@@ -73,6 +73,7 @@
     "@unpic/react": "^1.0.2",
     "@vercel/blob": "^2.0.0",
     "@vercel/functions": "^3.3.5",
+    "@vercel/otel": "^2.1.0",
     "@vercel/sdk": "^1.18.7",
     "@vitejs/plugin-react": "^5.1.1",
     "avvvatars-react": "^0.4.2",
