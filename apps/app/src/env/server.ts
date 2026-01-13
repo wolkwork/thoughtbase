@@ -26,6 +26,12 @@ export const env = createEnv({
 
     // Email (Resend)
     RESEND_API_KEY: z.string().min(1),
+
+    // Vercel for Platforms
+    VERCEL_TOKEN: z.string().min(1),
+    VERCEL_PROJECT_ID: z.string().min(1),
+    VERCEL_TEAM_ID: z.string().optional(),
+    VERCEL_TEAM_SLUG: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

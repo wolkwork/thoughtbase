@@ -1,3 +1,7 @@
+MVP:
+
+- Remove dark
+
 Features:
 
 - Dark mode

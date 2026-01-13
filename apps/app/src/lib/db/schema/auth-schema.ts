@@ -85,7 +85,6 @@ export const organization = pgTable(
     createdAt: timestamp("created_at").notNull(),
     metadata: text("metadata"),
     customDomain: text("custom_domain"),
-    domainVerificationToken: text("domain_verification_token"),
     domainVerifiedAt: timestamp("domain_verified_at"),
     domainVerificationStatus: text("domain_verification_status"),
   },

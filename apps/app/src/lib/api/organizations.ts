@@ -3,11 +3,16 @@ import { getRequest } from "@tanstack/react-start/server";
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { verifyDomainDNS } from "~/lib/api/domain-verification";
 import { requirePermission } from "~/lib/api/permissions";
 import { auth } from "~/lib/auth/auth";
 import { db } from "~/lib/db";
 import { member, organization } from "~/lib/db/schema";
+import {
+  addDomainToVercel,
+  getDomainConfigFromVercel,
+  getDomainStatusFromVercel,
+  removeDomainFromVercel,
+} from "~/lib/vercel/domains";
 import { Permission } from "~/plans";
 
 async function getAuthContext() {
@@ -186,11 +191,12 @@ export const $setCustomDomain = createServerFn({ method: "POST" })
       throw new Error("Insufficient permissions");
     }
 
-    // Get organization to access slug
+    // Get organization
     const org = await db.query.organization.findFirst({
       where: eq(organization.id, data.organizationId),
       columns: {
         slug: true,
+        customDomain: true,
       },
     });
 
@@ -198,24 +204,54 @@ export const $setCustomDomain = createServerFn({ method: "POST" })
       throw new Error("Organization not found");
     }
 
-    // Generate verification token
-    const verificationToken = nanoid(32);
+    // If there's an existing domain, remove it from Vercel first
+    if (org.customDomain && org.customDomain !== data.domain) {
+      try {
+        await removeDomainFromVercel(org.customDomain);
+      } catch (error) {
+        // Log but don't fail - domain might not exist in Vercel
+        console.error("Failed to remove existing domain from Vercel:", error);
+      }
+    }
 
-    // Update organization with domain and token
+    // Add domain to Vercel project
+    try {
+      await addDomainToVercel(data.domain);
+    } catch (error: unknown) {
+      // If domain already exists, that's okay - continue
+      if (error && typeof error === "object" && "status" in error) {
+        if (error.status !== 409) {
+          const message =
+            "message" in error && typeof error.message === "string"
+              ? error.message
+              : "Unknown error";
+          throw new Error(`Failed to add domain to Vercel: ${message}`);
+        }
+      } else {
+        throw new Error(
+          `Failed to add domain to Vercel: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+      }
+    }
+
+    // Get initial domain status from Vercel
+    const vercelStatus = await getDomainStatusFromVercel(data.domain);
+
+    // Update organization with domain
     await db
       .update(organization)
       .set({
         customDomain: data.domain,
-        domainVerificationToken: verificationToken,
-        domainVerificationStatus: "pending",
-        domainVerifiedAt: null,
+        domainVerificationToken: null, // No longer needed with Vercel
+        domainVerificationStatus: vercelStatus?.verified ? "verified" : "pending",
+        domainVerifiedAt: vercelStatus?.verified ? new Date() : null,
       })
       .where(eq(organization.id, data.organizationId));
 
     return {
       domain: data.domain,
-      verificationToken,
-      status: "pending" as const,
+      status: vercelStatus?.verified ? ("verified" as const) : ("pending" as const),
+      verification: vercelStatus?.verification,
     };
   });
 
@@ -243,7 +279,6 @@ export const $getCustomDomainStatus = createServerFn({ method: "GET" })
       where: eq(organization.id, data.organizationId),
       columns: {
         customDomain: true,
-        domainVerificationToken: true,
         domainVerifiedAt: true,
         domainVerificationStatus: true,
         slug: true,
@@ -254,13 +289,33 @@ export const $getCustomDomainStatus = createServerFn({ method: "GET" })
       throw new Error("Organization not found");
     }
 
-    return {
-      domain: org.customDomain,
-      verificationToken: org.domainVerificationToken,
-      verifiedAt: org.domainVerifiedAt,
-      status: org.domainVerificationStatus as "pending" | "verified" | "failed" | null,
-      orgSlug: org.slug,
-    };
+    // If no domain is configured, return early
+    if (!org.customDomain) {
+      return {
+        domain: null,
+        verifiedAt: null,
+        status: null as "pending" | "verified" | "failed" | null,
+        orgSlug: org.slug,
+        verification: undefined,
+        nameservers: undefined,
+      };
+    }
+
+    // Get current status from Vercel (includes nameservers)
+    const vercelDomain = await getDomainStatusFromVercel(org.customDomain);
+
+    // Sync status with database if it changed
+    if (org.domainVerificationStatus !== vercelDomain.status) {
+      await db
+        .update(organization)
+        .set({
+          domainVerificationStatus: vercelDomain.status,
+          domainVerifiedAt: vercelDomain.status === "verified" ? new Date() : null,
+        })
+        .where(eq(organization.id, data.organizationId));
+    }
+
+    return vercelDomain;
   });
 
 export const $verifyDomain = createServerFn({ method: "POST" })
@@ -294,8 +349,6 @@ export const $verifyDomain = createServerFn({ method: "POST" })
       where: eq(organization.id, data.organizationId),
       columns: {
         customDomain: true,
-        domainVerificationToken: true,
-        slug: true,
       },
     });
 
@@ -303,19 +356,24 @@ export const $verifyDomain = createServerFn({ method: "POST" })
       throw new Error("Organization not found");
     }
 
-    if (!org.customDomain || !org.domainVerificationToken) {
+    if (!org.customDomain) {
       throw new Error("No custom domain configured");
     }
 
-    // Verify DNS records
-    const verificationResult = await verifyDomainDNS(
-      org.customDomain,
-      org.slug,
-      org.domainVerificationToken,
-    );
+    // Get domain config which includes verification status and DNS records
+    const vercelStatus = await getDomainConfigFromVercel(org.customDomain);
+
+    if (!vercelStatus) {
+      throw new Error("Domain not found in Vercel");
+    }
+
+    const verificationResult = {
+      verified: vercelStatus.verified,
+      verification: vercelStatus.verification,
+    };
 
     // Update verification status
-    const status = verificationResult.verified ? "verified" : "failed";
+    const status = verificationResult.verified ? "verified" : "pending";
     const verifiedAt = verificationResult.verified ? new Date() : null;
 
     await db
@@ -328,10 +386,9 @@ export const $verifyDomain = createServerFn({ method: "POST" })
 
     return {
       verified: verificationResult.verified,
-      cnameVerified: verificationResult.cnameVerified,
-      txtVerified: verificationResult.txtVerified,
-      errors: verificationResult.errors,
       status,
       verifiedAt,
+      verification: verificationResult.verification,
+      nameservers: vercelStatus?.nameservers,
     };
   });
