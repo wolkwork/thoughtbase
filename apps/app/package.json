@@ -107,6 +107,7 @@
     "vaul": "^1.1.2",
     "vinxi": "^0.5.8",
     "vite": "npm:rolldown-vite@latest",
+    "ws": "^8.19.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {
@@ -124,6 +125,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "^0.31.7",
     "eslint": "^9.39.1",

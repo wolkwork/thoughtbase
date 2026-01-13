@@ -1,16 +1,19 @@
-import { neon } from "@neondatabase/serverless";
+import { Pool, neonConfig } from "@neondatabase/serverless";
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { drizzle as drizzlePg } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import ws from "ws";
 import { env } from "~/env/server";
 
 import * as schema from "~/lib/db/schema";
 
+neonConfig.webSocketConstructor = ws;
+
 const getDatabase = createServerOnlyFn(() => {
   if (env.VERCEL === "1") {
     console.time("[DB] neon");
-    const client = neon(env.DATABASE_URL);
+    const client = new Pool({ connectionString: env.DATABASE_URL });
     console.timeEnd("[DB] neon");
 
     console.time("[DB] drizzleNeon");
