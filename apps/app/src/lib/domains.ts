@@ -26,18 +26,6 @@ function isCustomDomain(hostname: string): boolean {
   return true;
 }
 
-export const $getOrganization = createServerFn({ method: "GET" })
-  .inputValidator((slug: string) => slug)
-  .handler(async ({ data: slug }) => {
-    const org = await db.query.organization.findFirst({
-      where: eq(organization.slug, slug),
-    });
-    if (!org) {
-      throw notFound();
-    }
-    return org;
-  });
-
 /**
  * Get organization by slug or custom domain
  * Checks custom domain first if hostname doesn't match base domains

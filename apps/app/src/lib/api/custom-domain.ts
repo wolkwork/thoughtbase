@@ -24,6 +24,8 @@ async function getAuthContext() {
   };
 }
 
+const blacklistedApexDomains = ["thoughtbase.app"];
+
 /**
  * Add a domain to Vercel project and save to organization
  * Matches the API expected by the Custom Domain block
@@ -36,6 +38,10 @@ export const $addDomain = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
+    if (blacklistedApexDomains.some((apex) => data.domain.includes(apex))) {
+      throw new Error("That's mine!");
+    }
+
     const ctx = await getAuthContext();
     if (!ctx.user) {
       throw new Error("Unauthorized");
@@ -119,4 +125,74 @@ export const $getDomainStatus = createServerFn({ method: "GET" })
     }
 
     return domainStatus;
+  });
+
+/**
+ * Remove a domain from Vercel and organization
+ */
+export const $removeDomain = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      organizationId: z.string(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await getAuthContext();
+    if (!ctx.user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Check permissions
+    await requirePermission(data.organizationId, Permission.CUSTOM_DOMAIN);
+
+    // Check user is admin/owner
+    const memberRecord = await db.query.member.findFirst({
+      where: and(
+        eq(member.userId, ctx.user.id),
+        eq(member.organizationId, data.organizationId),
+      ),
+    });
+
+    if (
+      !memberRecord ||
+      (memberRecord.role !== "admin" && memberRecord.role !== "owner")
+    ) {
+      throw new Error("Insufficient permissions");
+    }
+
+    // Get organization
+    const org = await db.query.organization.findFirst({
+      where: eq(organization.id, data.organizationId),
+      columns: {
+        customDomain: true,
+      },
+    });
+
+    if (!org) {
+      throw new Error("Organization not found");
+    }
+
+    if (!org.customDomain) {
+      throw new Error("No domain to remove");
+    }
+
+    // Remove from Vercel
+    try {
+      await removeDomainFromVercel(org.customDomain);
+    } catch (error) {
+      // Log but don't fail - domain might not exist in Vercel
+      console.error("Failed to remove domain from Vercel:", error);
+    }
+
+    // Update organization to remove domain
+    await db
+      .update(organization)
+      .set({
+        customDomain: null,
+        domainVerificationStatus: null,
+        domainVerifiedAt: null,
+      })
+      .where(eq(organization.id, data.organizationId));
+
+    return { success: true };
   });

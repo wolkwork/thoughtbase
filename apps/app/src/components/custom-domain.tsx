@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
-import { type HTMLAttributes, useState } from "react";
+import { AlertCircle, CheckCircle2, LoaderCircle, Trash2, XCircle } from "lucide-react";
+import { type HTMLAttributes, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,7 +12,16 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { $addDomain, $getDomainStatus } from "~/lib/api/custom-domain";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import { $addDomain, $getDomainStatus, $removeDomain } from "~/lib/api/custom-domain";
 import { cn } from "~/lib/utils";
 import { DNSTable } from "./dns-table";
 import { Badge } from "./ui/badge";
@@ -51,32 +60,12 @@ export const DomainConfiguration = ({
     return null;
   }
 
-  if (data.status === "verified") {
-    return (
-      <div
-        className={cn("text-muted-foreground flex w-full justify-start gap-2", className)}
-        {...props}
-      >
-        <DomainStatusIcon domain={domain} />
-        <p>Domain is configured correctly.</p>
-      </div>
-    );
-  }
-
   return (
     <div className={cn("w-full space-y-4", className)} {...props}>
-      <Badge variant="outline">{data.status}</Badge>
-      {/* {data.status === "pending" ? (
-        <div className="text-muted-foreground w-full text-left text-sm">
-          Please set the following TXT record on{" "}
-          <InlineSnippet>{data.dnsRecordsToSet?.[0]?.domain}</InlineSnippet> to prove ownership
-          of <InlineSnippet>{domain}</InlineSnippet>:
-        </div>
-      ) : (
-        <div className={cn("text-muted-foreground w-full text-left text-sm", className)}>
-          Set the following DNS records to your domain provider:
-        </div>
-      )} */}
+      <p>
+        The DNS records at your provider must match the following records to verify and
+        connect your domain to Thoughtbase.
+      </p>
 
       {data.dnsRecordsToSet && <DNSTable records={data.dnsRecordsToSet || []} />}
 
@@ -160,8 +149,16 @@ export type CustomDomainProps = {
 };
 
 export const CustomDomain = ({ defaultDomain, organizationId }: CustomDomainProps) => {
-  const [domain, setDomain] = useState(defaultDomain);
+  const [domain, setDomain] = useState(defaultDomain ?? "");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newDomain, setNewDomain] = useState("");
   const queryClient = useQueryClient();
+  const { data: domainStatus } = useDomainStatus(domain);
+
+  // Sync domain state with prop changes
+  useEffect(() => {
+    setDomain(defaultDomain ?? "");
+  }, [defaultDomain ?? ""]);
 
   const addDomainMutation = useMutation({
     mutationFn: (domain: string) =>
@@ -182,54 +179,144 @@ export const CustomDomain = ({ defaultDomain, organizationId }: CustomDomainProp
       }
 
       setDomain(customDomain);
+      setDialogOpen(false);
+      setNewDomain("");
     },
   });
 
-  console.log("DOMAIN", domain, defaultDomain);
+  const removeDomainMutation = useMutation({
+    mutationFn: () =>
+      $removeDomain({
+        data: { organizationId },
+      }),
+    onSuccess: () => {
+      // Invalidate queries
+      if (domain) {
+        queryClient.invalidateQueries({
+          queryKey: ["domain-status", domain],
+        });
+      }
+
+      if (organizationId) {
+        queryClient.invalidateQueries({
+          queryKey: ["custom-domain-status", organizationId],
+        });
+      }
+
+      setDomain("");
+    },
+  });
+
+  const handleAddDomain = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const domainToAdd = newDomain.toLowerCase().trim();
+    if (domainToAdd) {
+      addDomainMutation.mutate(domainToAdd);
+    }
+  };
 
   return (
-    <form
-      className="@container w-full"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const customDomain = (data.get("customDomain") as string).toLowerCase();
-        addDomainMutation.mutate(customDomain);
-      }}
-    >
-      <Card className="flex flex-col">
-        <CardHeader className="flex flex-col text-left">
-          <CardTitle>Custom Domain</CardTitle>
-          <CardDescription>The custom domain for your site.</CardDescription>
-        </CardHeader>
-        <CardContent className="relative flex w-full flex-col items-center justify-start gap-2 @sm:flex-row @sm:justify-between">
-          <Input
-            value={domain}
-            maxLength={64}
-            name="customDomain"
-            onChange={(e) => {
-              setDomain(e.target.value.toLowerCase());
-            }}
-            placeholder={"example.com"}
-            type="text"
-          />
-          <Button
-            className="w-full @sm:w-16"
-            type="submit"
-            variant="outline"
-            disabled={addDomainMutation.isPending}
-          >
-            {addDomainMutation.isPending ? (
-              <LoaderCircle className="animate-spin" />
-            ) : (
-              "Save"
-            )}
-          </Button>
-        </CardContent>
+    <Card className="flex flex-col">
+      <CardHeader className="flex flex-col text-left">
+        <CardTitle>Custom Domain</CardTitle>
+        <CardDescription>The custom domain for your site.</CardDescription>
+      </CardHeader>
+      <CardContent className="relative flex w-full flex-col gap-4">
+        {domain ? (
+          <div className="flex w-full items-center justify-between gap-4 rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <DomainStatusIcon domain={domain} />
+              <div className="flex flex-col gap-1">
+                <span className="text-base font-medium">{domain}</span>
+                {domainStatus?.status === "verified" && <p>Valid Configuration</p>}
+                {domainStatus?.status === "pending" && (
+                  <Badge variant="outline">Pending</Badge>
+                )}
+                {domainStatus?.status === "invalid" && (
+                  <Badge variant="destructive">Invalid Configuration</Badge>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => removeDomainMutation.mutate()}
+              disabled={removeDomainMutation.isPending}
+            >
+              {removeDomainMutation.isPending ? (
+                <LoaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Remove
+                </>
+              )}
+            </Button>
+          </div>
+        ) : (
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger
+              render={
+                <Button className="w-fit px-5" size="lg">
+                  Add Domain
+                </Button>
+              }
+            />
+            <DialogContent className="max-w-[450px]">
+              <form onSubmit={handleAddDomain}>
+                <DialogHeader>
+                  <DialogTitle>Add Custom Domain</DialogTitle>
+                  <DialogDescription>
+                    Enter your custom domain to use for your Thoughtbase board.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                  <Input
+                    value={newDomain}
+                    maxLength={64}
+                    onChange={(e) => {
+                      setNewDomain(e.target.value.toLowerCase());
+                    }}
+                    placeholder="example.com"
+                    type="text"
+                    autoFocus
+                  />
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setDialogOpen(false);
+                      setNewDomain("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={addDomainMutation.isPending || !newDomain.trim()}
+                  >
+                    {addDomainMutation.isPending ? (
+                      <>
+                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      "Add Domain"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+      </CardContent>
+      {domain && domainStatus?.status !== "verified" && (
         <CardFooter className="border-muted flex flex-col gap-4 border-t-2 pt-4 text-sm">
-          <DomainConfiguration domain={defaultDomain} />
+          <DomainConfiguration domain={domain} />
         </CardFooter>
-      </Card>
-    </form>
+      )}
+    </Card>
   );
 };
