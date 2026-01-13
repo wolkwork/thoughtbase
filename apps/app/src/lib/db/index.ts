@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { createServerOnlyFn } from "@tanstack/react-start";
-import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { drizzle as drizzlePg } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { env } from "~/env/server";
@@ -21,7 +21,10 @@ const getDatabase = createServerOnlyFn(() => {
 
   const driver = postgres(env.DATABASE_URL);
 
-  return drizzlePg({ client: driver, schema, casing: "snake_case" });
+  console.time("[DB] postgres");
+  const db = drizzlePg({ client: driver, schema, casing: "snake_case" });
+  console.timeEnd("[DB] postgres");
+  return db;
 });
 
 export const db = getDatabase();
