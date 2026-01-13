@@ -26,7 +26,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 // https://github.com/pacocoursey/next-themes/blob/main/next-themes/src/index.tsx
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",
   storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
@@ -60,25 +60,25 @@ export function ThemeProvider({
     return () => media.removeEventListener("change", handleMediaQuery);
   }, [handleMediaQuery]);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
+  // useEffect(() => {
+  //   const root = window.document.documentElement;
 
-    let targetTheme: string;
+  //   let targetTheme: string;
 
-    if (theme === "system") {
-      localStorage.removeItem(storageKey);
-      targetTheme = window.matchMedia(MEDIA).matches ? "dark" : "light";
-    } else {
-      localStorage.setItem(storageKey, theme);
-      targetTheme = theme;
-    }
+  //   if (theme === "system") {
+  //     localStorage.removeItem(storageKey);
+  //     targetTheme = window.matchMedia(MEDIA).matches ? "dark" : "light";
+  //   } else {
+  //     localStorage.setItem(storageKey, theme);
+  //     targetTheme = theme;
+  //   }
 
-    // Only update if the target theme is not already applied
-    if (!root.classList.contains(targetTheme)) {
-      root.classList.remove("light", "dark");
-      root.classList.add(targetTheme);
-    }
-  }, [theme, storageKey]);
+  //   // Only update if the target theme is not already applied
+  //   if (!root.classList.contains(targetTheme)) {
+  //     root.classList.remove("light", "dark");
+  //     root.classList.add(targetTheme);
+  //   }
+  // }, [theme, storageKey]);
 
   const value = useMemo(
     () => ({
