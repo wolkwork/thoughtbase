@@ -42,7 +42,7 @@ export function rewriteInput({ url }: { url: URL }) {
   const domain = parsed.domain;
   if (domain) {
     url.hostname = domain;
-    url.pathname = `/_custom/${domain}${url.pathname}`;
+    url.pathname = `/subdomain/_custom${url.pathname}`;
   }
 
   return url;
@@ -78,7 +78,7 @@ export function rewriteOutput({ url }: { url: URL }) {
   const parsed = parse(url.hostname);
   const domain = parsed.domain;
   if (domain) {
-    url.pathname = url.pathname.replace(`/_custom/${domain}`, "");
+    url.pathname = url.pathname.replace(`/subdomain/_custom`, "");
   }
 
   return url;

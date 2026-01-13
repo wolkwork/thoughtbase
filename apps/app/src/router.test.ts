@@ -47,13 +47,13 @@ describe("rewriteInput", () => {
   test("should rewrite input for custom domain", () => {
     const url = new URL("http://acme.com/");
 
-    expect(rewriteInput({ url }).pathname).toBe("/_custom/acme.com/");
+    expect(rewriteInput({ url }).pathname).toBe("/subdomain/_custom/");
   });
 
   test("should rewrite input for custom domain", () => {
     const url = new URL("http://acme.com/roadmap");
 
-    expect(rewriteInput({ url }).pathname).toBe("/_custom/acme.com/roadmap");
+    expect(rewriteInput({ url }).pathname).toBe("/subdomain/_custom/roadmap");
   });
 });
 
@@ -119,13 +119,13 @@ describe("rewriteOutput", () => {
   });
 
   test("should rewrite output for production base domain", () => {
-    const url = new URL("http://acme.com/_custom/acme.com/");
+    const url = new URL("http://acme.com/subdomain/_custom/");
 
     expect(rewriteOutput({ url }).pathname).toBe("/");
   });
 
   test("should rewrite output for production base domain", () => {
-    const url = new URL("http://acme.com/_custom/acme.com/roadmap");
+    const url = new URL("http://acme.com/subdomain/_custom/roadmap");
 
     expect(rewriteOutput({ url }).pathname).toBe("/roadmap");
   });
