@@ -227,7 +227,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                 <SidebarMenuButton
                   render={
                     <a
-                      href={`/org/${orgSlug}`}
+                      href={`https://${orgSlug}.thoughtbase.app`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex gap-2.5 text-black/70"
