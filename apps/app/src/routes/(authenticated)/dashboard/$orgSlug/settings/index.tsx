@@ -77,7 +77,6 @@ function SettingsPage() {
           <TabsContent value="domain" className="mt-6">
             <CustomDomainSettings
               organizationId={organization.id}
-              orgSlug={organization.slug}
               onUpgrade={() => setSubscriptionOpen(true)}
             />
           </TabsContent>

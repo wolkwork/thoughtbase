@@ -52,13 +52,13 @@ Bugs/Internal:
 ## Pro: $49/month
 
 - Custom Domain
-- Private boards
+<!-- - Private boards -->
 - White label
 
 ## Business: $99/month
 
 - SSO
-- Integrations
+<!-- - Integrations -->
 
 ## Enterprise
 

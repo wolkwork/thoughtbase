@@ -529,11 +529,7 @@ function SetupCustomDomainStep({
 
   return (
     <div className="space-y-6">
-      <CustomDomainSettings
-        organizationId={organizationId}
-        orgSlug={orgSlug}
-        onUpgrade={onUpgrade}
-      />
+      <CustomDomainSettings organizationId={organizationId} onUpgrade={onUpgrade} />
     </div>
   );
 }
