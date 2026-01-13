@@ -16,13 +16,14 @@ const getDatabase = createServerOnlyFn(() => {
     const client = new Pool({ connectionString: env.DATABASE_URL });
     console.timeEnd("[DB] neon");
 
+    console.time("[DB] Alternative");
+    drizzleNeon({ client, casing: "snake_case" });
+    console.timeEnd("[DB] Alternative");
+
     console.time("[DB] drizzleNeon");
     const db = drizzleNeon({ client, schema, casing: "snake_case" });
     console.timeEnd("[DB] drizzleNeon");
 
-    console.time("[DB] Alternative");
-    drizzleNeon({ client, casing: "snake_case" });
-    console.timeEnd("[DB] Alternative");
     return db;
   }
 
