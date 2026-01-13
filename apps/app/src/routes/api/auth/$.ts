@@ -1,3 +1,5 @@
+// TODO: It might be possible to simplify this a lot
+
 import { createFileRoute } from "@tanstack/react-router";
 import { $isVerifiedCustomDomain } from "~/lib/api/organizations";
 import { auth } from "~/lib/auth/auth";

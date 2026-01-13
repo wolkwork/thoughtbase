@@ -16,8 +16,7 @@ async function getCodeToHtml() {
 
 function getResolvedTheme(theme: "dark" | "light" | "system"): "dark" | "light" {
   if (theme !== "system") return theme;
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "light";
 }
 
 export function ShikiCodeBlock({
