@@ -137,4 +137,10 @@ describe("rewriteOutput", () => {
 
     expect(rewriteOutput({ url }).pathname).toBe("/roadmap");
   });
+
+  test("should rewrite output for production base domain", () => {
+    const url = new URL("https://test.acme.com/subdomain/acme/roadmap");
+
+    expect(rewriteOutput({ url }).href).toBe("https://test.acme.com/roadmap");
+  });
 });

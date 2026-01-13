@@ -77,7 +77,7 @@ export function rewriteOutput({ url }: { url: URL }) {
   const parsed = parse(url.hostname);
   const domain = parsed.domain;
   if (domain) {
-    url.pathname = url.pathname.replace(`/subdomain/_custom`, "");
+    url.pathname = url.pathname.replace(/^\/subdomain\/[^/]+/, "");
   }
 
   return url;
