@@ -41,7 +41,6 @@ export function rewriteInput({ url }: { url: URL }) {
   const parsed = parse(url.hostname);
   const domain = parsed.domain;
   if (domain) {
-    url.hostname = domain;
     url.pathname = `/subdomain/_custom${url.pathname}`;
   }
 

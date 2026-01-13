@@ -55,6 +55,14 @@ describe("rewriteInput", () => {
 
     expect(rewriteInput({ url }).pathname).toBe("/subdomain/_custom/roadmap");
   });
+
+  test("should rewrite input for custom domain", () => {
+    const url = new URL("https://test.acme.com/roadmap");
+
+    expect(rewriteInput({ url }).href).toBe(
+      "https://test.acme.com/subdomain/_custom/roadmap",
+    );
+  });
 });
 
 describe("rewriteOutput", () => {
