@@ -18,6 +18,7 @@ Initializes the widget on your page. This function must be called before using a
 - `config` (object, required): Configuration object
   - `organizationId` (string, required): Your Thoughtbase organization ID
   - `selector` (string, optional): CSS selector for a custom trigger button. If provided, the default floating button will be hidden.
+  - `thoughtbaseBranding` (boolean, optional): Set to `false` to remove the "Powered by Thoughtbase" branding from the widget footer. Only available on the *Pro* and *Business* plans.
 
 #### Returns
 
@@ -29,6 +30,14 @@ Initializes the widget on your page. This function must be called before using a
 window.thoughtbase.initWidget({
   organizationId: 'org-123',
   selector: '#my-button'
+});
+```
+
+```javascript
+// Remove Thoughtbase branding
+window.thoughtbase.initWidget({
+  organizationId: 'org-123',
+  thoughtbaseBranding: false
 });
 ```
 

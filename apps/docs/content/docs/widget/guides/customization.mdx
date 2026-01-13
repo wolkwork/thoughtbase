@@ -21,6 +21,21 @@ Instead of the default floating button, you can use your own button to open the 
 
 When users click your button, the widget will open. The default floating button won't appear when using a custom selector.
 
+## Removing Thoughtbase Branding
+
+To remove the "Powered by Thoughtbase" branding from the widget footer, set `thoughtbaseBranding` to `false`:
+
+```html
+<script>
+  window.thoughtbase.initWidget({
+    organizationId: 'your-organization-id-here',
+    thoughtbaseBranding: false
+  });
+</script>
+```
+
+This option is available on the *Pro* and *Business* plans.
+
 ## Styling
 
 ### Style Isolation

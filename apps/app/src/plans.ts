@@ -41,6 +41,7 @@ export const pro = {
   permissions: [
     ...start.permissions,
     Permission.CUSTOM_DOMAIN,
+    Permission.WHITE_LABEL,
     Permission.PRIVATE_BOARDS,
   ] as Permission[],
 } as const;
