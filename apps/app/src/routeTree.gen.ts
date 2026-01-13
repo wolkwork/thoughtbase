@@ -29,6 +29,7 @@ import { Route as ApiWidgetChangelogRouteImport } from './routes/api/widget/chan
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as authenticatedDashboardOrgSlugRouteRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/route'
 import { Route as authenticatedDashboardOrgSlugIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/index'
+import { Route as SubdomainSlugApiSplatRouteImport } from './routes/subdomain/$slug/api/$'
 import { Route as ApiZapierWebhooksSubscribeRouteImport } from './routes/api/zapier/webhooks/subscribe'
 import { Route as authenticatedDashboardOrgSlugSettingsIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/settings/index'
 import { Route as authenticatedDashboardOrgSlugRoadmapIndexRouteImport } from './routes/(authenticated)/dashboard/$orgSlug/roadmap/index'
@@ -144,6 +145,11 @@ const authenticatedDashboardOrgSlugIndexRoute =
     path: '/',
     getParentRoute: () => authenticatedDashboardOrgSlugRouteRoute,
   } as any)
+const SubdomainSlugApiSplatRoute = SubdomainSlugApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
+  getParentRoute: () => SubdomainSlugRouteRoute,
+} as any)
 const ApiZapierWebhooksSubscribeRoute =
   ApiZapierWebhooksSubscribeRouteImport.update({
     id: '/api/zapier/webhooks/subscribe',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof authenticatedDashboardIndexRoute
   '/subdomain/$slug/': typeof SubdomainSlugIndexRoute
   '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
+  '/subdomain/$slug/api/$': typeof SubdomainSlugApiSplatRoute
   '/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
   '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
   '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof authenticatedDashboardIndexRoute
   '/subdomain/$slug': typeof SubdomainSlugIndexRoute
   '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
+  '/subdomain/$slug/api/$': typeof SubdomainSlugApiSplatRoute
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugIndexRoute
   '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
   '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
   '/subdomain/$slug/': typeof SubdomainSlugIndexRoute
   '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
+  '/subdomain/$slug/api/$': typeof SubdomainSlugApiSplatRoute
   '/(authenticated)/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
   '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
   '/(authenticated)/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/subdomain/$slug/'
     | '/api/zapier/webhooks/subscribe'
+    | '/subdomain/$slug/api/$'
     | '/dashboard/$orgSlug/'
     | '/dashboard/$orgSlug/changelog/$changelogId'
     | '/dashboard/$orgSlug/changelog/new'
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/subdomain/$slug'
     | '/api/zapier/webhooks/subscribe'
+    | '/subdomain/$slug/api/$'
     | '/dashboard/$orgSlug'
     | '/dashboard/$orgSlug/changelog/$changelogId'
     | '/dashboard/$orgSlug/changelog/new'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/(authenticated)/dashboard/'
     | '/subdomain/$slug/'
     | '/api/zapier/webhooks/subscribe'
+    | '/subdomain/$slug/api/$'
     | '/(authenticated)/dashboard/$orgSlug/'
     | '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
     | '/(authenticated)/dashboard/$orgSlug/changelog/new'
@@ -554,6 +566,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/$orgSlug/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
+    }
+    '/subdomain/$slug/api/$': {
+      id: '/subdomain/$slug/api/$'
+      path: '/api/$'
+      fullPath: '/subdomain/$slug/api/$'
+      preLoaderRoute: typeof SubdomainSlugApiSplatRouteImport
+      parentRoute: typeof SubdomainSlugRouteRoute
     }
     '/api/zapier/webhooks/subscribe': {
       id: '/api/zapier/webhooks/subscribe'
@@ -725,6 +744,7 @@ interface SubdomainSlugRouteRouteChildren {
   SubdomainSlugChangelogRoute: typeof SubdomainSlugChangelogRoute
   SubdomainSlugRoadmapRoute: typeof SubdomainSlugRoadmapRoute
   SubdomainSlugIndexRoute: typeof SubdomainSlugIndexRoute
+  SubdomainSlugApiSplatRoute: typeof SubdomainSlugApiSplatRoute
 }
 
 const SubdomainSlugRouteRouteChildren: SubdomainSlugRouteRouteChildren = {
@@ -732,6 +752,7 @@ const SubdomainSlugRouteRouteChildren: SubdomainSlugRouteRouteChildren = {
   SubdomainSlugChangelogRoute: SubdomainSlugChangelogRoute,
   SubdomainSlugRoadmapRoute: SubdomainSlugRoadmapRoute,
   SubdomainSlugIndexRoute: SubdomainSlugIndexRoute,
+  SubdomainSlugApiSplatRoute: SubdomainSlugApiSplatRoute,
 }
 
 const SubdomainSlugRouteRouteWithChildren =

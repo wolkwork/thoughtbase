@@ -12,5 +12,4 @@ function getBaseUrl() {
 
 export const authClient = createAuthClient({
   plugins: [organizationClient(), apiKeyClient(), polarClient()],
-  baseURL: getBaseUrl(),
 });

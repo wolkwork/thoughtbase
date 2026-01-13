@@ -45,17 +45,20 @@ const getAuthConfig = createServerOnlyFn(() => {
       },
     }),
     advanced: {
+      // Enable cross-subdomain cookies for *.thoughtbase.app subdomains
+      // Custom domains will have their own cookies (domain: undefined handles this)
       crossSubDomainCookies: {
         enabled: true,
         domain: new URL(getBaseUrl()).hostname,
       },
-      // defaultCookieAttributes: {
-      //   sameSite: "none",
-      //   secure: true,
-      //   // TODO: Fix
-      //   domain: `.${getBaseUrl()}`,
-      // },
-      // trustedOrigins: [`*.vercel.app`, `http://localhost:4321`],
+      defaultCookieAttributes: {
+        sameSite: "lax",
+        secure: true,
+        // domain: undefined means cookies are set for the exact domain making the request
+        // This allows each domain (main, subdomain, custom) to have its own cookies
+        // while sharing the same session data in the database
+        domain: undefined,
+      },
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
