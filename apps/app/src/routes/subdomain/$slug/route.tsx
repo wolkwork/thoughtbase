@@ -6,7 +6,7 @@ import { $getOrganizationBySlugOrDomain, $getPlanPermissions } from "~/lib/domai
 
 // Known base domains for subdomain detection (must match router.tsx)
 
-export const Route = createFileRoute("/org/$slug")({
+export const Route = createFileRoute("/subdomain/$slug")({
   loaderDeps: ({ search: { sso_token } }: { search: { sso_token?: string } }) => ({
     sso_token,
   }),

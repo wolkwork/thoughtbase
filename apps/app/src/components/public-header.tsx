@@ -69,7 +69,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
         <div className="mx-auto flex h-16 max-w-none items-center justify-between px-4">
           <div className="flex items-center gap-8">
             <Link
-              to="/org/$slug"
+              to="/subdomain/$slug"
               params={{ slug: org.slug }}
               className="flex items-center gap-2"
             >
@@ -82,7 +82,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
 
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
               <Link
-                to="/org/$slug"
+                to="/subdomain/$slug"
                 params={{ slug: org.slug }}
                 className="text-foreground hover:text-foreground/80 transition-colors"
                 activeProps={{ className: "text-primary" }}
@@ -91,7 +91,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
                 Feedback
               </Link>
               <Link
-                to="/org/$slug/roadmap"
+                to="/subdomain/$slug/roadmap"
                 params={{ slug: org.slug }}
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 activeProps={{ className: "text-primary" }}
@@ -99,7 +99,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
                 Roadmap
               </Link>
               <Link
-                to="/org/$slug/changelog"
+                to="/subdomain/$slug/changelog"
                 params={{ slug: org.slug }}
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 activeProps={{ className: "text-primary" }}
@@ -175,7 +175,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
         orgSlug={org.slug}
         onSuccess={(newIdea) => {
           navigate({
-            to: "/org/$slug/$ideaId",
+            to: "/subdomain/$slug/$ideaId",
             params: { slug: org.slug, ideaId: newIdea.id },
           });
         }}

@@ -18,7 +18,7 @@ import {
 } from "~/components/ui/dialog";
 import { $getIdea } from "~/lib/api/ideas";
 
-export const Route = createFileRoute("/org/$slug/$ideaId")({
+export const Route = createFileRoute("/subdomain/$slug/$ideaId")({
   loader: async ({ params: { ideaId } }) => {
     const idea = await $getIdea({ data: ideaId });
     if (!idea) {
@@ -30,8 +30,8 @@ export const Route = createFileRoute("/org/$slug/$ideaId")({
 });
 
 function PublicIdeaDetailPage() {
-  const { idea: initialIdea } = useLoaderData({ from: "/org/$slug/$ideaId" });
-  const { org, user } = useLoaderData({ from: "/org/$slug" });
+  const { idea: initialIdea } = useLoaderData({ from: "/subdomain/$slug/$ideaId" });
+  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
   const { ideaId } = Route.useParams();
   const router = useRouter();
 

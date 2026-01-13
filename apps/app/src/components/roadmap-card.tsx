@@ -50,7 +50,7 @@ export function RoadmapCard({ idea, orgSlug, isPublic = false }: RoadmapCardProp
 
       {isPublic ? (
         <Link
-          to="/org/$slug/$ideaId"
+          to="/subdomain/$slug/$ideaId"
           params={{ slug: orgSlug, ideaId: idea.id }}
           className="absolute inset-0 z-0"
         />

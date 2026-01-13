@@ -19,12 +19,12 @@ import { UserAvatar } from "~/components/user-avatar";
 import { $getIdeasFeed, $toggleReaction } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 
-export const Route = createFileRoute("/org/$slug/")({
+export const Route = createFileRoute("/subdomain/$slug/")({
   component: OrganizationIndexPage,
 });
 
 function OrganizationIndexPage() {
-  const { org, user } = useLoaderData({ from: "/org/$slug" });
+  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -220,7 +220,7 @@ function OrganizationIndexPage() {
               return (
                 <Link
                   key={idea.id}
-                  to="/org/$slug/$ideaId"
+                  to="/subdomain/$slug/$ideaId"
                   params={{ slug: org.slug, ideaId: idea.id }}
                   className="block"
                 >

@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 import { LikeBadge } from "~/components/engagement-badges";
 import { $getPublishedChangelogs } from "~/lib/api/changelogs";
 
-export const Route = createFileRoute("/org/$slug/changelog")({
+export const Route = createFileRoute("/subdomain/$slug/changelog")({
   component: ChangelogPage,
 });
 
@@ -159,7 +159,7 @@ function renderNode(node: any): ReactNode {
 }
 
 function ChangelogPage() {
-  const { org } = useLoaderData({ from: "/org/$slug" });
+  const { org } = useLoaderData({ from: "/subdomain/$slug" });
 
   const {
     data: changelogsData,
@@ -270,7 +270,7 @@ function ChangelogPage() {
                     {changelog.ideas.map((idea) => (
                       <Link
                         key={idea.id}
-                        to="/org/$slug/$ideaId"
+                        to="/subdomain/$slug/$ideaId"
                         params={{ slug: org.slug, ideaId: idea.id }}
                         className="hover:bg-muted/50 flex items-center justify-between gap-3 border-t px-3 py-3"
                       >

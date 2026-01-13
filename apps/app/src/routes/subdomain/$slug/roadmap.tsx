@@ -3,12 +3,12 @@ import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { RoadmapBoard } from "~/components/roadmap-board";
 import { $getPublicRoadmapIdeas } from "~/lib/api/ideas";
 
-export const Route = createFileRoute("/org/$slug/roadmap")({
+export const Route = createFileRoute("/subdomain/$slug/roadmap")({
   component: PublicRoadmapPage,
 });
 
 function PublicRoadmapPage() {
-  const { org } = useLoaderData({ from: "/org/$slug" });
+  const { org } = useLoaderData({ from: "/subdomain/$slug" });
 
   const { data: ideas } = useQuery({
     queryKey: ["public-roadmap-ideas", org.id],

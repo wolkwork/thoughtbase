@@ -5,7 +5,7 @@ import { Permission } from "~/plans";
  * Hook to get permissions for an organization from route context
  */
 export function usePermissionsPublic() {
-  const { plan } = useLoaderData({ from: "/org/$slug" });
+  const { plan } = useLoaderData({ from: "/subdomain/$slug" });
 
   const hasPermission = (permission: Permission): boolean => {
     if (!plan) return false;

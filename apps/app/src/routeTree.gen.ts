@@ -16,13 +16,13 @@ import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation/$invitationId'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
 import { Route as authPagesLoginRouteImport } from './routes/(auth-pages)/login'
-import { Route as OrgSlugRouteRouteImport } from './routes/org/$slug/route'
+import { Route as SubdomainSlugRouteRouteImport } from './routes/subdomain/$slug/route'
 import { Route as authenticatedDashboardRouteRouteImport } from './routes/(authenticated)/dashboard/route'
-import { Route as OrgSlugIndexRouteImport } from './routes/org/$slug/index'
+import { Route as SubdomainSlugIndexRouteImport } from './routes/subdomain/$slug/index'
 import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authenticated)/dashboard/index'
-import { Route as OrgSlugRoadmapRouteImport } from './routes/org/$slug/roadmap'
-import { Route as OrgSlugChangelogRouteImport } from './routes/org/$slug/changelog'
-import { Route as OrgSlugIdeaIdRouteImport } from './routes/org/$slug/$ideaId'
+import { Route as SubdomainSlugRoadmapRouteImport } from './routes/subdomain/$slug/roadmap'
+import { Route as SubdomainSlugChangelogRouteImport } from './routes/subdomain/$slug/changelog'
+import { Route as SubdomainSlugIdeaIdRouteImport } from './routes/subdomain/$slug/$ideaId'
 import { Route as ApiWidgetOrganizationRouteImport } from './routes/api/widget/organization'
 import { Route as ApiWidgetIdeasRouteImport } from './routes/api/widget/ideas'
 import { Route as ApiWidgetChangelogRouteImport } from './routes/api/widget/changelog'
@@ -75,9 +75,9 @@ const authPagesLoginRoute = authPagesLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => authPagesRouteRoute,
 } as any)
-const OrgSlugRouteRoute = OrgSlugRouteRouteImport.update({
-  id: '/org/$slug',
-  path: '/org/$slug',
+const SubdomainSlugRouteRoute = SubdomainSlugRouteRouteImport.update({
+  id: '/subdomain/$slug',
+  path: '/subdomain/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authenticatedDashboardRouteRoute =
@@ -86,10 +86,10 @@ const authenticatedDashboardRouteRoute =
     path: '/dashboard',
     getParentRoute: () => authenticatedRouteRoute,
   } as any)
-const OrgSlugIndexRoute = OrgSlugIndexRouteImport.update({
+const SubdomainSlugIndexRoute = SubdomainSlugIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => OrgSlugRouteRoute,
+  getParentRoute: () => SubdomainSlugRouteRoute,
 } as any)
 const authenticatedDashboardIndexRoute =
   authenticatedDashboardIndexRouteImport.update({
@@ -97,20 +97,20 @@ const authenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => authenticatedDashboardRouteRoute,
   } as any)
-const OrgSlugRoadmapRoute = OrgSlugRoadmapRouteImport.update({
+const SubdomainSlugRoadmapRoute = SubdomainSlugRoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
-  getParentRoute: () => OrgSlugRouteRoute,
+  getParentRoute: () => SubdomainSlugRouteRoute,
 } as any)
-const OrgSlugChangelogRoute = OrgSlugChangelogRouteImport.update({
+const SubdomainSlugChangelogRoute = SubdomainSlugChangelogRouteImport.update({
   id: '/changelog',
   path: '/changelog',
-  getParentRoute: () => OrgSlugRouteRoute,
+  getParentRoute: () => SubdomainSlugRouteRoute,
 } as any)
-const OrgSlugIdeaIdRoute = OrgSlugIdeaIdRouteImport.update({
+const SubdomainSlugIdeaIdRoute = SubdomainSlugIdeaIdRouteImport.update({
   id: '/$ideaId',
   path: '/$ideaId',
-  getParentRoute: () => OrgSlugRouteRoute,
+  getParentRoute: () => SubdomainSlugRouteRoute,
 } as any)
 const ApiWidgetOrganizationRoute = ApiWidgetOrganizationRouteImport.update({
   id: '/api/widget/organization',
@@ -214,7 +214,7 @@ const authenticatedDashboardOrgSlugChangelogChangelogIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof authenticatedDashboardRouteRouteWithChildren
-  '/org/$slug': typeof OrgSlugRouteRouteWithChildren
+  '/subdomain/$slug': typeof SubdomainSlugRouteRouteWithChildren
   '/login': typeof authPagesLoginRoute
   '/signup': typeof authPagesSignupRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
@@ -224,11 +224,11 @@ export interface FileRoutesByFullPath {
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/api/widget/organization': typeof ApiWidgetOrganizationRoute
-  '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
-  '/org/$slug/changelog': typeof OrgSlugChangelogRoute
-  '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
+  '/subdomain/$slug/$ideaId': typeof SubdomainSlugIdeaIdRoute
+  '/subdomain/$slug/changelog': typeof SubdomainSlugChangelogRoute
+  '/subdomain/$slug/roadmap': typeof SubdomainSlugRoadmapRoute
   '/dashboard/': typeof authenticatedDashboardIndexRoute
-  '/org/$slug/': typeof OrgSlugIndexRoute
+  '/subdomain/$slug/': typeof SubdomainSlugIndexRoute
   '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
   '/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
   '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
@@ -252,11 +252,11 @@ export interface FileRoutesByTo {
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/api/widget/organization': typeof ApiWidgetOrganizationRoute
-  '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
-  '/org/$slug/changelog': typeof OrgSlugChangelogRoute
-  '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
+  '/subdomain/$slug/$ideaId': typeof SubdomainSlugIdeaIdRoute
+  '/subdomain/$slug/changelog': typeof SubdomainSlugChangelogRoute
+  '/subdomain/$slug/roadmap': typeof SubdomainSlugRoadmapRoute
   '/dashboard': typeof authenticatedDashboardIndexRoute
-  '/org/$slug': typeof OrgSlugIndexRoute
+  '/subdomain/$slug': typeof SubdomainSlugIndexRoute
   '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
   '/dashboard/$orgSlug': typeof authenticatedDashboardOrgSlugIndexRoute
   '/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
@@ -276,7 +276,7 @@ export interface FileRoutesById {
   '/(auth-pages)': typeof authPagesRouteRouteWithChildren
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/(authenticated)/dashboard': typeof authenticatedDashboardRouteRouteWithChildren
-  '/org/$slug': typeof OrgSlugRouteRouteWithChildren
+  '/subdomain/$slug': typeof SubdomainSlugRouteRouteWithChildren
   '/(auth-pages)/login': typeof authPagesLoginRoute
   '/(auth-pages)/signup': typeof authPagesSignupRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
@@ -286,11 +286,11 @@ export interface FileRoutesById {
   '/api/widget/changelog': typeof ApiWidgetChangelogRoute
   '/api/widget/ideas': typeof ApiWidgetIdeasRoute
   '/api/widget/organization': typeof ApiWidgetOrganizationRoute
-  '/org/$slug/$ideaId': typeof OrgSlugIdeaIdRoute
-  '/org/$slug/changelog': typeof OrgSlugChangelogRoute
-  '/org/$slug/roadmap': typeof OrgSlugRoadmapRoute
+  '/subdomain/$slug/$ideaId': typeof SubdomainSlugIdeaIdRoute
+  '/subdomain/$slug/changelog': typeof SubdomainSlugChangelogRoute
+  '/subdomain/$slug/roadmap': typeof SubdomainSlugRoadmapRoute
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
-  '/org/$slug/': typeof OrgSlugIndexRoute
+  '/subdomain/$slug/': typeof SubdomainSlugIndexRoute
   '/api/zapier/webhooks/subscribe': typeof ApiZapierWebhooksSubscribeRouteWithChildren
   '/(authenticated)/dashboard/$orgSlug/': typeof authenticatedDashboardOrgSlugIndexRoute
   '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId': typeof authenticatedDashboardOrgSlugChangelogChangelogIdRoute
@@ -309,7 +309,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
-    | '/org/$slug'
+    | '/subdomain/$slug'
     | '/login'
     | '/signup'
     | '/accept-invitation/$invitationId'
@@ -319,11 +319,11 @@ export interface FileRouteTypes {
     | '/api/widget/changelog'
     | '/api/widget/ideas'
     | '/api/widget/organization'
-    | '/org/$slug/$ideaId'
-    | '/org/$slug/changelog'
-    | '/org/$slug/roadmap'
+    | '/subdomain/$slug/$ideaId'
+    | '/subdomain/$slug/changelog'
+    | '/subdomain/$slug/roadmap'
     | '/dashboard/'
-    | '/org/$slug/'
+    | '/subdomain/$slug/'
     | '/api/zapier/webhooks/subscribe'
     | '/dashboard/$orgSlug/'
     | '/dashboard/$orgSlug/changelog/$changelogId'
@@ -347,11 +347,11 @@ export interface FileRouteTypes {
     | '/api/widget/changelog'
     | '/api/widget/ideas'
     | '/api/widget/organization'
-    | '/org/$slug/$ideaId'
-    | '/org/$slug/changelog'
-    | '/org/$slug/roadmap'
+    | '/subdomain/$slug/$ideaId'
+    | '/subdomain/$slug/changelog'
+    | '/subdomain/$slug/roadmap'
     | '/dashboard'
-    | '/org/$slug'
+    | '/subdomain/$slug'
     | '/api/zapier/webhooks/subscribe'
     | '/dashboard/$orgSlug'
     | '/dashboard/$orgSlug/changelog/$changelogId'
@@ -370,7 +370,7 @@ export interface FileRouteTypes {
     | '/(auth-pages)'
     | '/(authenticated)'
     | '/(authenticated)/dashboard'
-    | '/org/$slug'
+    | '/subdomain/$slug'
     | '/(auth-pages)/login'
     | '/(auth-pages)/signup'
     | '/accept-invitation/$invitationId'
@@ -380,11 +380,11 @@ export interface FileRouteTypes {
     | '/api/widget/changelog'
     | '/api/widget/ideas'
     | '/api/widget/organization'
-    | '/org/$slug/$ideaId'
-    | '/org/$slug/changelog'
-    | '/org/$slug/roadmap'
+    | '/subdomain/$slug/$ideaId'
+    | '/subdomain/$slug/changelog'
+    | '/subdomain/$slug/roadmap'
     | '/(authenticated)/dashboard/'
-    | '/org/$slug/'
+    | '/subdomain/$slug/'
     | '/api/zapier/webhooks/subscribe'
     | '/(authenticated)/dashboard/$orgSlug/'
     | '/(authenticated)/dashboard/$orgSlug/changelog/$changelogId'
@@ -403,7 +403,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   authPagesRouteRoute: typeof authPagesRouteRouteWithChildren
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
-  OrgSlugRouteRoute: typeof OrgSlugRouteRouteWithChildren
+  SubdomainSlugRouteRoute: typeof SubdomainSlugRouteRouteWithChildren
   AcceptInvitationInvitationIdRoute: typeof AcceptInvitationInvitationIdRoute
   ApiUploadRoute: typeof ApiUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -464,11 +464,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authPagesLoginRouteImport
       parentRoute: typeof authPagesRouteRoute
     }
-    '/org/$slug': {
-      id: '/org/$slug'
-      path: '/org/$slug'
-      fullPath: '/org/$slug'
-      preLoaderRoute: typeof OrgSlugRouteRouteImport
+    '/subdomain/$slug': {
+      id: '/subdomain/$slug'
+      path: '/subdomain/$slug'
+      fullPath: '/subdomain/$slug'
+      preLoaderRoute: typeof SubdomainSlugRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(authenticated)/dashboard': {
@@ -478,12 +478,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedDashboardRouteRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
-    '/org/$slug/': {
-      id: '/org/$slug/'
+    '/subdomain/$slug/': {
+      id: '/subdomain/$slug/'
       path: '/'
-      fullPath: '/org/$slug/'
-      preLoaderRoute: typeof OrgSlugIndexRouteImport
-      parentRoute: typeof OrgSlugRouteRoute
+      fullPath: '/subdomain/$slug/'
+      preLoaderRoute: typeof SubdomainSlugIndexRouteImport
+      parentRoute: typeof SubdomainSlugRouteRoute
     }
     '/(authenticated)/dashboard/': {
       id: '/(authenticated)/dashboard/'
@@ -492,26 +492,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedDashboardIndexRouteImport
       parentRoute: typeof authenticatedDashboardRouteRoute
     }
-    '/org/$slug/roadmap': {
-      id: '/org/$slug/roadmap'
+    '/subdomain/$slug/roadmap': {
+      id: '/subdomain/$slug/roadmap'
       path: '/roadmap'
-      fullPath: '/org/$slug/roadmap'
-      preLoaderRoute: typeof OrgSlugRoadmapRouteImport
-      parentRoute: typeof OrgSlugRouteRoute
+      fullPath: '/subdomain/$slug/roadmap'
+      preLoaderRoute: typeof SubdomainSlugRoadmapRouteImport
+      parentRoute: typeof SubdomainSlugRouteRoute
     }
-    '/org/$slug/changelog': {
-      id: '/org/$slug/changelog'
+    '/subdomain/$slug/changelog': {
+      id: '/subdomain/$slug/changelog'
       path: '/changelog'
-      fullPath: '/org/$slug/changelog'
-      preLoaderRoute: typeof OrgSlugChangelogRouteImport
-      parentRoute: typeof OrgSlugRouteRoute
+      fullPath: '/subdomain/$slug/changelog'
+      preLoaderRoute: typeof SubdomainSlugChangelogRouteImport
+      parentRoute: typeof SubdomainSlugRouteRoute
     }
-    '/org/$slug/$ideaId': {
-      id: '/org/$slug/$ideaId'
+    '/subdomain/$slug/$ideaId': {
+      id: '/subdomain/$slug/$ideaId'
       path: '/$ideaId'
-      fullPath: '/org/$slug/$ideaId'
-      preLoaderRoute: typeof OrgSlugIdeaIdRouteImport
-      parentRoute: typeof OrgSlugRouteRoute
+      fullPath: '/subdomain/$slug/$ideaId'
+      preLoaderRoute: typeof SubdomainSlugIdeaIdRouteImport
+      parentRoute: typeof SubdomainSlugRouteRoute
     }
     '/api/widget/organization': {
       id: '/api/widget/organization'
@@ -720,23 +720,22 @@ const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
 const authenticatedRouteRouteWithChildren =
   authenticatedRouteRoute._addFileChildren(authenticatedRouteRouteChildren)
 
-interface OrgSlugRouteRouteChildren {
-  OrgSlugIdeaIdRoute: typeof OrgSlugIdeaIdRoute
-  OrgSlugChangelogRoute: typeof OrgSlugChangelogRoute
-  OrgSlugRoadmapRoute: typeof OrgSlugRoadmapRoute
-  OrgSlugIndexRoute: typeof OrgSlugIndexRoute
+interface SubdomainSlugRouteRouteChildren {
+  SubdomainSlugIdeaIdRoute: typeof SubdomainSlugIdeaIdRoute
+  SubdomainSlugChangelogRoute: typeof SubdomainSlugChangelogRoute
+  SubdomainSlugRoadmapRoute: typeof SubdomainSlugRoadmapRoute
+  SubdomainSlugIndexRoute: typeof SubdomainSlugIndexRoute
 }
 
-const OrgSlugRouteRouteChildren: OrgSlugRouteRouteChildren = {
-  OrgSlugIdeaIdRoute: OrgSlugIdeaIdRoute,
-  OrgSlugChangelogRoute: OrgSlugChangelogRoute,
-  OrgSlugRoadmapRoute: OrgSlugRoadmapRoute,
-  OrgSlugIndexRoute: OrgSlugIndexRoute,
+const SubdomainSlugRouteRouteChildren: SubdomainSlugRouteRouteChildren = {
+  SubdomainSlugIdeaIdRoute: SubdomainSlugIdeaIdRoute,
+  SubdomainSlugChangelogRoute: SubdomainSlugChangelogRoute,
+  SubdomainSlugRoadmapRoute: SubdomainSlugRoadmapRoute,
+  SubdomainSlugIndexRoute: SubdomainSlugIndexRoute,
 }
 
-const OrgSlugRouteRouteWithChildren = OrgSlugRouteRoute._addFileChildren(
-  OrgSlugRouteRouteChildren,
-)
+const SubdomainSlugRouteRouteWithChildren =
+  SubdomainSlugRouteRoute._addFileChildren(SubdomainSlugRouteRouteChildren)
 
 interface ApiZapierWebhooksSubscribeRouteChildren {
   ApiZapierWebhooksSubscribeIdRoute: typeof ApiZapierWebhooksSubscribeIdRoute
@@ -756,7 +755,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authPagesRouteRoute: authPagesRouteRouteWithChildren,
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
-  OrgSlugRouteRoute: OrgSlugRouteRouteWithChildren,
+  SubdomainSlugRouteRoute: SubdomainSlugRouteRouteWithChildren,
   AcceptInvitationInvitationIdRoute: AcceptInvitationInvitationIdRoute,
   ApiUploadRoute: ApiUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
