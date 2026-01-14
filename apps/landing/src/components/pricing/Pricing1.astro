@@ -50,9 +50,9 @@ const pricingOptions = [
     },
     features: [
       { text: "Everything in Free" },
-      // { text: "Private boards" },
       { text: "Custom domain" },
       { text: "White label" },
+      { text: "Private boards", soon: true },
     ],
   },
   {
@@ -72,7 +72,7 @@ const pricingOptions = [
     features: [
       { text: "Everything in Pro" },
       { text: "Automatic login" },
-      // { text: "Integrations" },
+      { text: "Integrations", soon: true },
     ],
   },
 ];
@@ -145,7 +145,14 @@ const pricingOptions = [
                         size="sm"
                         class={`shrink-0 ${tier.secondaryTextColor}`}
                       />
-                      <span>{feature.text}</span>
+                      <span class={feature.soon ? "text-base-500/75" : ""}>
+                        {feature.text}{" "}
+                        {feature.soon && (
+                          <span class="ml-2 text-xs text-base-500 bg-white py-0.5 px-2 rounded-full">
+                            Coming soon
+                          </span>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>
