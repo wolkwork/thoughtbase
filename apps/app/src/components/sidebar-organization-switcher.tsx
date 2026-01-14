@@ -60,7 +60,7 @@ export function SidebarOrganizationSwitcher({
                     plan.slug === "business" && "text-emerald-600",
                   )}
                 >
-                  {plan.slug === "free" ? "Trial Expired" : plan.name}
+                  {plan.slug === "free" ? "Read-only" : plan.name}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4!" />

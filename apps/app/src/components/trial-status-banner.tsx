@@ -21,11 +21,11 @@ export function TrialStatusBanner() {
             <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             <div>
               <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
-                Your trial has ended
+                This workspace is now read-only. Subscribe or start a 14-day free trial to
+                continue.
               </p>
               <p className="text-xs text-amber-700 dark:text-amber-300">
-                This workspace is now read-only. All your data will be here when you're
-                ready!
+                All your data will be here when you're ready!
               </p>
             </div>
           </div>

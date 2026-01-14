@@ -110,7 +110,7 @@ export function BillingSettings() {
               )}
               {!activeSubscription && (
                 <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                  Trial Expired - Upgrade to continue
+                  Upgrade to continue
                 </p>
               )}
             </div>
