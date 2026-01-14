@@ -16,7 +16,7 @@ import { getBaseUrl } from "../base-url";
 const getPolarClient = createServerOnlyFn(() => {
   return new Polar({
     accessToken: env.POLAR_ACCESS_TOKEN,
-    server: env.VERCEL_ENV === "production" ? "sandbox" : "sandbox",
+    server: env.VERCEL_ENV === "production" ? "production" : "sandbox",
   });
 });
 
