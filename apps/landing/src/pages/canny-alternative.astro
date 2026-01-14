@@ -1,0 +1,410 @@
+---
+// Foundations
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Text from "@/components/fundations/elements/Text.astro";
+import Link from "@/components/fundations/elements/Link.astro";
+import Wrapper from "@/components/fundations/containers/Wrapper.astro";
+import Check from "@/components/fundations/icons/Check.astro";
+import { AstroSeo } from "@astrolib/seo";
+
+const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
+
+const comparisonFeatures = [
+  {
+    category: "Pricing & Value",
+    features: [
+      {
+        name: "Starting Price",
+        thoughtbase: "$25/month",
+        canny: "$19/month",
+        thoughtbaseWins: false,
+      },
+      {
+        name: "Unlimited Tracked Users",
+        thoughtbase: "✓ Included",
+        canny: "✗ Limited (25 free, 100+ paid)",
+        thoughtbaseWins: true,
+      },
+      {
+        name: "Unlimited Ideas",
+        thoughtbase: "✓ Included",
+        canny: "✓ Included",
+        thoughtbaseWins: false,
+      },
+      {
+        name: "Unlimited Admins",
+        thoughtbase: "✓ Included",
+        canny: "✗ Limited by plan",
+        thoughtbaseWins: true,
+      },
+    ],
+  },
+  {
+    category: "Core Features",
+    features: [
+      {
+        name: "Feedback Collection Widget",
+        thoughtbase: "✓ Lightweight & Fast",
+        canny: "✓ Available",
+        thoughtbaseWins: false,
+      },
+      {
+        name: "Roadmap",
+        thoughtbase: "✓ Beautiful & Visual",
+        canny: "✓ Available",
+        thoughtbaseWins: false,
+      },
+      {
+        name: "Custom Domain",
+        thoughtbase: "✓ Pro Plan ($49/mo)",
+        canny: "✓ Pro Plan ($79/mo)",
+        thoughtbaseWins: true,
+      },
+      {
+        name: "White Label",
+        thoughtbase: "✓ Pro Plan ($49/mo)",
+        canny: "✓ Business Plan (Custom)",
+        thoughtbaseWins: true,
+      },
+      {
+        name: "SSO / Automatic Login",
+        thoughtbase: "✓ Business Plan ($99/mo)",
+        canny: "✓ Business Plan (Custom)",
+        thoughtbaseWins: true,
+      },
+    ],
+  },
+  {
+    category: "User Experience",
+    features: [
+      {
+        name: "Speed & Performance",
+        thoughtbase: "✓ Fast dashboard, lightweight widget",
+        canny: "Standard",
+        thoughtbaseWins: true,
+      },
+      {
+        name: "Built by Engineers",
+        thoughtbase: "✓ We use it ourselves",
+        canny: "Standard",
+        thoughtbaseWins: true,
+      },
+      {
+        name: "Bootstrapped & Independent",
+        thoughtbase: "✓ No VC pressure",
+        canny: "VC-backed",
+        thoughtbaseWins: true,
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout>
+  <AstroSeo
+    slot="seo"
+    title="Canny Alternative - Thoughtbase | Better Feedback Management"
+    description="Looking for a Canny alternative? Thoughtbase offers unlimited users, faster performance, and better pricing. Compare features and switch today."
+    canonical="https://thoughtbase.app/canny-alternative"
+    openGraph={{
+      url: "https://thoughtbase.app/canny-alternative",
+      title: "Canny Alternative - Thoughtbase | Better Feedback Management",
+      description:
+        "Looking for a Canny alternative? Thoughtbase offers unlimited users, faster performance, and better pricing. Compare features and switch today.",
+      images: [
+        {
+          url: "https://thoughtbase.app/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: "Thoughtbase - Canny Alternative",
+          type: "image/jpeg",
+        },
+      ],
+      site_name: "Thoughtbase",
+      type: "website",
+      locale: "en_US",
+    }}
+  />
+
+  <section>
+    <Wrapper variant="standard" class="pt-32 pb-12">
+      <div class="max-w-4xl mx-auto text-balance">
+        <Text
+          tag="h1"
+          variant="displayMD"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Thoughtbase: a Canny alternative with unlimited users and ideas
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          Looking for a Canny alternative? Thoughtbase offers unlimited tracked
+          users, faster performance, better pricing, and a focus on what
+          actually matters: turning feedback into features.
+        </Text>
+      </div>
+    </Wrapper>
+
+    <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+      <div class="max-w-4xl mx-auto">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Why Choose Thoughtbase Over Canny?
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          We built Thoughtbase because we were frustrated with existing feedback
+          tools. Here's what makes us different:
+        </Text>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="flex flex-col p-4 bg-sand-100 rounded-xl">
+            <Text tag="h3" variant="textSM" class="font-medium text-base-900">
+              Unlimited Everything
+            </Text>
+            <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+              Unlimited tracked users, unlimited ideas, unlimited admins. No
+              arbitrary limits that force you to upgrade.
+            </Text>
+          </div>
+
+          <div class="flex flex-col p-4 bg-sand-100 rounded-xl">
+            <Text tag="h3" variant="textSM" class="font-medium text-base-900">
+              Better Pricing
+            </Text>
+            <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+              Custom domains and white label at $49/month vs Canny's $79/month.
+              More value, less cost.
+            </Text>
+          </div>
+
+          <div class="flex flex-col p-4 bg-sand-100 rounded-xl">
+            <Text tag="h3" variant="textSM" class="font-medium text-base-900">
+              Built for Speed
+            </Text>
+            <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+              Fast dashboard, lightweight widget, no loading spinners. We
+              prioritize performance over bloat.
+            </Text>
+          </div>
+        </div>
+      </div>
+    </Wrapper>
+
+    <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+      <div class="max-w-4xl mx-auto">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Feature Comparison
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          See how Thoughtbase compares to Canny across key features:
+        </Text>
+
+        <div class="mt-8 space-y-12">
+          {
+            comparisonFeatures.map((category) => (
+              <div>
+                <Text
+                  tag="h3"
+                  variant="textBase"
+                  class="font-medium text-base-900 mb-4"
+                >
+                  {category.category}
+                </Text>
+                <div class="overflow-x-auto">
+                  <table class="w-full border-collapse">
+                    <thead>
+                      <tr class="border-b border-base-200">
+                        <th class="text-left py-3 px-4 font-medium text-base-900">
+                          Feature
+                        </th>
+                        <th class="text-left py-3 px-4 font-medium text-base-900">
+                          Thoughtbase
+                        </th>
+                        <th class="text-left py-3 px-4 font-medium text-base-900">
+                          Canny
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {category.features.map((feature) => (
+                        <tr
+                          class={`border-b border-base-200 ${
+                            feature.thoughtbaseWins ? "bg-sand-50" : ""
+                          }`}
+                        >
+                          <td class="py-3 px-4 font-medium text-base-900">
+                            {feature.name}
+                          </td>
+                          <td class="py-3 px-4 text-base-500">
+                            {feature.thoughtbase}
+                          </td>
+                          <td class="py-3 px-4 text-base-500">
+                            {feature.canny}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </Wrapper>
+
+    <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+      <div class="max-w-4xl mx-auto">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Pricing Comparison
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          Transparent pricing with no hidden costs. 14-day free trial on all
+          plans.
+        </Text>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col p-6 bg-sand-50 rounded-xl">
+            <Text tag="h3" variant="textBase" class="font-medium text-base-900">
+              Thoughtbase Pro
+            </Text>
+            <Text
+              variant="displaySM"
+              class="font-medium flex items-baseline tracking-tighter mt-2 font-serif text-base-900"
+            >
+              $49
+              <span class="text-sm font-normal tracking-normal text-base-500">
+                / mo
+              </span>
+            </Text>
+            <ul class="flex flex-col mt-4 text-sm gap-y-2 text-base-900">
+              <li class="flex items-start gap-2">
+                <Check size="sm" class="shrink-0 text-base-500" />
+                <span>Custom Domain</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Check size="sm" class="shrink-0 text-base-500" />
+                <span>White Label</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Check size="sm" class="shrink-0 text-base-500" />
+                <span>Unlimited Users</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="flex flex-col p-6 bg-sand-50 rounded-xl">
+            <Text tag="h3" variant="textBase" class="font-medium text-base-900">
+              Canny Pro
+            </Text>
+            <Text
+              variant="displaySM"
+              class="font-medium flex items-baseline tracking-tighter mt-2 font-serif text-base-900"
+            >
+              $79
+              <span class="text-sm font-normal tracking-normal text-base-500">
+                / mo
+              </span>
+            </Text>
+            <ul class="flex flex-col mt-4 text-sm gap-y-2 text-base-900">
+              <li class="flex items-start gap-2">
+                <Check size="sm" class="shrink-0 text-base-500" />
+                <span>Custom Domain</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Check size="sm" class="shrink-0 text-base-500" />
+                <span>Limited Users (100+)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Check size="sm" class="shrink-0 text-base-500" />
+                <span>Additional Features</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-accent-50 rounded-xl">
+          <Text tag="p" variant="textSM" class="text-base-900">
+            <strong>Save $30/month:</strong> Get custom domain and white label features
+            at Thoughtbase Pro ($49/mo) vs Canny Pro ($79/mo). That's $360 saved per
+            year.
+          </Text>
+        </div>
+      </div>
+    </Wrapper>
+
+    <Wrapper variant="standard" class="pt-12 pb-4 border-t">
+      <div class="max-w-4xl mx-auto">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Made for Product Teams Who Ship Fast
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          Thoughtbase is built by engineers, for engineers. We use it ourselves
+          to build Thoughtbase. If something sucks, we fix it. No committee
+          meetings, no VC pressure — just a focus on building the best feedback
+          tool possible.
+        </Text>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col p-4 bg-sand-100 rounded-xl">
+            <Text tag="h3" variant="textSM" class="font-medium text-base-900">
+              Bootstrapped & Independent
+            </Text>
+            <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+              We don't have VCs breathing down our necks demanding 10x growth.
+              We answer to you.
+            </Text>
+          </div>
+
+          <div class="flex flex-col p-4 bg-sand-100 rounded-xl">
+            <Text tag="h3" variant="textSM" class="font-medium text-base-900">
+              Built by Engineers
+            </Text>
+            <Text tag="p" variant="textSM" class="mt-2 text-base-500">
+              We use Thoughtbase to build Thoughtbase. If it sucks, we fix it.
+            </Text>
+          </div>
+        </div>
+      </div>
+    </Wrapper>
+
+    <Wrapper variant="standard" class="pt-12 pb-32 border-t">
+      <div class="max-w-2xl mx-auto text-center">
+        <Text
+          tag="h2"
+          variant="displaySM"
+          class="font-serif font-medium tracking-tight text-black"
+        >
+          Ready to Make the Switch?
+        </Text>
+        <Text tag="p" variant="textBase" class="mt-4 text-base-500">
+          Start your 14-day free trial. Cancel anytime.
+        </Text>
+        <div class="mt-8 flex justify-center">
+          <Link
+            size="sm"
+            variant="accent"
+            href={SIGNUP_URL}
+            class="opacity-70 relative group w-fit"
+          >
+            Get started for free
+          </Link>
+        </div>
+      </div>
+    </Wrapper>
+  </section>
+</BaseLayout>

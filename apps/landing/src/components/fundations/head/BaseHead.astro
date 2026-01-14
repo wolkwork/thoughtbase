@@ -8,7 +8,15 @@ import Analytics from "@vercel/analytics/astro";
 import Fuse from "@/components/fundations/scripts/Fuse.astro";
 ---
 
-<Seo />
+{
+  Astro.slots.has("seo") ? (
+    <Seo>
+      <slot name="seo" slot="seo" />
+    </Seo>
+  ) : (
+    <Seo />
+  )
+}
 <Meta />
 <Fonts />
 <Favicons />

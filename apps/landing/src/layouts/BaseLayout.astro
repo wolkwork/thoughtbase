@@ -19,7 +19,15 @@ const { hideNav = false, hideFooter = false } = Astro.props;
   class="scroll-smooth selection:bg-sand-100 selection:text-accent-500"
 >
   <head>
-    <BaseHead />
+    {
+      Astro.slots.has("seo") ? (
+        <BaseHead>
+          <slot name="seo" slot="seo" />
+        </BaseHead>
+      ) : (
+        <BaseHead />
+      )
+    }
   </head>
   <body class="relative flex flex-col bg-white min-h-svh">
     {!hideNav && <Navigation />}

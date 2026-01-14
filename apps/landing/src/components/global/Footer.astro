@@ -21,6 +21,15 @@ const footerLinks = [
       },
     ],
   },
+  {
+    heading: "Comparisons",
+    links: [
+      {
+        label: "Canny Alternative",
+        href: "/canny-alternative",
+      },
+    ],
+  },
 ];
 ---
 
@@ -36,7 +45,7 @@ const footerLinks = [
           <Logo class="size-10 text-base-900" />
         </a>
       </div>
-      <div class="flex justify-end">
+      <div class="md:grid md:grid-cols-2 xl:grid-cols-2 md:gap-8 xl:col-span-2">
         {
           footerLinks.map((section) => (
             <div class="mt-12 md:mt-0 ">

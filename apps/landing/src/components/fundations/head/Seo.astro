@@ -2,26 +2,33 @@
 import { AstroSeo } from "@astrolib/seo";
 ---
 
-<AstroSeo
-  title="Thoughtbase - Feedback tools for product engineers"
-  description="Collect feedback, prioritize roadmap, and ship changelogs without leaving your flow."
-  canonical="https://thoughtbase.app"
-  openGraph={{
-    url: "https://thoughtbase.app",
-    title: "Thoughtbase - Feedback tools for product engineers",
-    description:
-      "Collect feedback, prioritize roadmap, and ship changelogs without leaving your flow.",
-    images: [
-      {
-        url: "https://thoughtbase.app/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Thoughtbase - Feedback tools for product engineers",
-        type: "image/jpeg",
-      },
-    ],
-    site_name: "Thoughtbase",
-    type: "website",
-    locale: "en_US",
-  }}
-/>
+{/* If a custom SEO slot is provided, use it; otherwise use the default */}
+{
+  Astro.slots.has("seo") ? (
+    <slot name="seo" />
+  ) : (
+    <AstroSeo
+      title="Thoughtbase - Feedback tools for product engineers"
+      description="Collect feedback, prioritize roadmap, and ship changelogs without leaving your flow."
+      canonical="https://thoughtbase.app"
+      openGraph={{
+        url: "https://thoughtbase.app",
+        title: "Thoughtbase - Feedback tools for product engineers",
+        description:
+          "Collect feedback, prioritize roadmap, and ship changelogs without leaving your flow.",
+        images: [
+          {
+            url: "https://thoughtbase.app/og-image.jpg",
+            width: 1200,
+            height: 630,
+            alt: "Thoughtbase - Feedback tools for product engineers",
+            type: "image/jpeg",
+          },
+        ],
+        site_name: "Thoughtbase",
+        type: "website",
+        locale: "en_US",
+      }}
+    />
+  )
+}
