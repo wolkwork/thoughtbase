@@ -12,7 +12,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { AlertCircle, Copy, ExternalLink, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
-import type { BundledLanguage } from "shiki";
+// import type { BundledLanguage } from "shiki";
 import { toast } from "sonner";
 import { BrandingSettings } from "~/components/branding-settings";
 import { CustomDomainSettings } from "~/components/custom-domain-settings";
@@ -21,7 +21,7 @@ import { InviteMemberForm } from "~/components/team-settings";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
+// import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
 import { usePermissions } from "~/hooks/use-permissions";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 import { cn } from "~/lib/utils";
@@ -216,7 +216,7 @@ function CodeSnippet({
 }: {
   label: string;
   value: string;
-  lang: BundledLanguage;
+  lang: "ts" | "html" | "typescript";
 }) {
   return (
     <div className="space-y-2">
@@ -231,7 +231,7 @@ function CodeSnippet({
           content={value}
           className="absolute top-2 right-2"
         />
-        <ShikiCodeBlock code={value} lang={lang} />
+        {/*<ShikiCodeBlock code={value} lang={lang} />*/}
       </div>
     </div>
   );

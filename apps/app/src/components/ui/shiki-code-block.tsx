@@ -1,18 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import type { BundledLanguage } from "shiki";
+// import type { BundledLanguage } from "shiki";
+import { codeToHtml } from "shiki";
 import { useTheme } from "~/components/theme-provider";
 import { cn } from "~/lib/utils";
 
 type ShikiTheme = "github-light" | "github-dark";
-
-let shikiCodeToHtmlPromise: Promise<
-  (code: string, options: { lang: BundledLanguage; theme: ShikiTheme }) => Promise<string>
-> | null = null;
-
-async function getCodeToHtml() {
-  shikiCodeToHtmlPromise ??= import("shiki").then((m) => m.codeToHtml);
-  return await shikiCodeToHtmlPromise;
-}
 
 function getResolvedTheme(theme: "dark" | "light" | "system"): "dark" | "light" {
   if (theme !== "system") return theme;
@@ -26,7 +18,7 @@ export function ShikiCodeBlock({
   fallbackClassName,
 }: {
   code: string;
-  lang: BundledLanguage;
+  lang: "ts" | "html" | "typescript";
   className?: string;
   fallbackClassName?: string;
 }) {
@@ -46,7 +38,6 @@ export function ShikiCodeBlock({
 
     async function run() {
       try {
-        const codeToHtml = await getCodeToHtml();
         const out = await codeToHtml(code, { lang, theme: shikiTheme });
         if (!cancelled) setState({ key: localKey, html: out });
       } catch {
