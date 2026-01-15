@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { IdeasDataTable } from "~/components/ideas-data-table";
 import { $getIdeas } from "~/lib/api/ideas";
-import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 const ideasSearchSchema = z.object({
   status: z.string().optional(),
@@ -13,28 +12,23 @@ const ideasSearchSchema = z.object({
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/")({
   validateSearch: ideasSearchSchema,
   loaderDeps: ({ search }) => ({ search }),
-  loader: async ({ deps: { search }, params }) => {
+  loader: async ({ deps: { search }, context }) => {
     console.time("[IDEAS_INDEX_LOADER] Total loader time");
 
-    console.time("[IDEAS_INDEX_LOADER] Get organization by slug");
-    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-    console.timeEnd("[IDEAS_INDEX_LOADER] Get organization by slug");
-
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
+    // Get organization from parent route context instead of fetching again
+    const organizationId = context.organization.id;
 
     console.time("[IDEAS_INDEX_LOADER] Get ideas");
     const ideas = await $getIdeas({
       data: {
-        organizationId: organization.id,
+        organizationId,
         boardId: search.boardId,
       },
     });
     console.timeEnd("[IDEAS_INDEX_LOADER] Get ideas");
 
     console.timeEnd("[IDEAS_INDEX_LOADER] Total loader time");
-    return { ideas, organizationId: organization.id };
+    return { ideas, organizationId };
   },
   component: IdeasPage,
 });

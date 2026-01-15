@@ -2,19 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { MembersDataTable } from "~/components/members-data-table";
 import { $getMembers } from "~/lib/api/members";
-import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/members/")({
-  loader: async ({ params }) => {
-    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
-
+  loader: async ({ context }) => {
+    // Use organization from parent route context
     const members = await $getMembers({
-      data: { organizationId: organization.id },
+      data: { organizationId: context.organization.id },
     });
-    return { members, organizationId: organization.id };
+    return { members, organizationId: context.organization.id };
   },
   component: MembersPage,
 });

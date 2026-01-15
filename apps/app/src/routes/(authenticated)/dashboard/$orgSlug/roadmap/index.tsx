@@ -2,17 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { RoadmapBoard } from "~/components/roadmap-board";
 import { $getIdeas } from "~/lib/api/ideas";
-import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/roadmap/")({
-  loader: async ({ params }) => {
-    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
-
+  loader: async ({ context }) => {
+    // Use organization from parent route context
     const ideas = await $getIdeas({
-      data: { organizationId: organization.id },
+      data: { organizationId: context.organization.id },
     });
 
     return { ideas };

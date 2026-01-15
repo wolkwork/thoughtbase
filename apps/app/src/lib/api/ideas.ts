@@ -290,8 +290,6 @@ export const $getIdea = createServerFn({ method: "GET" })
 
     if (!item) return null;
 
-    console.time("[IDEAS_API] Transform single idea data");
-
     const author = item.externalAuthor || item.author;
     const image = author && "image" in author ? author.image : author?.avatarUrl;
 

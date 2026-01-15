@@ -5,16 +5,12 @@ import { ChangelogEditor } from "~/components/changelog-editor";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { $createChangelog } from "~/lib/api/changelogs";
-import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/changelog/new")(
   {
-    loader: async ({ params }) => {
-      const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-      if (!organization) {
-        throw new Error("Organization not found");
-      }
-      return { organizationId: organization.id };
+    loader: async ({ context }) => {
+      // Use organization from parent route context
+      return { organizationId: context.organization.id };
     },
     component: NewChangelogPage,
   },

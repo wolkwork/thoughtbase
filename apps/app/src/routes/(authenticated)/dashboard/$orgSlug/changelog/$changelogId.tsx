@@ -5,23 +5,18 @@ import { ChangelogEditor } from "~/components/changelog-editor";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { $getChangelog, $updateChangelog } from "~/lib/api/changelogs";
-import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 export const Route = createFileRoute(
   "/(authenticated)/dashboard/$orgSlug/changelog/$changelogId",
 )({
-  loader: async ({ params }) => {
-    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
-
+  loader: async ({ params, context }) => {
+    // Use organization from parent route context
     const changelog = await $getChangelog({ data: params.changelogId });
     if (!changelog) {
       throw notFound();
     }
 
-    return { changelog, organizationId: organization.id };
+    return { changelog, organizationId: context.organization.id };
   },
   component: EditChangelogPage,
 });

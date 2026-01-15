@@ -5,18 +5,14 @@ import { ChangelogDataTable } from "~/components/changelog-data-table";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { $deleteChangelog, $getChangelogs } from "~/lib/api/changelogs";
-import { $getOrganizationBySlug } from "~/lib/api/organizations";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/changelog/")({
-  loader: async ({ params }) => {
-    const organization = await $getOrganizationBySlug({ data: params.orgSlug });
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
+  loader: async ({ context }) => {
+    // Use organization from parent route context
     const changelogs = await $getChangelogs({
-      data: { organizationId: organization.id },
+      data: { organizationId: context.organization.id },
     });
-    return { changelogs, organizationId: organization.id };
+    return { changelogs, organizationId: context.organization.id };
   },
   component: ChangelogListPage,
 });
