@@ -7,10 +7,12 @@ import { db } from "~/lib/db";
 import { profile } from "~/lib/db/schema";
 
 export const $getSession = createServerFn({ method: "GET" }).handler(async () => {
+  console.time("[AUTH] Get session");
   const session = await auth.api.getSession({
     headers: getRequest().headers,
     returnHeaders: true,
   });
+  console.timeEnd("[AUTH] Get session");
 
   // Forward any Set-Cookie headers to the client, e.g. for session/cache refresh
   const cookies = session.headers?.getSetCookie();

@@ -14,18 +14,26 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/
   validateSearch: ideasSearchSchema,
   loaderDeps: ({ search }) => ({ search }),
   loader: async ({ deps: { search }, params }) => {
-    // Get organization by slug to get the ID
+    console.time("[IDEAS_INDEX_LOADER] Total loader time");
+
+    console.time("[IDEAS_INDEX_LOADER] Get organization by slug");
     const organization = await $getOrganizationBySlug({ data: params.orgSlug });
+    console.timeEnd("[IDEAS_INDEX_LOADER] Get organization by slug");
+
     if (!organization) {
       throw new Error("Organization not found");
     }
 
+    console.time("[IDEAS_INDEX_LOADER] Get ideas");
     const ideas = await $getIdeas({
       data: {
         organizationId: organization.id,
         boardId: search.boardId,
       },
     });
+    console.timeEnd("[IDEAS_INDEX_LOADER] Get ideas");
+
+    console.timeEnd("[IDEAS_INDEX_LOADER] Total loader time");
     return { ideas, organizationId: organization.id };
   },
   component: IdeasPage,

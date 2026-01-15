@@ -20,23 +20,31 @@ export const $getPlanPermissions = createServerFn({ method: "GET" })
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
   beforeLoad: async ({ context, params }) => {
-    // Look up organization by slug
+    console.time("[ORG_ROUTE_BEFORELOAD] Total beforeLoad time");
+
+    console.time("[ORG_ROUTE_BEFORELOAD] Get organization by slug");
     const organization = await $getOrganizationBySlug({ data: params.orgSlug });
+    console.timeEnd("[ORG_ROUTE_BEFORELOAD] Get organization by slug");
+
     if (!organization) {
       throw notFound();
     }
 
-    // Verify user is a member
+    console.time("[ORG_ROUTE_BEFORELOAD] Check membership");
     const isMember = await $checkMembership({
       data: { organizationId: organization.id, userId: context.user.id },
     });
+    console.timeEnd("[ORG_ROUTE_BEFORELOAD] Check membership");
 
     if (!isMember) {
       throw redirect({ to: "/dashboard" });
     }
 
-    // Fetch permissions during SSR
+    console.time("[ORG_ROUTE_BEFORELOAD] Get plan permissions");
     const plan = await $getPlanPermissions({ data: { organizationId: organization.id } });
+    console.timeEnd("[ORG_ROUTE_BEFORELOAD] Get plan permissions");
+
+    console.timeEnd("[ORG_ROUTE_BEFORELOAD] Total beforeLoad time");
 
     // Provide organization and permissions to child routes via context
     return { organization, plan };

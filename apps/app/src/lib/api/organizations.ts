@@ -22,10 +22,12 @@ async function getAuthContext() {
 export const $getOrganizationBySlug = createServerFn({ method: "GET" })
   .inputValidator(z.string())
   .handler(async ({ data: slug }) => {
+    console.time("[ORG_API] Get organization by slug - DB query");
     // TODO: Maybe use better auth client for this? https://www.better-auth.com/docs/plugins/organization#get-full-organization
     const org = await db.query.organization.findFirst({
       where: eq(organization.slug, slug),
     });
+    console.timeEnd("[ORG_API] Get organization by slug - DB query");
 
     return org;
   });
@@ -80,12 +82,14 @@ export const $checkMembership = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data }) => {
+    console.time("[ORG_API] Check membership - DB query");
     const memberRecord = await db.query.member.findFirst({
       where: and(
         eq(member.organizationId, data.organizationId),
         eq(member.userId, data.userId),
       ),
     });
+    console.timeEnd("[ORG_API] Check membership - DB query");
     return !!memberRecord;
   });
 
