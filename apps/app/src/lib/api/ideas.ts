@@ -32,11 +32,7 @@ export const $getIdeas = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data }) => {
-    console.time("[IDEAS_API] Get ideas - total time");
-
-    console.time("[IDEAS_API] Get auth context");
     const ctx = await getAuthContext();
-    console.timeEnd("[IDEAS_API] Get auth context");
 
     const organizationId = data.organizationId;
 
@@ -55,7 +51,6 @@ export const $getIdeas = createServerFn({ method: "GET" })
       whereConditions.push(eq(idea.boardId, data.boardId));
     }
 
-    console.time("[IDEAS_API] DB query - find ideas with relations");
     const ideas = await db.query.idea.findMany({
       where: and(...whereConditions),
       orderBy: desc(idea.createdAt),
@@ -80,9 +75,7 @@ export const $getIdeas = createServerFn({ method: "GET" })
         },
       },
     });
-    console.timeEnd("[IDEAS_API] DB query - find ideas with relations");
 
-    console.time("[IDEAS_API] Transform/map ideas data");
     const result = ideas.map((item) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { author, externalAuthor, reactions, comments, ...rest } = item;
@@ -113,9 +106,7 @@ export const $getIdeas = createServerFn({ method: "GET" })
         revenue,
       };
     });
-    console.timeEnd("[IDEAS_API] Transform/map ideas data");
 
-    console.timeEnd("[IDEAS_API] Get ideas - total time");
     return result;
   });
 
@@ -256,9 +247,6 @@ export const $getIdeasFeed = createServerFn({ method: "GET" })
 export const $getIdea = createServerFn({ method: "GET" })
   .inputValidator(z.string())
   .handler(async ({ data: ideaId }) => {
-    console.time("[IDEAS_API] Get single idea - total time");
-
-    console.time("[IDEAS_API] DB query - find idea with relations");
     const item = await db.query.idea.findFirst({
       where: eq(idea.id, ideaId),
       with: {
@@ -286,7 +274,6 @@ export const $getIdea = createServerFn({ method: "GET" })
         },
       },
     });
-    console.timeEnd("[IDEAS_API] DB query - find idea with relations");
 
     if (!item) return null;
 
@@ -318,9 +305,7 @@ export const $getIdea = createServerFn({ method: "GET" })
           : undefined,
       })),
     };
-    console.timeEnd("[IDEAS_API] Transform single idea data");
 
-    console.timeEnd("[IDEAS_API] Get single idea - total time");
     return result;
   });
 

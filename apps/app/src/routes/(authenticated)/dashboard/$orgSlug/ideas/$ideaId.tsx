@@ -6,17 +6,12 @@ import { $getIdea } from "~/lib/api/ideas";
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/$ideaId")(
   {
     loader: async ({ params: { ideaId } }) => {
-      console.time("[IDEAS_DETAIL_LOADER] Total loader time");
-
-      console.time("[IDEAS_DETAIL_LOADER] Get idea");
       const idea = await $getIdea({ data: ideaId });
-      console.timeEnd("[IDEAS_DETAIL_LOADER] Get idea");
 
       if (!idea) {
         throw notFound();
       }
 
-      console.timeEnd("[IDEAS_DETAIL_LOADER] Total loader time");
       return { idea };
     },
     component: IdeaDetailPage,

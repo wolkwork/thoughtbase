@@ -30,13 +30,11 @@ export async function getSubscriptionTier(
   organizationId: string,
 ): Promise<SubscriptionTier> {
   try {
-    console.time("[PERMISSIONS] Polar API - list subscriptions");
     const subscriptions = await polarClient.subscriptions.list({
       metadata: {
         referenceId: organizationId,
       },
     });
-    console.timeEnd("[PERMISSIONS] Polar API - list subscriptions");
 
     if (!subscriptions.result?.items?.length) {
       return "free";
@@ -141,10 +139,8 @@ export async function getPermissions(organizationId: string): Promise<{
 export async function getPlanPermissions(
   organizationId: string,
 ): Promise<(typeof plans)[SubscriptionTier]> {
-  console.time("[PERMISSIONS] Get plan permissions (includes tier lookup)");
   const tier = await getSubscriptionTier(organizationId);
   const plan = plans[tier];
-  console.timeEnd("[PERMISSIONS] Get plan permissions (includes tier lookup)");
   return plan;
 }
 

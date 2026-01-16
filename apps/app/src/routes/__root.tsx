@@ -22,11 +22,9 @@ export const Route = createRootRouteWithContext<{
   user: AuthQueryResult;
 }>()({
   beforeLoad: ({ context }) => {
-    console.time("[ROOT_BEFORELOAD] Prefetch auth query");
     // we're using react-query for client-side caching to reduce client-to-server calls, see /src/router.tsx
     // better-auth's cookieCache is also enabled server-side to reduce server-to-db calls, see /src/lib/auth/auth.ts
     context.queryClient.prefetchQuery(authQueryOptions());
-    console.timeEnd("[ROOT_BEFORELOAD] Prefetch auth query");
 
     // typically we don't need the user immediately in landing pages,
     // so we're only prefetching here and not awaiting.

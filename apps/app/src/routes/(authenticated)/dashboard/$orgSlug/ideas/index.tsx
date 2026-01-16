@@ -13,21 +13,16 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/
   validateSearch: ideasSearchSchema,
   loaderDeps: ({ search }) => ({ search }),
   loader: async ({ deps: { search }, context }) => {
-    console.time("[IDEAS_INDEX_LOADER] Total loader time");
-
     // Get organization from parent route context instead of fetching again
     const organizationId = context.organization.id;
 
-    console.time("[IDEAS_INDEX_LOADER] Get ideas");
     const ideas = await $getIdeas({
       data: {
         organizationId,
         boardId: search.boardId,
       },
     });
-    console.timeEnd("[IDEAS_INDEX_LOADER] Get ideas");
 
-    console.timeEnd("[IDEAS_INDEX_LOADER] Total loader time");
     return { ideas, organizationId };
   },
   component: IdeasPage,
