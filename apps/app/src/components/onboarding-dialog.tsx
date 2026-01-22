@@ -21,7 +21,7 @@ import { InviteMemberForm } from "~/components/team-settings";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-// import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
+import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
 import { usePermissions } from "~/hooks/use-permissions";
 import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 import { cn } from "~/lib/utils";
@@ -231,7 +231,7 @@ function CodeSnippet({
           content={value}
           className="absolute top-2 right-2"
         />
-        {/*<ShikiCodeBlock code={value} lang={lang} />*/}
+        <ShikiCodeBlock code={value} lang={lang} />
       </div>
     </div>
   );
