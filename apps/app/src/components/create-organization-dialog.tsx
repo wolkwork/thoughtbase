@@ -2,7 +2,7 @@ import slugify from "@sindresorhus/slugify";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 import { Button } from "./ui/button";
 import {
   Dialog,

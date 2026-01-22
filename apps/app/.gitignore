@@ -28,3 +28,4 @@ dist
 test-pglite-db
 playwright-report
 test-results
+.env.local

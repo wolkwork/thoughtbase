@@ -242,12 +242,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/$orgSlug/changelog/new': typeof authenticatedDashboardOrgSlugChangelogNewRoute
   '/dashboard/$orgSlug/ideas/$ideaId': typeof authenticatedDashboardOrgSlugIdeasIdeaIdRoute
   '/api/zapier/webhooks/subscribe/$id': typeof ApiZapierWebhooksSubscribeIdRoute
-  '/dashboard/$orgSlug/account': typeof authenticatedDashboardOrgSlugAccountIndexRoute
-  '/dashboard/$orgSlug/changelog': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
-  '/dashboard/$orgSlug/ideas': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
-  '/dashboard/$orgSlug/members': typeof authenticatedDashboardOrgSlugMembersIndexRoute
-  '/dashboard/$orgSlug/roadmap': typeof authenticatedDashboardOrgSlugRoadmapIndexRoute
-  '/dashboard/$orgSlug/settings': typeof authenticatedDashboardOrgSlugSettingsIndexRoute
+  '/dashboard/$orgSlug/account/': typeof authenticatedDashboardOrgSlugAccountIndexRoute
+  '/dashboard/$orgSlug/changelog/': typeof authenticatedDashboardOrgSlugChangelogIndexRoute
+  '/dashboard/$orgSlug/ideas/': typeof authenticatedDashboardOrgSlugIdeasIndexRoute
+  '/dashboard/$orgSlug/members/': typeof authenticatedDashboardOrgSlugMembersIndexRoute
+  '/dashboard/$orgSlug/roadmap/': typeof authenticatedDashboardOrgSlugRoadmapIndexRoute
+  '/dashboard/$orgSlug/settings/': typeof authenticatedDashboardOrgSlugSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -340,12 +340,12 @@ export interface FileRouteTypes {
     | '/dashboard/$orgSlug/changelog/new'
     | '/dashboard/$orgSlug/ideas/$ideaId'
     | '/api/zapier/webhooks/subscribe/$id'
-    | '/dashboard/$orgSlug/account'
-    | '/dashboard/$orgSlug/changelog'
-    | '/dashboard/$orgSlug/ideas'
-    | '/dashboard/$orgSlug/members'
-    | '/dashboard/$orgSlug/roadmap'
-    | '/dashboard/$orgSlug/settings'
+    | '/dashboard/$orgSlug/account/'
+    | '/dashboard/$orgSlug/changelog/'
+    | '/dashboard/$orgSlug/ideas/'
+    | '/dashboard/$orgSlug/members/'
+    | '/dashboard/$orgSlug/roadmap/'
+    | '/dashboard/$orgSlug/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -584,42 +584,42 @@ declare module '@tanstack/react-router' {
     '/(authenticated)/dashboard/$orgSlug/settings/': {
       id: '/(authenticated)/dashboard/$orgSlug/settings/'
       path: '/settings'
-      fullPath: '/dashboard/$orgSlug/settings'
+      fullPath: '/dashboard/$orgSlug/settings/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugSettingsIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
     '/(authenticated)/dashboard/$orgSlug/roadmap/': {
       id: '/(authenticated)/dashboard/$orgSlug/roadmap/'
       path: '/roadmap'
-      fullPath: '/dashboard/$orgSlug/roadmap'
+      fullPath: '/dashboard/$orgSlug/roadmap/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugRoadmapIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
     '/(authenticated)/dashboard/$orgSlug/members/': {
       id: '/(authenticated)/dashboard/$orgSlug/members/'
       path: '/members'
-      fullPath: '/dashboard/$orgSlug/members'
+      fullPath: '/dashboard/$orgSlug/members/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugMembersIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
     '/(authenticated)/dashboard/$orgSlug/ideas/': {
       id: '/(authenticated)/dashboard/$orgSlug/ideas/'
       path: '/ideas'
-      fullPath: '/dashboard/$orgSlug/ideas'
+      fullPath: '/dashboard/$orgSlug/ideas/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugIdeasIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
     '/(authenticated)/dashboard/$orgSlug/changelog/': {
       id: '/(authenticated)/dashboard/$orgSlug/changelog/'
       path: '/changelog'
-      fullPath: '/dashboard/$orgSlug/changelog'
+      fullPath: '/dashboard/$orgSlug/changelog/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugChangelogIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }
     '/(authenticated)/dashboard/$orgSlug/account/': {
       id: '/(authenticated)/dashboard/$orgSlug/account/'
       path: '/account'
-      fullPath: '/dashboard/$orgSlug/account'
+      fullPath: '/dashboard/$orgSlug/account/'
       preLoaderRoute: typeof authenticatedDashboardOrgSlugAccountIndexRouteImport
       parentRoute: typeof authenticatedDashboardOrgSlugRouteRoute
     }

@@ -1,6 +1,7 @@
+import { api } from "@/convex/_generated/api";
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { CreateOrganizationDialog } from "~/components/create-organization-dialog";
@@ -14,18 +15,13 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { WorkspaceAvatar } from "~/components/workspace-avatar";
-import { auth } from "~/lib/auth/auth";
-
-const $getOrganizations = createServerFn().handler(async () => {
-  return auth.api.listOrganizations({
-    headers: getRequestHeaders(),
-  });
-});
 
 export const Route = createFileRoute("/(authenticated)/dashboard/")({
   component: DashboardIndex,
-  beforeLoad: async () => {
-    const organizations = await $getOrganizations();
+  beforeLoad: async ({ context }) => {
+    const organizations = await context.queryClient.ensureQueryData(
+      convexQuery(api.auth.listOrganizations, {}),
+    );
 
     if (organizations?.length === 1) {
       throw redirect({
@@ -39,7 +35,10 @@ export const Route = createFileRoute("/(authenticated)/dashboard/")({
 });
 
 function DashboardIndex() {
-  const { organizations } = Route.useRouteContext();
+  const { data: organizations } = useSuspenseQuery(
+    convexQuery(api.auth.listOrganizations, {}),
+  );
+
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   return (
