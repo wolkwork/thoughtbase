@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { ArrowDown01, Search, SlidersHorizontal } from "lucide-react";
 import * as React from "react";
 
+import { FunctionReturnType } from "convex/server";
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { StatusBadge } from "~/components/status-badge";
 import { Button } from "~/components/ui/button";
@@ -43,37 +44,17 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { api } from "~/lib/convex/client";
 import { UserAvatar } from "./user-avatar";
 
 // Define the Idea type based on what we receive from the API
-export type Idea = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  createdAt: Date;
-  author: {
-    name: string;
-    image?: string | null;
-  };
-  tags: {
-    tag: {
-      id: string;
-      name: string;
-      color: string | null;
-    };
-  }[];
-  commentCount: number;
-  reactionCount: number;
-  // Placeholder for revenue
-  revenue?: number;
-};
+export type Idea = NonNullable<FunctionReturnType<typeof api.ideas.getIdeas>>[number];
 
 // Custom filter for tags
 const tagsFilter: FilterFn<Idea> = (row, columnId, filterValue: string[]) => {
   const tags = row.getValue(columnId) as Idea["tags"];
   if (!filterValue || filterValue.length === 0) return true;
-  const tagNames = tags.map((t) => t.tag.name);
+  const tagNames = tags.map((t) => t.name);
   return filterValue.some((val) => tagNames.includes(val));
 };
 
@@ -82,7 +63,7 @@ const globalSearchFilter: FilterFn<Idea> = (row, columnId, filterValue: string) 
   const search = filterValue.toLowerCase();
   const title = row.original.title.toLowerCase();
   const description = row.original.description?.toLowerCase() || "";
-  const authorName = row.original.author.name.toLowerCase();
+  const authorName = row.original.author?.name?.toLowerCase() || "";
 
   return (
     title.includes(search) || description.includes(search) || authorName.includes(search)
@@ -100,7 +81,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       orgSlug ? (
         <Link
           to="/dashboard/$orgSlug/ideas/$ideaId"
-          params={{ orgSlug, ideaId: row.original.id }}
+          params={{ orgSlug, ideaId: row.original._id }}
           className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
           title={row.getValue("title")}
           style={{ width: "100%" }}
@@ -173,8 +154,8 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       return (
         <div className="flex items-center gap-2">
           <UserAvatar user={author} className="size-6!" />
-          <span className="max-w-[120px] truncate text-sm" title={author.name}>
-            {author.name}
+          <span className="max-w-[120px] truncate text-sm" title={author?.name || ""}>
+            {author?.name || "Unknown User"}
           </span>
         </div>
       );
@@ -257,7 +238,7 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
   const allTags = React.useMemo(() => {
     const tags = new Set<string>();
     data.forEach((idea) => {
-      idea.tags.forEach((t) => tags.add(t.tag.name));
+      idea.tags.forEach((t) => tags.add(t.name));
     });
     return Array.from(tags).sort();
   }, [data]);

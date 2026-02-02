@@ -10,7 +10,13 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { cn } from "~/lib/utils";
-import { DNSRecord } from "~/lib/vercel/domains";
+
+// DNSRecord type - matches the type from Convex backend
+export type DNSRecord = {
+  type: "CNAME" | "A" | "TXT";
+  name: string;
+  value: string;
+};
 
 export type DNSCopyButtonProps = {
   text: string;

@@ -1,11 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import { authClient } from "~/lib/auth/auth-client";
-import { authQueryOptions } from "~/lib/auth/queries";
+import { authClient } from "~/lib/auth/auth-client-convex";
+import { api } from "~/lib/convex/client";
 
 export const Route = createFileRoute("/accept-invitation/$invitationId")({
   component: AcceptInvitationPage,
@@ -14,10 +15,11 @@ export const Route = createFileRoute("/accept-invitation/$invitationId")({
 function AcceptInvitationPage() {
   const { invitationId } = Route.useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   // Check if user is logged in
-  const { data: session, isPending: isSessionPending } = useQuery(authQueryOptions());
+  const { data: session, isPending: isSessionPending } = useQuery(
+    convexQuery(api.auth.getSafeCurrentUser, {}),
+  );
 
   // Get invitation details
   const {
@@ -35,7 +37,7 @@ function AcceptInvitationPage() {
       }
       return result.data;
     },
-    enabled: !!session?.user,
+    enabled: !!session?._id,
   });
 
   // Accept invitation mutation
@@ -51,7 +53,6 @@ function AcceptInvitationPage() {
     },
     onSuccess: () => {
       toast.success("Invitation accepted! Welcome to the organization.");
-      queryClient.invalidateQueries({ queryKey: authQueryOptions().queryKey });
       navigate({ to: "/dashboard" });
     },
     onError: (error) => {
@@ -81,7 +82,7 @@ function AcceptInvitationPage() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isSessionPending && !session?.user) {
+    if (!isSessionPending && !session?._id) {
       navigate({
         to: "/login",
         search: { redirect: `/accept-invitation/${invitationId}` },

@@ -1,6 +1,7 @@
+import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { AlertCircle, MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -40,26 +41,16 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import { useOrganization } from "~/hooks/organization";
 import { usePermissions } from "~/hooks/use-permissions";
+import { authClient } from "~/lib/auth/auth-client-convex";
 import { Permission } from "~/plans";
-// import { $getPermissions } from "~/lib/api/permissions";
-import { z } from "zod";
-import { getPermissions } from "~/lib/api/permissions";
-import { authClient } from "~/lib/auth/auth-client";
 import { UserAvatar } from "./user-avatar";
 
-export const $getPermissions = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ organizationId: z.string() }))
-  .handler(async ({ data }) => {
-    return await getPermissions(data.organizationId);
-  });
-
 export function TeamSettings() {
-  const { organization } = useRouteContext({
-    from: "/(authenticated)/dashboard/$orgSlug",
-  });
+  const organization = useOrganization();
 
-  const organizationId = organization.id;
+  const organizationId = organization._id;
 
   const { data: members, isPending: isMembersLoading } = useQuery({
     queryKey: ["team-members", organizationId],
@@ -93,15 +84,11 @@ export function TeamSettings() {
     enabled: !!organizationId,
   });
 
-  const getPermissions = useServerFn($getPermissions);
-
-  const { data: permissions } = useQuery({
-    queryKey: ["permissions", organizationId],
-    queryFn: () => {
-      return getPermissions({ data: { organizationId } });
-    },
-    enabled: !!organizationId,
-  });
+  const { data: permissions } = useQuery(
+    convexQuery(api.permissions.getPermissions, {
+      organizationId,
+    }),
+  );
 
   const isLimitReached =
     permissions && !permissions.canAddAdmin && permissions.maxAdmins !== null;
@@ -164,7 +151,7 @@ export function TeamSettings() {
                   <MemberRow
                     key={member.id}
                     member={member}
-                    organizationId={organization.id}
+                    organizationId={organizationId}
                   />
                 ))
               )}

@@ -12,7 +12,6 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
-import { authQueryOptions, type AuthQueryResult } from "~/lib/auth/queries";
 import appCss from "~/styles.css?url";
 
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
@@ -30,13 +29,8 @@ const getAuth = createServerFn({ method: "GET" }).handler(async () => {
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   convexQueryClient: ConvexQueryClient;
-  user: AuthQueryResult;
 }>()({
   beforeLoad: async ({ context }) => {
-    // we're using react-query for client-side caching to reduce client-to-server calls, see /src/router.tsx
-    // better-auth's cookieCache is also enabled server-side to reduce server-to-db calls, see /src/lib/auth/auth.ts
-    context.queryClient.prefetchQuery(authQueryOptions());
-
     const token = await getAuth();
 
     if (token) {

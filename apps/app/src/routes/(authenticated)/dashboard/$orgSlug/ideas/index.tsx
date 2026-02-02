@@ -1,8 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { z } from "zod";
 import { IdeasDataTable } from "~/components/ideas-data-table";
-import { $getIdeas } from "~/lib/api/ideas";
+import { useOrganization } from "~/hooks/organization";
 
 const ideasSearchSchema = z.object({
   status: z.string().optional(),
@@ -13,15 +15,16 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/
   validateSearch: ideasSearchSchema,
   loaderDeps: ({ search }) => ({ search }),
   loader: async ({ deps: { search }, context }) => {
-    // Get organization from parent route context instead of fetching again
-    const organizationId = context.organization.id;
+    // Get organization from parent route context
+    const organizationId = context.organization._id;
 
-    const ideas = await $getIdeas({
-      data: {
+    const ideas = await context.queryClient.ensureQueryData(
+      convexQuery(api.ideas.getIdeas, {
         organizationId,
-        boardId: search.boardId,
-      },
-    });
+        status: search.status,
+        boardId: search.boardId as any, // Convert string to Id<"board"> if needed
+      }),
+    );
 
     return { ideas, organizationId };
   },
@@ -29,31 +32,17 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/
 });
 
 function IdeasPage() {
-  const { ideas: initialIdeas, organizationId } = Route.useLoaderData();
+  const organization = useOrganization();
   const search = Route.useSearch();
   const { orgSlug } = Route.useParams();
 
-  const { data: ideas } = useQuery({
-    queryKey: ["ideas", "all", search.boardId, organizationId],
-    queryFn: () =>
-      $getIdeas({
-        data: {
-          organizationId,
-          boardId: search.boardId,
-        },
-      }),
-    initialData: initialIdeas,
-  });
-
-  // Map the data to ensure dates are Date objects if they were serialized
-  const tableData = ideas.map((idea) => ({
-    ...idea,
-    createdAt: new Date(idea.createdAt),
-    author: {
-      ...idea.author,
-      name: idea.author.name || "Unknown User",
-    },
-  }));
+  const { data: ideas } = useSuspenseQuery(
+    convexQuery(api.ideas.getIdeas, {
+      organizationId: organization._id,
+      status: search.status,
+      boardId: search.boardId as any,
+    }),
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -62,11 +51,7 @@ function IdeasPage() {
       </div>
 
       <div className="space-y-4">
-        <IdeasDataTable
-          data={tableData}
-          initialStatus={search.status}
-          orgSlug={orgSlug}
-        />
+        <IdeasDataTable data={ideas} initialStatus={search.status} orgSlug={orgSlug} />
       </div>
     </div>
   );

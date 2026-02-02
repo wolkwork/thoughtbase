@@ -19,8 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useOrganization } from "~/hooks/organization";
 import { usePermissions } from "~/hooks/use-permissions";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 import { Permission } from "~/plans";
 import { CreateIdeaDialog } from "./create-idea-dialog";
 import { SidebarOrganizationSwitcher } from "./sidebar-organization-switcher";
@@ -54,10 +55,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
   const [widgetOpen, setWidgetOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
-  const { organization } = useRouteContext({
-    from: "/(authenticated)/dashboard/$orgSlug",
-  });
-  const organizationId = organization?.id;
+  const organization = useOrganization();
 
   const location = useLocation();
 
@@ -344,11 +342,11 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         orgSlug={orgSlug}
-        organizationId={organizationId}
+        organizationId={organization._id}
         onSuccess={(newIdea) => {
           navigate({
             to: "/dashboard/$orgSlug/ideas/$ideaId",
-            params: { orgSlug, ideaId: newIdea.id },
+            params: { orgSlug, ideaId: newIdea._id },
           });
         }}
       />
@@ -356,12 +354,12 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
         open={onboardingOpen}
         onOpenChange={setOnboardingOpen}
         orgSlug={orgSlug}
-        organizationId={organizationId}
+        organizationId={organization._id}
       />
       <FeedbackWidget
         isOpen={widgetOpen}
         onClose={() => setWidgetOpen(false)}
-        organizationSlug="feedback"
+        organizationSlug={process.env.NODE_ENV === "production" ? "feedback" : orgSlug}
       />
     </Sidebar>
   );

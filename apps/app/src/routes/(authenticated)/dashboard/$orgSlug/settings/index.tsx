@@ -1,5 +1,7 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -21,7 +23,6 @@ import { Input } from "~/components/ui/input";
 import { CopyButton } from "~/components/ui/shadcn-io/copy-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { usePermissions } from "~/hooks/use-permissions";
-import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 import { Permission } from "~/plans";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/settings/")({
@@ -71,14 +72,11 @@ function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="branding" className="mt-6">
-            <BrandingSettings organizationId={organization.id} />
+            <BrandingSettings organizationId={organization._id} />
           </TabsContent>
 
           <TabsContent value="domain" className="mt-6">
-            <CustomDomainSettings
-              organizationId={organization.id}
-              onUpgrade={() => setSubscriptionOpen(true)}
-            />
+            <CustomDomainSettings onUpgrade={() => setSubscriptionOpen(true)} />
           </TabsContent>
 
           <TabsContent value="team" className="mt-6">
@@ -96,28 +94,24 @@ function SSOSettings({
   organization,
   onUpgrade,
 }: {
-  organization: { id: string; name: string; slug: string };
+  organization: { _id: string; name: string; slug: string };
   onUpgrade?: () => void;
 }) {
   const { hasPermission } = usePermissions();
   const canUseSSO = hasPermission(Permission.SSO);
 
   const { data: secretData, refetch } = useQuery({
-    queryKey: ["org-secret", organization.id],
-    queryFn: () => $getOrgSecret({ data: { organizationId: organization.id } }),
+    ...convexQuery(api.organizations.getOrgSecret, {
+      organizationId: organization._id,
+    }),
     enabled: canUseSSO,
   });
 
-  const { mutate: generateSecret, isPending } = useMutation({
-    mutationFn: () => $generateOrgSecret({ data: { organizationId: organization.id } }),
-    onSuccess: () => {
-      toast.success("New secret generated");
-      refetch();
-    },
-    onError: () => {
-      toast.error("Failed to generate secret");
-    },
-  });
+  const generateSecret = useConvexMutation(api.organizations.generateOrgSecret);
+
+  const handleGenerateSecret = () => {
+    generateSecret({ organizationId: organization._id });
+  };
 
   const copyToClipboard = () => {
     if (secretData?.secret) {
@@ -180,12 +174,8 @@ function SSOSettings({
         )}
 
         <div className="flex">
-          <Button
-            variant="destructive"
-            onClick={() => generateSecret()}
-            disabled={isPending}
-          >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
+          <Button variant="destructive" onClick={handleGenerateSecret}>
+            <RefreshCw className="mr-2 h-4 w-4" />
             {secretData?.secret ? "Generate New Secret" : "Generate Secret"}
           </Button>
         </div>

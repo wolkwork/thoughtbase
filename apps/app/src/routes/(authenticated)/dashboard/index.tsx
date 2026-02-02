@@ -1,7 +1,7 @@
-import { api } from "@/convex/_generated/api";
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { CreateOrganizationDialog } from "~/components/create-organization-dialog";

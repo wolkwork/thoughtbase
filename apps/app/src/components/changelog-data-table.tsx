@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
+import { Doc, Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -51,19 +52,8 @@ import {
   TableRow,
 } from "~/components/ui/table";
 
-export type Changelog = {
-  id: string;
-  title: string;
-  content: string | null;
-  featuredImage: string | null;
-  publishedAt: Date | null;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  ideas: {
-    id: string;
-    title: string;
-  }[];
+export type Changelog = Doc<"changelog"> & {
+  ideas: Doc<"idea">[];
 };
 
 // Custom global filter for title
@@ -75,7 +65,7 @@ const globalSearchFilter: FilterFn<Changelog> = (row, columnId, filterValue: str
 
 const createColumns = (
   orgSlug?: string,
-  onDelete?: (id: string) => void,
+  onDelete?: (id: Id<"changelog">) => void,
 ): ColumnDef<Changelog>[] => [
   {
     accessorKey: "title",
@@ -87,7 +77,7 @@ const createColumns = (
       orgSlug ? (
         <Link
           to="/dashboard/$orgSlug/changelog/$changelogId"
-          params={{ orgSlug, changelogId: row.original.id }}
+          params={{ orgSlug, changelogId: row.original._id }}
           className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
           title={row.getValue("title")}
           style={{ width: "100%" }}
@@ -141,7 +131,7 @@ const createColumns = (
         <div className="flex max-w-[200px] flex-wrap gap-1">
           {ideas.slice(0, 2).map((idea) => (
             <Badge
-              key={idea.id}
+              key={idea._id}
               variant="outline"
               className="h-5 px-1 py-0 text-[10px] font-normal"
             >
@@ -190,7 +180,7 @@ const createColumns = (
                 render={
                   <Link
                     to="/dashboard/$orgSlug/changelog/$changelogId"
-                    params={{ orgSlug, changelogId: row.original.id }}
+                    params={{ orgSlug, changelogId: row.original._id }}
                   >
                     <Pencil className="mr-2 h-4 w-4" />
                     Edit
@@ -201,7 +191,7 @@ const createColumns = (
             {onDelete && (
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
-                onClick={() => onDelete(row.original.id)}
+                onClick={() => onDelete(row.original._id)}
               >
                 <Trash className="mr-2 h-4 w-4" />
                 Delete
@@ -218,7 +208,7 @@ interface ChangelogDataTableProps {
   data: Changelog[];
   initialStatus?: string;
   orgSlug?: string;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: Id<"changelog">) => void;
 }
 
 export function ChangelogDataTable({

@@ -1,61 +1,79 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  notFound,
+  useNavigate,
+  useRouteContext,
+} from "@tanstack/react-router";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { ArrowLeft } from "lucide-react";
 import { ChangelogEditor } from "~/components/changelog-editor";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { $getChangelog, $updateChangelog } from "~/lib/api/changelogs";
 
 export const Route = createFileRoute(
   "/(authenticated)/dashboard/$orgSlug/changelog/$changelogId",
 )({
   loader: async ({ params, context }) => {
     // Use organization from parent route context
-    const changelog = await $getChangelog({ data: params.changelogId });
-    if (!changelog) {
-      throw notFound();
-    }
-
-    return { changelog, organizationId: context.organization.id };
+    await context.queryClient.ensureQueryData(
+      convexQuery(api.changelogs.getChangelog, {
+        changelogId: params.changelogId as Id<"changelog">,
+      }),
+    );
   },
   component: EditChangelogPage,
 });
 
 function EditChangelogPage() {
-  const { changelog, organizationId } = Route.useLoaderData();
-  const { orgSlug } = Route.useParams();
+  const { orgSlug, changelogId } = Route.useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const { mutate: updateChangelog, isPending } = useMutation({
-    mutationFn: $updateChangelog,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["changelogs", organizationId] });
-      navigate({ to: "/dashboard/$orgSlug/changelog", params: { orgSlug } });
-    },
+  const { organization } = useRouteContext({
+    from: "/(authenticated)/dashboard/$orgSlug",
   });
+
+  const { data } = useSuspenseQuery(
+    convexQuery(api.changelogs.getChangelog, {
+      changelogId: changelogId as any,
+    }),
+  );
+
+  const changelog = data?.changelog;
+  const ideas = data?.ideas ?? [];
+
+  const updateChangelog = useConvexMutation(api.changelogs.updateChangelog);
 
   const handleSubmit = (data: {
     title: string;
     content: string;
-    featuredImage: string | null;
-    publishedAt: string | null;
+    featuredImage?: string;
+    publishedAt?: string;
     status: "draft" | "published";
-    ideaIds: string[];
+    ideaIds: Id<"idea">[];
   }) => {
+    if (!changelog) {
+      throw notFound();
+    }
+
     updateChangelog({
-      data: {
-        id: changelog.id,
-        organizationId,
-        title: data.title,
-        content: data.content,
-        featuredImage: data.featuredImage,
-        publishedAt: data.publishedAt,
-        status: data.status,
-        ideaIds: data.ideaIds,
-      },
+      id: changelog._id,
+      organizationId: changelog.organizationId,
+      title: data.title,
+      content: data.content,
+      featuredImage: data.featuredImage,
+      publishedAt: data.publishedAt,
+      status: data.status,
+      ideaIds: data.ideaIds.map((id) => id),
     });
+
+    navigate({ to: "/dashboard/$orgSlug/changelog", params: { orgSlug } });
   };
+
+  if (!changelog) {
+    throw notFound();
+  }
 
   return (
     <div className="px-4 py-6">
@@ -81,18 +99,22 @@ function EditChangelogPage() {
         </CardHeader>
         <CardContent>
           <ChangelogEditor
-            organizationId={organizationId}
+            organizationId={organization._id}
             initialData={{
-              id: changelog.id,
+              id: changelog._id,
               title: changelog.title,
               content: changelog.content,
               featuredImage: changelog.featuredImage,
-              publishedAt: changelog.publishedAt,
+              publishedAt: changelog.publishedAt
+                ? new Date(changelog.publishedAt).toISOString()
+                : undefined,
               status: changelog.status as "draft" | "published",
-              ideas: changelog.ideas,
+              ideas: ideas.map((i) => ({
+                id: i._id,
+                title: i.title,
+              })),
             }}
             onSubmit={handleSubmit}
-            isSubmitting={isPending}
           />
         </CardContent>
       </Card>

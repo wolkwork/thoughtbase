@@ -13,7 +13,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { UserAvatar } from "~/components/user-avatar";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 
 export function ProfileTab() {
   const { data: session, isPending: isSessionPending, refetch } = authClient.useSession();
@@ -102,7 +102,6 @@ export function ProfileTab() {
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="flex flex-col items-center gap-4">
               {/* TODO: fix */}
-              {/* @ts-expect-error - user is not typed */}
               <UserAvatar user={user} />
               <div className="flex flex-col items-center gap-2">
                 <Button

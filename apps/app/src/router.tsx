@@ -92,9 +92,7 @@ export function getRouter() {
 
   const convexUrl = (import.meta as any).env.VITE_CONVEX_URL!;
 
-  const convexQueryClient = new ConvexQueryClient(convexUrl, {
-    expectAuth: true,
-  });
+  const convexQueryClient = new ConvexQueryClient(convexUrl);
 
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -109,7 +107,7 @@ export function getRouter() {
 
   const router = createRouter({
     routeTree,
-    context: { queryClient, convexQueryClient, user: null },
+    context: { queryClient, convexQueryClient },
     defaultPreload: "intent",
     // react-query will handle data fetching & caching
     // https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#passing-all-loader-events-to-an-external-cache

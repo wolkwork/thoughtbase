@@ -176,7 +176,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
         onSuccess={(newIdea) => {
           navigate({
             to: "/subdomain/$slug/$ideaId",
-            params: { slug: org.slug, ideaId: newIdea.id },
+            params: { slug: org.slug, ideaId: newIdea._id },
           });
         }}
       />

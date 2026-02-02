@@ -1,31 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { RoadmapBoard } from "~/components/roadmap-board";
-import { $getIdeas } from "~/lib/api/ideas";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/roadmap/")({
   loader: async ({ context }) => {
-    // Use organization from parent route context
-    const ideas = await $getIdeas({
-      data: { organizationId: context.organization.id },
-    });
-
-    return { ideas };
+    await context.queryClient.ensureQueryData(
+      convexQuery(api.ideas.getIdeas, {
+        organizationId: context.organization._id,
+      }),
+    );
   },
   component: RoadmapPage,
 });
 
 function RoadmapPage() {
-  const { ideas: initialIdeas } = Route.useLoaderData();
   const { organization } = useRouteContext({
     from: "/(authenticated)/dashboard/$orgSlug",
   });
 
-  const { data: ideas } = useQuery({
-    queryKey: ["ideas", "all", organization.id],
-    queryFn: () => $getIdeas({ data: { organizationId: organization.id } }),
-    initialData: initialIdeas,
-  });
+  const { data: ideas } = useSuspenseQuery(
+    convexQuery(api.ideas.getIdeas, {
+      organizationId: organization._id,
+    }),
+  );
+
+  // Transform ideas data to match expected format
 
   return (
     <div className="flex h-full flex-col overflow-hidden p-6">
@@ -36,7 +37,7 @@ function RoadmapPage() {
       <div className="min-h-0 flex-1 overflow-x-auto">
         <RoadmapBoard
           ideas={ideas}
-          organizationId={organization.id}
+          organizationId={organization._id}
           orgSlug={organization.slug}
         />
       </div>

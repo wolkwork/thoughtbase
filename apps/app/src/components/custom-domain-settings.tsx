@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, LoaderCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { CustomDomain } from "~/components/custom-domain";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -10,27 +9,18 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { useOrganization } from "~/hooks/organization";
 import { usePermissions } from "~/hooks/use-permissions";
-import { $getCustomDomainStatus } from "~/lib/api/organizations";
 import { Permission } from "~/plans";
 
 interface CustomDomainSettingsProps {
-  organizationId: string;
   onUpgrade?: () => void;
 }
 
-export function CustomDomainSettings({
-  organizationId,
-  onUpgrade,
-}: CustomDomainSettingsProps) {
+export function CustomDomainSettings({ onUpgrade }: CustomDomainSettingsProps) {
   const { hasPermission } = usePermissions();
   const canUseCustomDomain = hasPermission(Permission.CUSTOM_DOMAIN);
-
-  const { data: domainStatus, isLoading } = useQuery({
-    queryKey: ["custom-domain-status", organizationId],
-    queryFn: () => $getCustomDomainStatus({ data: { organizationId } }),
-    enabled: !!organizationId,
-  });
+  const organization = useOrganization();
 
   if (!canUseCustomDomain) {
     return (
@@ -62,14 +52,10 @@ export function CustomDomainSettings({
     );
   }
 
-  if (isLoading) {
-    return <LoaderCircle className="animate-spin" />;
-  }
-
   return (
     <CustomDomain
-      defaultDomain={domainStatus?.domain || undefined}
-      organizationId={organizationId}
+      defaultDomain={organization?.customDomain || undefined}
+      organizationId={organization?._id}
     />
   );
 }

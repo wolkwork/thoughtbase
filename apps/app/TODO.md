@@ -1,3 +1,7 @@
+Fix:
+
+- Show if I upvoted something myself
+
 Features:
 
 - Dark mode

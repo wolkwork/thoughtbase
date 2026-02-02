@@ -2,17 +2,24 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
 import { cn } from "~/lib/utils";
 
+type Idea = (
+  | NonNullable<FunctionReturnType<typeof api.ideas.getIdeasPublic>>["page"]
+  | NonNullable<FunctionReturnType<typeof api.ideas.getIdeas>>
+)[number];
+
 interface RoadmapCardProps {
-  idea: any;
+  idea: Idea;
   orgSlug: string;
   isPublic?: boolean;
 }
 
 export function RoadmapCard({ idea, orgSlug, isPublic = false }: RoadmapCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: idea.id, data: { idea } });
+    useSortable({ id: idea._id, data: { idea } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -51,13 +58,13 @@ export function RoadmapCard({ idea, orgSlug, isPublic = false }: RoadmapCardProp
       {isPublic ? (
         <Link
           to="/subdomain/$slug/$ideaId"
-          params={{ slug: orgSlug, ideaId: idea.id }}
+          params={{ slug: orgSlug, ideaId: idea._id }}
           className="absolute inset-0 z-0"
         />
       ) : (
         <Link
           to="/dashboard/$orgSlug/ideas/$ideaId"
-          params={{ orgSlug: orgSlug, ideaId: idea.id }}
+          params={{ orgSlug: orgSlug, ideaId: idea._id }}
           className="absolute inset-0 z-0"
         />
       )}

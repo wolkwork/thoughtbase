@@ -1,10 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
-import { toast } from "sonner";
+import { useConvexMutation } from "@convex-dev/react-query";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
+import { useSessionId } from "convex-helpers/react/sessions";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { $upsertUnifiedProfile } from "~/lib/auth/unified-auth-functions";
 
 interface ProfileFormProps {
   orgId: string;
@@ -13,24 +13,19 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ orgId, initialName = "", onSuccess }: ProfileFormProps) {
-  const { mutate: upsertProfile, isPending } = useMutation({
-    mutationFn: async (name: string) => {
-      await $upsertUnifiedProfile({ data: { organizationId: orgId, name } });
-    },
-    onSuccess: () => {
-      toast.success("Profile updated!");
-      onSuccess();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to update profile");
-    },
-  });
+  const upsertProfile = useConvexMutation(api.profiles.upsertProfile);
+
+  const [sessionId] = useSessionId();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
-    upsertProfile(name);
+    upsertProfile({
+      organizationId: orgId,
+      name,
+      sessionId: sessionId as Id<"externalSession"> | "no-external-session",
+    });
   };
 
   return (
@@ -43,13 +38,9 @@ export function ProfileForm({ orgId, initialName = "", onSuccess }: ProfileFormP
           placeholder="Your Name"
           defaultValue={initialName}
           required
-          disabled={isPending}
         />
       </div>
-      <Button type="submit" disabled={isPending}>
-        {isPending && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-        Save
-      </Button>
+      <Button type="submit">Save</Button>
     </form>
   );
 }

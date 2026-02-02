@@ -1,7 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useConvexMutation } from "@convex-dev/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { useState } from "react";
 import { toast } from "sonner";
-import { $createIdea } from "~/lib/api/ideas";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -14,14 +16,12 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
-type CreateIdeaReturnType = Awaited<ReturnType<typeof $createIdea>>;
-
 interface CreateIdeaDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   organizationId?: string;
   orgSlug: string;
-  onSuccess?: (newIdea: CreateIdeaReturnType) => void;
+  onSuccess?: (newIdea: { _id: Id<"idea">; title: string }) => void;
 }
 
 export function CreateIdeaDialog({
@@ -34,33 +34,43 @@ export function CreateIdeaDialog({
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutate: createIdea, isPending } = useMutation({
-    mutationFn: $createIdea,
-    onSuccess: (newIdea) => {
-      toast.success("Idea created successfully");
-      // Invalidate sidebar counts and ideas list
-      if (organizationId) {
-        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
-        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
-      }
-      onOpenChange(false);
-      setTitle("");
-      setDescription("");
-      onSuccess?.(newIdea);
-    },
-    onError: () => {
-      toast.error("Failed to submit idea");
-    },
-  });
+  const createIdea = useConvexMutation(api.ideas.createIdea);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!organizationId) {
       toast.error("Organization ID is required");
       return;
     }
-    createIdea({ data: { title, description, organizationSlug: orgSlug } });
+
+    setIsPending(true);
+    try {
+      const newIdea = await createIdea({
+        organizationId,
+        title,
+        description: description || undefined,
+      });
+
+      toast.success("Idea created successfully");
+      // Invalidate sidebar counts and ideas list
+      queryClient.invalidateQueries({
+        queryKey: [api.ideas.getSidebarCounts, { organizationId }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [api.ideas.getIdeas, { organizationId }],
+      });
+      onOpenChange(false);
+      setTitle("");
+      setDescription("");
+      onSuccess?.(newIdea);
+    } catch (error) {
+      console.error("Failed to create idea:", error);
+      toast.error("Failed to submit idea");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (

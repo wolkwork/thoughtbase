@@ -1,10 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  notFound,
-  useLoaderData,
-  useRouter,
-} from "@tanstack/react-router";
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { useState } from "react";
 import { AuthForm } from "~/components/auth-form";
 import { ProfileForm } from "~/components/profile-form";
@@ -16,33 +14,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { $getIdea } from "~/lib/api/ideas";
 
 export const Route = createFileRoute("/subdomain/$slug/$ideaId")({
-  loader: async ({ params: { ideaId } }) => {
-    const idea = await $getIdea({ data: ideaId });
-    if (!idea) {
-      throw notFound();
-    }
-    return { idea };
+  loader: async ({ context, params: { ideaId } }) => {
+    context.queryClient.ensureQueryData(
+      convexQuery(api.ideas.getPublicIdea, {
+        ideaId: ideaId as Id<"idea">,
+      }),
+    );
   },
   component: PublicIdeaDetailPage,
 });
 
 function PublicIdeaDetailPage() {
-  const { idea: initialIdea } = useLoaderData({ from: "/subdomain/$slug/$ideaId" });
-  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
   const { ideaId } = Route.useParams();
+
+  const { data: idea } = useSuspenseQuery(
+    convexQuery(api.ideas.getPublicIdea, {
+      ideaId: ideaId as Id<"idea">,
+    }),
+  );
+
+  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
   const router = useRouter();
 
   const [loginOpen, setLoginOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-
-  const { data: idea } = useQuery({
-    queryKey: ["idea", ideaId],
-    queryFn: () => $getIdea({ data: ideaId }),
-    initialData: initialIdea,
-  });
 
   const handleLoginRequired = () => {
     setLoginOpen(true);

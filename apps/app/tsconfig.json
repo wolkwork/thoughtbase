@@ -1,5 +1,6 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "./tests"],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
@@ -14,8 +15,7 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "~/*": ["./src/*"],
-      "@/convex/*": ["./convex/*"]
+      "~/*": ["./src/*"]
     },
     "noEmit": true,
     "strictNullChecks": true

@@ -7,12 +7,14 @@ import {
   UsersThreeIcon,
   WrenchIcon,
 } from "@phosphor-icons/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
-import { AlertCircle, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { AlertCircle, Copy, ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 // import type { BundledLanguage } from "shiki";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { toast } from "sonner";
 import { BrandingSettings } from "~/components/branding-settings";
 import { CustomDomainSettings } from "~/components/custom-domain-settings";
@@ -22,8 +24,8 @@ import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
+import { useOrganization } from "~/hooks/organization";
 import { usePermissions } from "~/hooks/use-permissions";
-import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
 import { cn } from "~/lib/utils";
 import { Permission } from "~/plans";
 import { CopyButton } from "./ui/shadcn-io/copy-button";
@@ -191,11 +193,7 @@ export function OnboardingDialog({
                   )}
                   {activeStepId === "share-board" && <ShareBoardStep orgSlug={orgSlug} />}
                   {activeStepId === "setup-custom-domain" && (
-                    <SetupCustomDomainStep
-                      organizationId={organizationId}
-                      orgSlug={orgSlug}
-                      onUpgrade={() => setSubscriptionOpen(true)}
-                    />
+                    <SetupCustomDomainStep onUpgrade={() => setSubscriptionOpen(true)} />
                   )}
                 </div>
               </div>
@@ -305,32 +303,19 @@ function EnableAutoLoginStep({
   organizationId?: string;
   onUpgrade?: () => void;
 }) {
-  const queryClient = useQueryClient();
   const { hasPermission } = usePermissions();
   const canUseSSO = hasPermission(Permission.SSO);
+  const organization = useOrganization();
 
-  const { data, isPending } = useQuery({
-    queryKey: ["org-secret", organizationId],
-    queryFn: async () => {
-      if (!organizationId) return { secret: null as string | null };
-      return await $getOrgSecret({ data: { organizationId } });
-    },
-    enabled: !!organizationId && canUseSSO,
-  });
+  const { data: orgSecret } = useSuspenseQuery(
+    convexQuery(api.organizations.getOrgSecret, {
+      organizationId: organization?._id,
+    }),
+  );
 
-  const { mutate: generateSecret, isPending: isGenerating } = useMutation({
-    mutationFn: async () => {
-      if (!organizationId) throw new Error("Missing organizationId");
-      return await $generateOrgSecret({ data: { organizationId } });
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["org-secret", organizationId] });
-      toast.success("SSO secret generated");
-    },
-    onError: () => toast.error("Failed to generate secret"),
-  });
+  const generateSecret = useConvexMutation(api.organizations.generateOrgSecret);
 
-  const secret = data?.secret ?? null;
+  const secret = orgSecret.secret;
 
   const joseExample = `import { SignJWT } from "jose";
 
@@ -383,12 +368,7 @@ const token = await new SignJWT({
         </div>
 
         <div className="mt-4">
-          {isPending ? (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading...
-            </div>
-          ) : secret ? (
+          {secret ? (
             <div className="flex items-center gap-2">
               <code className="bg-muted rounded px-2 py-1 text-xs">{secret}</code>
               <CopyButton variant="outline" content={secret} />
@@ -396,10 +376,8 @@ const token = await new SignJWT({
           ) : (
             <Button
               type="button"
-              onClick={() => generateSecret()}
-              disabled={isGenerating}
+              onClick={() => generateSecret({ organizationId: organization?._id })}
             >
-              {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate secret
             </Button>
           )}
@@ -514,22 +492,10 @@ function ShareBoardStep({ orgSlug }: { orgSlug: string }) {
   );
 }
 
-function SetupCustomDomainStep({
-  organizationId,
-  orgSlug,
-  onUpgrade,
-}: {
-  organizationId?: string;
-  orgSlug: string;
-  onUpgrade: () => void;
-}) {
-  if (!organizationId) {
-    return <div className="text-muted-foreground text-sm">No organization selected.</div>;
-  }
-
+function SetupCustomDomainStep({ onUpgrade }: { onUpgrade: () => void }) {
   return (
     <div className="space-y-6">
-      <CustomDomainSettings organizationId={organizationId} onUpgrade={onUpgrade} />
+      <CustomDomainSettings onUpgrade={onUpgrade} />
     </div>
   );
 }

@@ -1,24 +1,13 @@
-import { api } from "@/convex/_generated/api";
 import { convexQuery } from "@convex-dev/react-query";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import z from "zod";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { AppSidebar } from "~/components/app-sidebar";
 import { TrialStatusBanner } from "~/components/trial-status-banner";
 import { SidebarProvider } from "~/components/ui/sidebar";
-import { $getSidebarCounts } from "~/lib/api/ideas";
-import { getPlanPermissions } from "~/lib/api/permissions";
+import { useOrganization } from "~/hooks/organization";
+import { SubscriptionTier } from "~/lib/api/permissions";
 import { plans } from "~/plans";
-
-/**
- * Server function to get plan permissions for use in route loaders
- */
-export const $getPlanPermissions = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ organizationId: z.string() }))
-  .handler(async ({ data }) => {
-    return await getPlanPermissions(data.organizationId);
-  });
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
   beforeLoad: async ({ context, params }) => {
@@ -31,8 +20,6 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
     if (!organization) {
       throw notFound();
     }
-
-    console.log(organization);
 
     // const isMember = await $checkMembership({
     //   data: { organizationId: organization.id, userId: context.user.id },
@@ -52,7 +39,7 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
     // const plan = await $getPlanPermissions({ data: { organizationId: organization.id } });
 
     // Provide organization and permissions to child routes via context
-    return { organization, plan: plans.business };
+    return { organization, plan: plans.business as (typeof plans)[SubscriptionTier] };
   },
   component: DashboardLayout,
 });
@@ -60,18 +47,20 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
 function DashboardLayout() {
   const { orgSlug } = Route.useParams();
 
-  const { data: organization } = useSuspenseQuery(
-    convexQuery(api.auth.getOrganizationBySlug, { slug: orgSlug }),
-  );
+  const organization = useOrganization();
 
-  const { data: counts } = useQuery({
-    queryKey: ["sidebar-counts", organization.id],
-    queryFn: () => $getSidebarCounts({ data: { organizationId: organization.id } }),
-  });
+  const { data: counts } = useQuery(
+    convexQuery(api.ideas.getSidebarCounts, {
+      organizationId: organization._id,
+    }),
+  );
 
   return (
     <SidebarProvider>
-      <AppSidebar counts={counts} orgSlug={orgSlug} />
+      <AppSidebar
+        counts={counts as Record<string, number> | undefined}
+        orgSlug={orgSlug}
+      />
       <main className="w-full flex-1 overflow-auto">
         <TrialStatusBanner />
         <Outlet />

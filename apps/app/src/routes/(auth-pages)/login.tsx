@@ -26,12 +26,6 @@ function LoginForm() {
           onError: ({ error }) => {
             toast.error(error.message || "An error occurred while signing in.");
           },
-          // better-auth seems to trigger a hard navigation on login,
-          // so we don't have to revalidate & navigate ourselves
-          // onSuccess: () => {
-          //   queryClient.removeQueries({ queryKey: authQueryOptions().queryKey });
-          //   navigate({ to: redirectUrl });
-          // },
         },
       ),
   });

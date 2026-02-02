@@ -1,6 +1,7 @@
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { useMutation } from "convex/react";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { createWidgetIdea } from "../../lib/api/widget-client";
 import { Button } from "../ui/button";
 
 interface SubmitViewProps {
@@ -11,27 +12,27 @@ interface SubmitViewProps {
 export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const createIdea = useMutation(api.widget.createWidgetIdea);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !title) return;
 
-    setIsPending(true);
     try {
-      await createWidgetIdea({
+      await createIdea({
+        organizationSlug,
         title,
         description,
-        organizationSlug,
-        token: ssoToken,
+        ssoToken,
       });
       setIsSuccess(true);
+      setTitle("");
       setDescription("");
     } catch (error) {
       // TODO: Show error message
-    } finally {
-      setIsPending(false);
+      console.error("Failed to create idea:", error);
     }
   };
 
@@ -89,9 +90,9 @@ export function SubmitView({ organizationSlug, ssoToken }: SubmitViewProps) {
             <Button
               type="submit"
               className="w-full"
-              disabled={isPending || !description}
+              disabled={!description || !title}
             >
-              {isPending ? "Sending..." : "Submit Idea"}
+              Submit Idea
             </Button>
           </div>
         )}

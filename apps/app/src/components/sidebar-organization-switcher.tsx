@@ -1,8 +1,10 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useRouteContext } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { usePermissions } from "~/hooks/use-permissions";
-import { authClient } from "~/lib/auth/auth-client";
 import { cn } from "~/lib/utils";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import {
@@ -26,7 +28,9 @@ export function SidebarOrganizationSwitcher({
     from: "/(authenticated)/dashboard/$orgSlug",
   });
 
-  const { data: organizations } = authClient.useListOrganizations();
+  const { data: organizations } = useSuspenseQuery(
+    convexQuery(api.auth.listOrganizations, {}),
+  );
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const { plan } = usePermissions();

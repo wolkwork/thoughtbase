@@ -1,131 +1,109 @@
 import { getRequest } from "@tanstack/react-start/server";
-import { eq } from "drizzle-orm";
-import { parse } from "es-cookie";
-import { jwtVerify } from "jose";
-import { nanoid } from "nanoid";
-import { auth } from "~/lib/auth/auth";
-import { db } from "~/lib/db";
-import { externalSession, externalUser, organization } from "~/lib/db/schema";
+import { api, getConvexClient } from "~/lib/convex/client";
 
-export async function getUserFromToken(token: string, organizationId: string) {
-  // 1. Fetch Organization Secret
-  const org = await db.query.organization.findFirst({
-    where: eq(organization.id, organizationId),
-    columns: { secret: true },
-  });
+/**
+ * Get user from SSO token
+ * This function verifies the JWT token and returns the external user
+ * Note: This creates a session as a side effect via signInWithSSO
+ */
+export async function getUserFromToken(
+  token: string,
+  organizationId: string,
+): Promise<
+  | {
+      id: string;
+      email?: string;
+      name?: string;
+      avatarUrl?: string;
+      revenue?: number;
+      metadata?: unknown;
+    }
+  | undefined
+> {
+  try {
+    const convexClient = getConvexClient();
 
-  if (!org || !org.secret) {
-    throw new Error("Organization not found or SSO not configured");
-  }
+    // signInWithSSO verifies the token and creates a session
+    // We need to get the user from the session
+    const session = await convexClient.mutation(api.externalSessions.signInWithSSO, {
+      ssoToken: token,
+      organizationId,
+    });
 
-  const secret = new TextEncoder().encode(org.secret);
+    if (!session) {
+      return undefined;
+    }
 
-  // 2. Verify JWT
-  const { payload } = await jwtVerify(token, secret);
-
-  if (!payload.email || typeof payload.email !== "string") {
-    throw new Error("Invalid token payload: email missing");
-  }
-
-  const externalId = (payload.sub || payload.id) as string;
-  if (!externalId) {
-    throw new Error("Invalid token payload: sub or id missing");
-  }
-
-  const email = payload.email;
-  const name = (payload.name as string) || email.split("@")[0];
-  const image = (payload.image as string) || (payload.avatarUrl as string) || null;
-  const metadata = payload.metadata as unknown;
-  const revenue = Number(payload.revenue) || null;
-
-  // 3. Upsert External User
-  const [user] = await db
-    .insert(externalUser)
-    .values({
-      id: nanoid(),
-      organizationId: organizationId,
-      externalId,
-      email,
-      name,
-      avatarUrl: image,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [externalUser.organizationId, externalUser.externalId],
-      set: {
-        name,
-        email,
-        avatarUrl: image,
-        metadata,
-        revenue,
-        updatedAt: new Date(),
+    // Get the external user by querying the session with the user
+    // We can get the user directly from the database via a query
+    // For now, we'll need to get it from the session's externalUserId
+    // Since we don't have a direct query, we'll use getExternalSessionById
+    const sessionWithUser = await convexClient.query(
+      api.externalSessions.getExternalSessionById,
+      {
+        id: session._id,
       },
-    })
-    .returning();
+    );
 
-  return user;
+    if (!sessionWithUser || !sessionWithUser.externalUser) {
+      return undefined;
+    }
+
+    const externalUser = sessionWithUser.externalUser;
+
+    return {
+      id: externalUser._id,
+      email: externalUser.email,
+      name: externalUser.name,
+      avatarUrl: externalUser.avatarUrl || undefined,
+      revenue: externalUser.revenue || undefined,
+      metadata: externalUser.metadata || undefined,
+    };
+  } catch (error) {
+    console.error("Error getting user from token:", error);
+    return undefined;
+  }
 }
 
-export async function getWidgetAuthContext() {
-  // 1. Try getting cookie from request headers
+/**
+ * Get unified auth context (internal or external user)
+ */
+export async function getUnifiedAuthContext() {
   const request = getRequest();
   const cookieHeader = request.headers.get("cookie");
 
-  if (!cookieHeader) return null;
+  // Extract feedback_widget_token from cookies
+  const tokenMatch = cookieHeader?.match(/feedback_widget_token=([^;]+)/);
+  const token = tokenMatch ? tokenMatch[1] : null;
 
-  const cookies = parse(cookieHeader);
-  const token = cookies["feedback_widget_token"];
+  if (!token) {
+    return null;
+  }
 
-  if (!token) return null;
+  const convexClient = getConvexClient();
 
-  // 2. Validate session
-  const session = await db.query.externalSession.findFirst({
-    where: eq(externalSession.token, token),
-    with: {
-      externalUser: true,
-    },
+  // Get session by token
+  const sessionData = await convexClient.query(api.externalSessions.getSessionByToken, {
+    token,
   });
 
-  if (!session) return null;
+  if (!sessionData || !sessionData.session || !sessionData.externalUser) {
+    return null;
+  }
 
-  // 3. Check expiry
-  if (new Date() > session.expiresAt) {
+  // Check if session is expired
+  if (Date.now() > sessionData.session.expiresAt) {
     return null;
   }
 
   return {
-    externalUser: session.externalUser,
-    session: session,
+    type: "external" as const,
+    user: {
+      id: sessionData.externalUser._id,
+      email: sessionData.externalUser.email,
+      name: sessionData.externalUser.name,
+      avatarUrl: sessionData.externalUser.avatarUrl,
+    },
+    session: sessionData.session,
   };
-}
-
-// Helper to get either authenticated user (dashboard) or external user (widget)
-export async function getUnifiedAuthContext() {
-  // 1. Try standard auth first
-  const dashboardSession = await auth.api.getSession({
-    headers: getRequest().headers,
-  });
-
-  if (dashboardSession) {
-    return {
-      type: "internal" as const,
-      user: dashboardSession.user,
-      session: dashboardSession.session,
-    };
-  }
-
-  // 2. Try widget auth
-  const widgetCtx = await getWidgetAuthContext();
-
-  if (widgetCtx) {
-    return {
-      type: "external" as const,
-      user: widgetCtx.externalUser,
-      organizationId: widgetCtx.externalUser.organizationId,
-      session: widgetCtx.session,
-    };
-  }
-
-  return null;
 }

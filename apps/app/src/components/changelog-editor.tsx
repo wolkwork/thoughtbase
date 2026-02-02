@@ -1,4 +1,7 @@
+import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { upload } from "@vercel/blob/client";
 import { format } from "date-fns";
 import {
@@ -26,10 +29,6 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Switch } from "~/components/ui/switch";
-import {
-  $getCompletedIdeasSinceLastChangelog,
-  $getIdeasForChangelogSelection,
-} from "~/lib/api/changelogs";
 import { cn } from "~/lib/utils";
 import { TiptapEditor } from "./tiptap-editor";
 
@@ -38,19 +37,19 @@ interface ChangelogEditorProps {
   initialData?: {
     id?: string;
     title: string;
-    content: string | null;
-    featuredImage: string | null;
-    publishedAt: Date | string | null;
+    content?: string;
+    featuredImage?: string;
+    publishedAt?: Date | string;
     status: "draft" | "published";
-    ideas: { id: string; title: string }[];
+    ideas: { id: Id<"idea">; title: string }[];
   };
   onSubmit: (data: {
     title: string;
     content: string;
-    featuredImage: string | null;
-    publishedAt: string | null;
+    featuredImage?: string;
+    publishedAt?: string;
     status: "draft" | "published";
-    ideaIds: string[];
+    ideaIds: Id<"idea">[];
   }) => void;
   isSubmitting?: boolean;
 }
@@ -63,8 +62,8 @@ export function ChangelogEditor({
 }: ChangelogEditorProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
-  const [featuredImage, setFeaturedImage] = useState<string | null>(
-    initialData?.featuredImage || null,
+  const [featuredImage, setFeaturedImage] = useState<string | undefined>(
+    initialData?.featuredImage,
   );
   const [isUploading, setIsUploading] = useState(false);
   const [publishedAt, setPublishedAt] = useState<Date | undefined>(
@@ -73,7 +72,7 @@ export function ChangelogEditor({
   const [status, setStatus] = useState<"draft" | "published">(
     initialData?.status || "draft",
   );
-  const [selectedIdeaIds, setSelectedIdeaIds] = useState<string[]>(
+  const [selectedIdeaIds, setSelectedIdeaIds] = useState<Id<"idea">[]>(
     initialData?.ideas.map((i) => i.id) || [],
   );
   const [ideaSelectOpen, setIdeaSelectOpen] = useState(false);
@@ -81,21 +80,23 @@ export function ChangelogEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get all completed ideas
-  const { data: allIdeas = [] } = useQuery({
-    queryKey: ["ideas-for-changelog", organizationId],
-    queryFn: () => $getIdeasForChangelogSelection({ data: { organizationId } }),
-  });
+  const { data: allIdeas = [] } = useQuery(
+    convexQuery(api.changelogs.getIdeasForChangelogSelection, {
+      organizationId,
+    }),
+  );
 
   // Get suggested ideas (completed since last changelog)
-  const { data: suggestedIdeas = [] } = useQuery({
-    queryKey: ["suggested-ideas-for-changelog", organizationId],
-    queryFn: () => $getCompletedIdeasSinceLastChangelog({ data: { organizationId } }),
-  });
+  const { data: suggestedIdeas = [] } = useQuery(
+    convexQuery(api.changelogs.getCompletedIdeasSinceLastChangelog, {
+      organizationId,
+    }),
+  );
 
-  const suggestedIdeaIds = new Set(suggestedIdeas.map((i) => i.id));
+  const suggestedIdeaIds = new Set<Id<"idea">>(suggestedIdeas.map((i) => i.id));
   const selectedIdeas = allIdeas.filter((i) => selectedIdeaIds.includes(i.id));
 
-  const handleToggleIdea = (ideaId: string) => {
+  const handleToggleIdea = (ideaId: Id<"idea">) => {
     setSelectedIdeaIds((prev) =>
       prev.includes(ideaId) ? prev.filter((id) => id !== ideaId) : [...prev, ideaId],
     );
@@ -127,7 +128,7 @@ export function ChangelogEditor({
   };
 
   const handleRemoveImage = () => {
-    setFeaturedImage(null);
+    setFeaturedImage(undefined);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -139,7 +140,7 @@ export function ChangelogEditor({
       title,
       content,
       featuredImage,
-      publishedAt: publishedAt ? publishedAt.toISOString() : null,
+      publishedAt: publishedAt ? publishedAt.toISOString() : undefined,
       status,
       ideaIds: selectedIdeaIds,
     });

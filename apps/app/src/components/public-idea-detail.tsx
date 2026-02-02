@@ -1,14 +1,14 @@
+import { useConvexMutation } from "@convex-dev/react-query";
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { useSessionMutation } from "convex-helpers/react/sessions";
+import { FunctionReturnType } from "convex/server";
 import { format, formatDistanceToNow } from "date-fns";
 import { PencilIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { usePermissionsPublic } from "~/hooks/use-permissions-public";
-import { $createComment, $toggleReaction, $updateIdea } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
-import { Permission } from "~/plans";
 import { StatusBadge } from "./status-badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,8 +17,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { UserAvatar } from "./user-avatar";
 
 interface PublicIdeaDetailProps {
-  idea: any;
-  currentUser: any;
+  idea: NonNullable<FunctionReturnType<typeof api.ideas.getPublicIdea>>;
+  currentUser: FunctionReturnType<typeof api.auth.getUnifiedUser>;
   organizationId?: string;
   onLoginRequired?: () => void;
 }
@@ -26,138 +26,86 @@ interface PublicIdeaDetailProps {
 export function PublicIdeaDetail({
   idea,
   currentUser,
-  organizationId,
   onLoginRequired,
 }: PublicIdeaDetailProps) {
-  const queryClient = useQueryClient();
-  const router = useRouter();
   const [comment, setComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(idea.title);
   const [editDescription, setEditDescription] = useState(idea.description || "");
   const { hasPermission } = usePermissionsPublic();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = true;
 
   // Check if current user is the author
   const isAuthor =
-    currentUser &&
-    ((currentUser.type === "external" && idea.externalAuthorId === currentUser.id) ||
-      (currentUser.type !== "external" && idea.authorId === currentUser.id));
+    currentUser && currentUser.type === "external" && idea.authorId === currentUser._id;
 
-  const { mutate: addComment, isPending: isCommentPending } = useMutation({
-    mutationFn: $createComment,
-    onMutate: async (newComment) => {
-      const tempId = crypto.randomUUID();
-      const optimisticComment = {
-        id: tempId,
-        content: newComment.data.content,
-        createdAt: new Date(),
-        author: {
-          name: currentUser.name,
-          image: currentUser.image,
-        },
-        reactions: [],
-      };
+  const addComment = useConvexMutation(api.ideas.createComment);
 
-      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
-        ...old,
-        comments: [optimisticComment, ...old.comments],
-      }));
+  // const { mutate: toggleReaction } = useMutation({
+  //   mutationFn: $toggleReaction,
+  //   onMutate: async (newReaction) => {
+  //     // Optimistically update reaction count/state
+  //     queryClient.setQueryData(["idea", idea.id], (old: any) => {
+  //       const isExternal = currentUser?.type === "external";
+  //       const hasReacted = old.reactions.some((r: any) => {
+  //         if (isExternal)
+  //           return (
+  //             r.externalUserId === currentUser.id && r.type === newReaction.data.type
+  //           );
+  //         return r.userId === currentUser.id && r.type === newReaction.data.type;
+  //       });
 
-      return { tempId };
-    },
-    onSuccess: () => {
-      setComment("");
-      toast.success("Comment added");
-      router.invalidate();
-    },
-    onError: () => {
-      toast.error("Failed to add comment");
-      router.invalidate();
-    },
-  });
+  //       let newReactions = [...old.reactions];
 
-  const { mutate: toggleReaction } = useMutation({
-    mutationFn: $toggleReaction,
-    onMutate: async (newReaction) => {
-      // Optimistically update reaction count/state
-      queryClient.setQueryData(["idea", idea.id], (old: any) => {
-        const isExternal = currentUser?.type === "external";
-        const hasReacted = old.reactions.some((r: any) => {
-          if (isExternal)
-            return (
-              r.externalUserId === currentUser.id && r.type === newReaction.data.type
-            );
-          return r.userId === currentUser.id && r.type === newReaction.data.type;
-        });
+  //       if (hasReacted) {
+  //         newReactions = newReactions.filter((r: any) => {
+  //           if (isExternal)
+  //             return !(
+  //               r.externalUserId === currentUser.id && r.type === newReaction.data.type
+  //             );
+  //           return !(r.userId === currentUser.id && r.type === newReaction.data.type);
+  //         });
+  //       } else {
+  //         newReactions.push({
+  //           id: "optimistic-" + Math.random(),
+  //           userId: isExternal ? null : currentUser.id,
+  //           externalUserId: isExternal ? currentUser.id : null,
+  //           type: newReaction.data.type,
+  //         });
+  //       }
 
-        let newReactions = [...old.reactions];
+  //       return {
+  //         ...old,
+  //         reactions: newReactions,
+  //       };
+  //     });
+  //   },
+  //   onSuccess: () => {
+  //     router.invalidate();
+  //   },
+  //   onError: () => {
+  //     router.invalidate();
+  //   },
+  // });
 
-        if (hasReacted) {
-          newReactions = newReactions.filter((r: any) => {
-            if (isExternal)
-              return !(
-                r.externalUserId === currentUser.id && r.type === newReaction.data.type
-              );
-            return !(r.userId === currentUser.id && r.type === newReaction.data.type);
-          });
-        } else {
-          newReactions.push({
-            id: "optimistic-" + Math.random(),
-            userId: isExternal ? null : currentUser.id,
-            externalUserId: isExternal ? currentUser.id : null,
-            type: newReaction.data.type,
-          });
-        }
+  const toggleReaction = useSessionMutation(api.ideas.toggleReaction);
 
-        return {
-          ...old,
-          reactions: newReactions,
-        };
-      });
-    },
-    onSuccess: () => {
-      router.invalidate();
-    },
-    onError: () => {
-      router.invalidate();
-    },
-  });
+  const updateIdea = useConvexMutation(api.ideas.updateIdea);
 
-  const { mutate: updateIdea, isPending: isUpdatePending } = useMutation({
-    mutationFn: $updateIdea,
-    onMutate: async (updated) => {
-      // Optimistically update
-      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
-        ...old,
-        title: updated.data.title,
-        description: updated.data.description,
-      }));
-    },
-    onSuccess: () => {
-      setIsEditing(false);
-      toast.success("Idea updated");
-      queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
-      router.invalidate();
-    },
-    onError: () => {
-      toast.error("Failed to update idea");
-      router.invalidate();
-    },
-  });
-
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editTitle.trim()) {
       toast.error("Title is required");
       return;
     }
-    updateIdea({
-      data: {
-        ideaId: idea.id,
-        title: editTitle,
-        description: editDescription,
-      },
+
+    await updateIdea({
+      ideaId: idea.id,
+      title: editTitle,
+      description: editDescription,
     });
+
+    setIsEditing(false);
+    toast.success("Idea updated");
   };
 
   const handleCancelEdit = () => {
@@ -175,24 +123,27 @@ export function PublicIdeaDetail({
       toast.error("Your trial has ended. Upgrade to interact with ideas.");
       return;
     }
-    toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
+    toggleReaction({ ideaId: idea.id, type: "upvote" });
   };
 
-  const handleSubmitComment = () => {
+  const handleSubmitComment = async () => {
     if (!currentUser) {
       onLoginRequired?.();
       return;
     }
-    addComment({ data: { ideaId: idea.id, content: comment } });
+
+    try {
+      await addComment({ ideaId: idea.id, content: comment });
+      setComment("");
+    } catch (error) {
+      toast.error("Failed to add comment");
+    }
   };
 
   const hasUpvoted =
     currentUser &&
-    idea.reactions.some((r: any) => {
-      if (currentUser.type === "external") {
-        return r.externalUserId === currentUser.id && r.type === "upvote";
-      }
-      return r.userId === currentUser.id && r.type === "upvote";
+    idea.reactions.some((r) => {
+      return r.userId === currentUser._id && r.type === "upvote";
     });
 
   return (
@@ -215,19 +166,10 @@ export function PublicIdeaDetail({
               className="field-sizing-content min-h-[100px] resize-none"
             />
             <div className="flex items-center gap-1.5">
-              <Button
-                size="sm"
-                onClick={handleSaveEdit}
-                disabled={isUpdatePending || !editTitle.trim()}
-              >
+              <Button size="sm" onClick={handleSaveEdit} disabled={!editTitle.trim()}>
                 Save
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleCancelEdit}
-                disabled={isUpdatePending}
-              >
+              <Button size="sm" variant="outline" onClick={handleCancelEdit}>
                 Cancel
               </Button>
             </div>
@@ -299,7 +241,7 @@ export function PublicIdeaDetail({
             <Button
               size="sm"
               className="absolute right-2 bottom-2"
-              disabled={!comment.trim() || isCommentPending || !currentUser}
+              disabled={!comment.trim() || !currentUser}
               onClick={handleSubmitComment}
             >
               Comment
@@ -349,7 +291,7 @@ export function PublicIdeaDetail({
           <UserAvatar user={idea.author} />
           <div className="flex flex-col gap-0.5">
             <div className="text-foreground flex items-center gap-2 font-medium">
-              <span>{idea.author.name}</span>
+              <span>{idea.author?.name || "Unknown"}</span>
             </div>
             <span className="text-xs">
               {formatDistanceToNow(idea.createdAt, { addSuffix: true })}

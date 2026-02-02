@@ -1,10 +1,12 @@
+// @ts-nocheck - TODO: decide how to billing when open source
+
 import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 import { cn } from "~/lib/utils";
 import { plans } from "~/plans";
 import { Badge } from "./ui/badge";

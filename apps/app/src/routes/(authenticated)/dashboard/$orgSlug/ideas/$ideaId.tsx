@@ -1,33 +1,36 @@
-import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { IdeaDetail } from "~/components/idea-detail";
-import { $getIdea } from "~/lib/api/ideas";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/$ideaId")(
   {
-    loader: async ({ params: { ideaId } }) => {
-      const idea = await $getIdea({ data: ideaId });
+    loader: async ({ context, params: { ideaId } }) => {
+      const idea = await context.queryClient.ensureQueryData(
+        convexQuery(api.ideas.getIdea, {
+          ideaId: ideaId as Id<"idea">,
+        }),
+      );
 
       if (!idea) {
         throw notFound();
       }
-
-      return { idea };
     },
     component: IdeaDetailPage,
   },
 );
 
 function IdeaDetailPage() {
-  const { idea: initialIdea } = Route.useLoaderData();
   const { ideaId, orgSlug } = Route.useParams();
   const { user, organization } = Route.useRouteContext();
 
-  const { data: idea } = useQuery({
-    queryKey: ["idea", ideaId],
-    queryFn: () => $getIdea({ data: ideaId }),
-    initialData: initialIdea,
-  });
+  const { data: idea } = useSuspenseQuery(
+    convexQuery(api.ideas.getIdea, {
+      ideaId: ideaId as any,
+    }),
+  );
 
   if (!idea) return null;
 
@@ -36,7 +39,7 @@ function IdeaDetailPage() {
       idea={idea}
       currentUser={user}
       orgSlug={orgSlug}
-      organizationId={organization.id}
+      organizationId={organization._id}
     />
   );
 }

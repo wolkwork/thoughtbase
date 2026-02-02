@@ -8,37 +8,37 @@ import Feature2 from "@/components/features/Feature2.astro";
 import Pricing1 from "@/components/pricing/Pricing1.astro";
 import Cta1 from "@/components/ctas/Cta1.astro";
 import Cta2 from "@/components/ctas/Cta2.astro";
-// import { SignJWT } from "jose";
+import { SignJWT } from "jose";
 
-// const secret = "DLePfZvOs24wxZdn24-Q9AjL7eB7DU0j";
-// const secretKey = new TextEncoder().encode(secret);
+const secret = "edqSmAlewX_4ujVJskkqeCJ1tPbfu2-D";
+const secretKey = new TextEncoder().encode(secret);
 
-// const token = await new SignJWT({
-//   id: "demo-user-123",
-//   email: "demo@example.com",
-//   name: "Demo User",
-//   avatarUrl: "https://ui-avatars.com/api/?name=Demo+User&background=random",
-//   metadata: {
-//     absolute: "legend",
-//     pizzasEaten: 10,
-//     nested: {
-//       key: "value",
-//     },
-//     array: [1, 2, 3],
-//     boolean: true,
-//     number: 123,
-//     string: "hello",
-//     null: null,
-//     undefined: undefined,
-//     date: new Date(),
-//     object: { key: "value" },
-//   },
-//   revenue: 29,
-// })
-//   .setProtectedHeader({ alg: "HS256" })
-//   .setIssuedAt()
-//   .setExpirationTime("2h")
-//   .sign(secretKey);
+const token = await new SignJWT({
+  id: "demo-user-123",
+  email: "demo@example.com",
+  name: "Demo User",
+  avatarUrl: "https://ui-avatars.com/api/?name=Demo+User&background=random",
+  metadata: {
+    absolute: "legend",
+    pizzasEaten: 10,
+    nested: {
+      key: "value",
+    },
+    array: [1, 2, 3],
+    boolean: true,
+    number: 123,
+    string: "hello",
+    null: null,
+    undefined: undefined,
+    date: new Date(),
+    object: { key: "value" },
+  },
+  revenue: 29,
+})
+  .setProtectedHeader({ alg: "HS256" })
+  .setIssuedAt()
+  .setExpirationTime("2h")
+  .sign(secretKey);
 ---
 
 <BaseLayout>
@@ -51,11 +51,24 @@ import Cta2 from "@/components/ctas/Cta2.astro";
   <Cta1 />
 </BaseLayout>
 
-<script>
-  import { initFeedbackWidget } from "@thoughtbase/widget";
-  const ORGANIZATION_SLUG = import.meta.env.PUBLIC_ORGANIZATION_SLUG;
+<feedback-widget data-token={token}></feedback-widget>
 
-  initFeedbackWidget({
-    organizationSlug: ORGANIZATION_SLUG,
-  });
+<script>
+  import { identify, initFeedbackWidget } from "@thoughtbase/widget";
+  const ORGANIZATION_SLUG = import.meta.env.PUBLIC_ORGANIZATION_SLUG as string;
+  const CONVEX_URL = import.meta.env.PUBLIC_CONVEX_URL as string;
+
+  console.log("ORGANIZATION_SLUG", ORGANIZATION_SLUG);
+  class FeedbackWidget extends HTMLElement {
+    constructor() {
+      super();
+      initFeedbackWidget({
+        organizationSlug: ORGANIZATION_SLUG,
+        convexUrl: CONVEX_URL,
+        ssoToken: this.dataset.token,
+      });
+    }
+  }
+
+  customElements.define("feedback-widget", FeedbackWidget);
 </script>

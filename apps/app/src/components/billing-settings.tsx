@@ -1,3 +1,5 @@
+// @ts-nocheck - TODO: decide how to billing when open source
+
 import { useQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import { CreditCard, ExternalLink, Loader2 } from "lucide-react";
@@ -12,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 
 export function BillingSettings() {
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
@@ -22,11 +24,11 @@ export function BillingSettings() {
   });
 
   const { data: subscriptions, isPending } = useQuery({
-    queryKey: ["subscriptions", organization.id],
+    queryKey: ["subscriptions", organization._id],
     queryFn: async () => {
       const result = await authClient.customer.subscriptions.list({
         query: {
-          referenceId: organization.id,
+          referenceId: organization._id,
           active: true,
           limit: 1,
         },
