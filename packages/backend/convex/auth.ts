@@ -4,7 +4,7 @@ import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth, BetterAuthOptions } from "better-auth/minimal";
 import { apiKey, organization } from "better-auth/plugins";
 import { v } from "convex/values";
-import { api, components } from "./_generated/api";
+import { components } from "./_generated/api";
 import type { DataModel, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import authConfig from "./auth.config";
@@ -18,16 +18,52 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
     local: {
       schema: authSchema,
     },
-  },
+  }
 );
+
+const staticTrustedOrigins = [
+  "http://thoughtbase.localhost:3000",
+  "http://*.thoughtbase.localhost:3000",
+  "https://*-wolkwork.vercel.app",
+  "https://*-thoughtbase.app",
+  "https://thoughtbase.app",
+];
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
     // baseURL: "http://thoughtbase.localhost:3000",
-    trustedOrigins: [
-      "http://thoughtbase.localhost:3000",
-      "http://*.thoughtbase.localhost:3000",
-    ],
+    trustedOrigins: async (request?: Request): Promise<string[]> => {
+      const trustedOrigins = [...staticTrustedOrigins];
+
+      if (!request) {
+        return trustedOrigins;
+      }
+
+      const origin = request.headers.get("origin");
+
+      if (!origin) {
+        return trustedOrigins;
+      }
+
+      // Check if the origin is a verified custom domain
+      try {
+        const url = new URL(origin);
+        const hostname = url.hostname;
+
+        const org = await ctx.runQuery(
+          components.betterAuth.functions.getOrganizationByCustomDomain,
+          { customDomain: hostname }
+        );
+
+        if (org && org.domainVerificationStatus === "verified") {
+          trustedOrigins.push(origin);
+        }
+      } catch {
+        // Invalid URL or query failed, just return static origins
+      }
+
+      return trustedOrigins;
+    },
 
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started
@@ -77,7 +113,7 @@ export const getUnifiedUser = query({
   args: {
     sessionId: v.union(
       v.literal("no-external-session"),
-      v.id("externalSession"),
+      v.id("externalSession")
     ),
   },
 
