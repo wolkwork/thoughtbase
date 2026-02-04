@@ -12,12 +12,6 @@ export const env = createEnv({
     VERCEL_ENV: z.string().default("development"),
     BETTER_AUTH_SECRET: z.string().min(1),
 
-    // OAuth2 providers, optional, update as needed
-    GITHUB_CLIENT_ID: z.string().optional(),
-    GITHUB_CLIENT_SECRET: z.string().optional(),
-    GOOGLE_CLIENT_ID: z.string().optional(),
-    GOOGLE_CLIENT_SECRET: z.string().optional(),
-
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
 
     // Email (Resend)

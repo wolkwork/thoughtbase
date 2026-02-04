@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
+    "prebuild": "echo $VITE_CONVEX_URL",
     "preview": "vite preview",
     "test": "playwright test",
     "start": "node .output/server/index.mjs",
