@@ -11,7 +11,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { usePermissions } from "~/hooks/use-permissions";
 import { cn } from "~/lib/utils";
-import { Permission } from "~/plans";
 import { IdeaStatus, StatusPill } from "./status-badge";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -49,8 +48,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [activeTab, setActiveTab] = useState("comments");
-  const { hasPermission } = usePermissions();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = usePermissions().canWrite();
 
   const createComment = useConvexMutation(api.ideas.createComment);
   const [isCommentPending, setIsCommentPending] = useState(false);

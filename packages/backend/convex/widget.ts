@@ -37,7 +37,7 @@ export const createWidgetIdea = mutation({
       components.betterAuth.functions.getOrganizationBySlug,
       {
         slug: args.organizationSlug,
-      },
+      }
     );
 
     if (!organization) {
@@ -55,7 +55,7 @@ export const createWidgetIdea = mutation({
           {
             ssoToken: args.ssoToken,
             organizationId: organization._id,
-          },
+          }
         );
 
         // Get the external user from the session
@@ -63,7 +63,7 @@ export const createWidgetIdea = mutation({
           api.externalSessions.getExternalSessionById,
           {
             id: session._id,
-          },
+          }
         );
 
         if (sessionData?.externalUser) {
@@ -75,7 +75,7 @@ export const createWidgetIdea = mutation({
       } catch (error) {
         // If SSO fails, throw error (don't allow anonymous submissions)
         throw new Error(
-          "SSO authentication failed: " + (error as Error).message,
+          "SSO authentication failed: " + (error as Error).message
         );
       }
     } else {
@@ -126,7 +126,7 @@ export const getWidgetChangelogs = query({
       components.betterAuth.functions.getOrganizationBySlug,
       {
         slug: args.organizationSlug,
-      },
+      }
     );
 
     if (!organization) {
@@ -140,33 +140,5 @@ export const getWidgetChangelogs = query({
     });
 
     return changelogs;
-  },
-});
-
-/**
- * Get organization branding settings for widget
- */
-export const getWidgetOrganization = query({
-  args: {
-    organizationSlug: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Get organization by slug
-    const organization = await ctx.runQuery(
-      components.betterAuth.functions.getOrganizationBySlug,
-      {
-        slug: args.organizationSlug,
-      },
-    );
-
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
-
-    // For now, return default branding settings
-    // TODO: Add showThoughtbaseBranding to organization schema if needed
-    return {
-      showThoughtbaseBranding: true, // Default to showing branding
-    };
   },
 });

@@ -1,10 +1,8 @@
-import { api } from "@thoughtbase/backend/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { useEffect, useState } from "react";
 import { ChangelogView } from "./widget/changelog-view";
 import { RoadmapView } from "./widget/roadmap-view";
 import { SubmitView } from "./widget/submit-view";
 import { Tab, WidgetLayout } from "./widget/widget-layout";
+import React from "react";
 
 interface FeedbackWidgetProps {
   organizationSlug: string;
@@ -19,20 +17,9 @@ export function FeedbackWidget({
   isOpen,
   onClose,
   ssoToken,
-  thoughtbaseBranding,
+  thoughtbaseBranding = true,
 }: FeedbackWidgetProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("feedback");
-
-  // Get organization branding settings
-  const orgBranding = useQuery(api.widget.getWidgetOrganization, {
-    organizationSlug,
-  });
-
-  // Determine if we should show Thoughtbase branding
-  const showThoughtbaseBranding =
-    thoughtbaseBranding === false
-      ? orgBranding?.showThoughtbaseBranding ?? true
-      : true;
+  const [activeTab, setActiveTab] = React.useState<Tab>("feedback");
 
   if (!isOpen) return null;
 
@@ -41,7 +28,7 @@ export function FeedbackWidget({
       activeTab={activeTab}
       onTabChange={setActiveTab}
       onClose={onClose}
-      showThoughtbaseBranding={showThoughtbaseBranding}
+      showThoughtbaseBranding={thoughtbaseBranding}
     >
       {activeTab === "feedback" && (
         <SubmitView organizationSlug={organizationSlug} ssoToken={ssoToken} />

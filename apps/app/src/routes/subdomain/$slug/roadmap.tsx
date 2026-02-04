@@ -13,7 +13,7 @@ function PublicRoadmapPage() {
 
   const { data: ideas } = useQuery(
     convexQuery(api.ideas.getIdeasPublic, {
-      organizationId: org.id,
+      organizationId: org._id,
       paginationOpts: {
         numItems: 1000,
         cursor: null,
@@ -37,7 +37,7 @@ function PublicRoadmapPage() {
             readOnly
             orgSlug={org.slug}
             isPublic
-            organizationId={org.id}
+            organizationId={org._id}
           />
         </div>
       </div>

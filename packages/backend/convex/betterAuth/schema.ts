@@ -68,6 +68,17 @@ export const tables = {
   organization: defineTable({
     name: v.string(),
     slug: v.string(),
+    subscriptionStatus: v.optional(
+      v.union(
+        v.literal("active"),
+        v.literal("expired"),
+        v.literal("scheduled"),
+        v.literal("trialing"),
+        v.literal("past_due"),
+      ),
+    ),
+    subscriptionPeriodStart: v.optional(v.number()),
+    subscriptionPeriodEnd: v.optional(v.number()),
     logo: v.optional(v.union(v.null(), v.string())),
     secret: v.optional(v.union(v.null(), v.string())),
     createdAt: v.number(),

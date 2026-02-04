@@ -13,8 +13,6 @@ export const Route = createFileRoute("/(authenticated)")({
       throw redirect({ to: "/login" });
     }
 
-    // Organization context now comes from URL ($orgSlug param)
-    // The $orgSlug route handles membership validation
     return { user };
   },
 });

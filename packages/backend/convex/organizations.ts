@@ -4,6 +4,7 @@ import { components } from "./_generated/api";
 import { action, mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
 import { api } from "./_generated/api";
+import { autumn } from "./autumn";
 
 /**
  * Get organization by ID (public, for SSO verification)
@@ -18,7 +19,7 @@ export const getOrganizationById = query({
       components.betterAuth.functions.getOrganizationById,
       {
         id: args.organizationId,
-      },
+      }
     );
 
     return organization;
@@ -41,17 +42,11 @@ export const getOrganizationBySlugOrDomain = query({
         components.betterAuth.functions.getOrganizationByCustomDomain,
         {
           customDomain: args.hostname,
-        },
+        }
       );
 
       if (orgByDomain && orgByDomain.domainVerificationStatus === "verified") {
-        return {
-          id: orgByDomain._id,
-          name: orgByDomain.name,
-          slug: orgByDomain.slug,
-          logo: orgByDomain.logo || null,
-          customDomain: orgByDomain.customDomain || null,
-        };
+        return orgByDomain;
       }
     }
 
@@ -64,20 +59,14 @@ export const getOrganizationBySlugOrDomain = query({
       components.betterAuth.functions.getOrganizationBySlug,
       {
         slug: args.slug,
-      },
+      }
     );
 
     if (!org) {
       return null;
     }
 
-    return {
-      id: org._id,
-      name: org.name,
-      slug: org.slug,
-      logo: org.logo || null,
-      customDomain: org.customDomain || null,
-    };
+    return org;
   },
 });
 
@@ -101,7 +90,7 @@ export const getOrgSecret = query({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!member) {
@@ -114,7 +103,7 @@ export const getOrgSecret = query({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (
@@ -128,7 +117,7 @@ export const getOrgSecret = query({
       components.betterAuth.functions.getOrganizationById,
       {
         id: args.organizationId,
-      },
+      }
     );
 
     if (!organization) {
@@ -159,7 +148,7 @@ export const generateOrgSecret = mutation({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (
@@ -177,35 +166,10 @@ export const generateOrgSecret = mutation({
       {
         id: args.organizationId,
         secret,
-      },
+      }
     );
 
     return { secret };
-  },
-});
-
-/**
- * Get plan permissions for an organization
- * For public pages, this returns the free plan by default
- * TODO: Integrate with Polar API to get actual subscription tier
- */
-export const getPlanPermissions = query({
-  args: {
-    organizationId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // For now, return free plan for public pages
-    // TODO: Integrate with Polar API via HTTP action to get actual subscription
-    return {
-      slug: "free",
-      name: "Free",
-      hidden: true,
-      price: {
-        month: 0,
-        year: 0,
-      },
-      permissions: ["read"],
-    };
   },
 });
 
@@ -231,19 +195,13 @@ export const addDomain = action({
       throw new Error("Unauthorized");
     }
 
-    // Check permissions
-    await ctx.runQuery(api.permissions.requirePermission, {
-      organizationId: args.organizationId,
-      permission: "custom-domain",
-    });
-
     // Check user is admin/owner
     const memberRecord = await ctx.runQuery(
       components.betterAuth.functions.getMembership,
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (
@@ -258,7 +216,7 @@ export const addDomain = action({
       components.betterAuth.functions.getOrganizationById,
       {
         id: args.organizationId,
-      },
+      }
     );
 
     if (!org) {
@@ -324,19 +282,13 @@ export const removeDomain = action({
       throw new Error("Unauthorized");
     }
 
-    // Check permissions
-    await ctx.runQuery(api.permissions.requirePermission, {
-      organizationId: args.organizationId,
-      permission: "custom-domain",
-    });
-
     // Check user is admin/owner
     const memberRecord = await ctx.runQuery(
       components.betterAuth.functions.getMembership,
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (
@@ -351,7 +303,7 @@ export const removeDomain = action({
       components.betterAuth.functions.getOrganizationById,
       {
         id: args.organizationId,
-      },
+      }
     );
 
     if (!org) {
@@ -379,9 +331,33 @@ export const removeDomain = action({
         id: org._id,
         customDomain: null,
         domainVerificationStatus: null,
-      },
+      }
     );
 
     return { success: true };
+  },
+});
+
+export const checkout = action({
+  args: {
+    organizationId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { data, error } = await autumn.checkout(
+      {
+        organizationId: args.organizationId,
+        ...ctx,
+      },
+      {
+        productId: "cloud",
+      }
+    );
+
+    if (error || !data) {
+      console.error(error);
+      return null;
+    }
+
+    return data;
   },
 });

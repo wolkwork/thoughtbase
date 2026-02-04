@@ -10,7 +10,7 @@ export function UserAvatar({
 }: {
   user?: {
     name?: string;
-    image?: string | null | undefined | undefined;
+    image?: string | null | undefined;
   };
   className?: string;
 }) {
@@ -34,8 +34,6 @@ export function UserAvatar({
       </div>
     );
   }
-
-  console.log("user", user);
 
   return (
     <Image

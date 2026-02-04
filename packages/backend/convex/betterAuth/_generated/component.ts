@@ -101,6 +101,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   name: string;
                   secret?: null | string;
                   slug: string;
+                  subscriptionPeriodEnd?: number;
+                  subscriptionPeriodStart?: number;
+                  subscriptionStatus?:
+                    | "active"
+                    | "expired"
+                    | "scheduled"
+                    | "trialing"
+                    | "past_due";
                 };
                 model: "organization";
               }
@@ -317,6 +325,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -655,6 +666,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -1135,12 +1149,23 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   name?: string;
                   secret?: null | string;
                   slug?: string;
+                  subscriptionPeriodEnd?: number;
+                  subscriptionPeriodStart?: number;
+                  subscriptionStatus?:
+                    | "active"
+                    | "expired"
+                    | "scheduled"
+                    | "trialing"
+                    | "past_due";
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -1576,12 +1601,23 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   name?: string;
                   secret?: null | string;
                   slug?: string;
+                  subscriptionPeriodEnd?: number;
+                  subscriptionPeriodStart?: number;
+                  subscriptionStatus?:
+                    | "active"
+                    | "expired"
+                    | "scheduled"
+                    | "trialing"
+                    | "past_due";
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -1854,6 +1890,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         } | null,
         Name
       >;
@@ -1878,6 +1922,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         } | null,
         Name
       >;
@@ -1902,6 +1954,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         } | null,
         Name
       >;
@@ -1920,6 +1980,23 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           updatedAt: number;
           userId?: null | string;
         } | null,
+        Name
+      >;
+      setOrganizationSubscription: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          organizationId: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
+        },
+        any,
         Name
       >;
       updateOrganizationCustomDomain: FunctionReference<
@@ -1968,6 +2045,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         },
         Name
       >;
@@ -1992,6 +2077,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         },
         Name
       >;

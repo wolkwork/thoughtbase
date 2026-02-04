@@ -1,11 +1,8 @@
-import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { api } from "@thoughtbase/backend/convex/_generated/api";
-import { AlertCircle, MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
+import { MoreHorizontal, Trash2, UserMinus, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -44,7 +41,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip
 import { useOrganization } from "~/hooks/organization";
 import { usePermissions } from "~/hooks/use-permissions";
 import { authClient } from "~/lib/auth/auth-client-convex";
-import { Permission } from "~/plans";
 import { UserAvatar } from "./user-avatar";
 
 export function TeamSettings() {
@@ -84,15 +80,6 @@ export function TeamSettings() {
     enabled: !!organizationId,
   });
 
-  const { data: permissions } = useQuery(
-    convexQuery(api.permissions.getPermissions, {
-      organizationId,
-    }),
-  );
-
-  const isLimitReached =
-    permissions && !permissions.canAddAdmin && permissions.maxAdmins !== null;
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -102,27 +89,12 @@ export function TeamSettings() {
             Manage your organization members and invitations.
           </p>
         </div>
-        <InviteMemberDialog organizationId={organizationId} permissions={permissions} />
+        <InviteMemberDialog organizationId={organizationId} />
       </div>
 
       <div className="space-y-4">
         <h3 className="text-md font-semibold">Active Members</h3>
-        {isLimitReached && permissions && (
-          <Alert
-            variant="default"
-            className="border-amber-400 bg-amber-50/50 text-amber-900"
-          >
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-amber-900">
-              You've reached the admin limit for your <strong>{permissions.tier}</strong>{" "}
-              plan (
-              {permissions.maxAdmins === null
-                ? "unlimited"
-                : `${permissions.maxAdmins} admin${permissions.maxAdmins !== 1 ? "s" : ""}`}
-              ).
-            </AlertDescription>
-          </Alert>
-        )}
+
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -216,8 +188,7 @@ function MemberRow({
 }) {
   const user = member.user;
   const router = useRouter();
-  const { hasPermission } = usePermissions();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = usePermissions().canWrite();
 
   const handleRemoveMember = async () => {
     if (!canWrite) {
@@ -416,7 +387,6 @@ export function InviteMemberForm({
   organizationId,
   onSuccess,
   submitLabel = "Invite Member",
-  permissions,
 }: {
   organizationId: string;
   onSuccess?: () => void;
@@ -431,8 +401,7 @@ export function InviteMemberForm({
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { hasPermission } = usePermissions();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = usePermissions().canWrite();
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();

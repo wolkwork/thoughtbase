@@ -40,7 +40,7 @@ export const Route = createFileRoute("/subdomain/$slug")({
       try {
         const session = await convexClient.mutation(api.externalSessions.signInWithSSO, {
           ssoToken: sso_token,
-          organizationId: org.id,
+          organizationId: org._id,
         });
 
         sessionId = session?._id;
@@ -76,12 +76,7 @@ export const Route = createFileRoute("/subdomain/$slug")({
       });
     }
 
-    // Use Convex to get plan permissions
-    const plan = await convexClient.query(api.organizations.getPlanPermissions, {
-      organizationId: org.id,
-    });
-
-    return { org, user, profile, plan, sessionId };
+    return { org, user, profile, sessionId };
   },
   component: PublicLayout,
 });

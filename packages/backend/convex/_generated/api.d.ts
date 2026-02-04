@@ -9,7 +9,9 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as autumn from "../autumn.js";
 import type * as changelogs from "../changelogs.js";
+import type * as config from "../config.js";
 import type * as externalSessions from "../externalSessions.js";
 import type * as externalUsers from "../externalUsers.js";
 import type * as helpers from "../helpers.js";
@@ -30,7 +32,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  autumn: typeof autumn;
   changelogs: typeof changelogs;
+  config: typeof config;
   externalSessions: typeof externalSessions;
   externalUsers: typeof externalUsers;
   helpers: typeof helpers;
@@ -150,6 +154,14 @@ export declare const components: {
                   name: string;
                   secret?: null | string;
                   slug: string;
+                  subscriptionPeriodEnd?: number;
+                  subscriptionPeriodStart?: number;
+                  subscriptionStatus?:
+                    | "active"
+                    | "expired"
+                    | "scheduled"
+                    | "trialing"
+                    | "past_due";
                 };
                 model: "organization";
               }
@@ -365,6 +377,9 @@ export declare const components: {
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -702,6 +717,9 @@ export declare const components: {
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -1179,12 +1197,23 @@ export declare const components: {
                   name?: string;
                   secret?: null | string;
                   slug?: string;
+                  subscriptionPeriodEnd?: number;
+                  subscriptionPeriodStart?: number;
+                  subscriptionStatus?:
+                    | "active"
+                    | "expired"
+                    | "scheduled"
+                    | "trialing"
+                    | "past_due";
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -1619,12 +1648,23 @@ export declare const components: {
                   name?: string;
                   secret?: null | string;
                   slug?: string;
+                  subscriptionPeriodEnd?: number;
+                  subscriptionPeriodStart?: number;
+                  subscriptionStatus?:
+                    | "active"
+                    | "expired"
+                    | "scheduled"
+                    | "trialing"
+                    | "past_due";
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
                   field:
                     | "name"
                     | "slug"
+                    | "subscriptionStatus"
+                    | "subscriptionPeriodStart"
+                    | "subscriptionPeriodEnd"
                     | "logo"
                     | "secret"
                     | "createdAt"
@@ -1893,6 +1933,14 @@ export declare const components: {
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         } | null
       >;
       getOrganizationById: FunctionReference<
@@ -1916,6 +1964,14 @@ export declare const components: {
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         } | null
       >;
       getOrganizationBySlug: FunctionReference<
@@ -1939,6 +1995,14 @@ export declare const components: {
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         } | null
       >;
       getUserById: FunctionReference<
@@ -1956,6 +2020,22 @@ export declare const components: {
           updatedAt: number;
           userId?: null | string;
         } | null
+      >;
+      setOrganizationSubscription: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          organizationId: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
+        },
+        any
       >;
       updateOrganizationCustomDomain: FunctionReference<
         "mutation",
@@ -2002,6 +2082,14 @@ export declare const components: {
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         }
       >;
       updateOrganizationSecret: FunctionReference<
@@ -2025,8 +2113,17 @@ export declare const components: {
           name: string;
           secret?: null | string;
           slug: string;
+          subscriptionPeriodEnd?: number;
+          subscriptionPeriodStart?: number;
+          subscriptionStatus?:
+            | "active"
+            | "expired"
+            | "scheduled"
+            | "trialing"
+            | "past_due";
         }
       >;
     };
   };
+  autumn: {};
 };

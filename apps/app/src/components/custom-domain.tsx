@@ -28,15 +28,6 @@ import { cn } from "~/lib/utils";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
 
-export type InlineSnippetProps = HTMLAttributes<HTMLSpanElement>;
-
-export const InlineSnippet = ({ className, ...props }: InlineSnippetProps) => (
-  <span
-    className={cn("bg-muted py-0.2 rounded-md px-1 font-mono text-sm", className)}
-    {...props}
-  />
-);
-
 export type DomainConfigurationProps = HTMLAttributes<HTMLDivElement> & {
   domain: string;
 };

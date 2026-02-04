@@ -20,13 +20,6 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
 
-    POLAR_ACCESS_TOKEN: z.string().min(1),
-    POLAR_WEBHOOK_SECRET: z.string().min(1),
-
-    POLAR_START_ID: z.string().min(1),
-    POLAR_PRO_ID: z.string().min(1),
-    POLAR_BUSINESS_ID: z.string().min(1),
-
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
 
     // Email (Resend)

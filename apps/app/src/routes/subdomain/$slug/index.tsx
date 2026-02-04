@@ -39,7 +39,7 @@ function OrganizationIndexPage() {
     loadMore,
   } = usePaginatedQuery(
     api.ideas.getIdeasPublic,
-    { organizationId: org.id, sort: sortBy },
+    { organizationId: org._id, sort: sortBy },
     { initialNumItems: 10 },
   );
 
@@ -247,7 +247,7 @@ function OrganizationIndexPage() {
         <DialogContent className="sm:max-w-[425px]">
           <AuthForm
             orgName={org.name}
-            orgId={org.id}
+            orgId={org._id}
             onSuccess={handleLoginSuccess}
             mode="dialog"
           />

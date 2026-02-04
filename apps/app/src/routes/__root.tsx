@@ -15,8 +15,9 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import appCss from "~/styles.css?url";
 
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
-import type { ConvexQueryClient } from "@convex-dev/react-query";
+import { convexQuery, type ConvexQueryClient } from "@convex-dev/react-query";
 import { createServerFn } from "@tanstack/react-start";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { ThemeProvider } from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
 import { authClient } from "~/lib/auth/auth-client-convex";
@@ -36,6 +37,8 @@ export const Route = createRootRouteWithContext<{
     if (token) {
       context.convexQueryClient.serverHttpClient?.setAuth(token);
     }
+
+    await context.queryClient.ensureQueryData(convexQuery(api.config.isCloud, {}));
 
     return {
       isAuthenticated: !!token,

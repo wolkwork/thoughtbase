@@ -83,27 +83,27 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
           to="/dashboard/$orgSlug/ideas/$ideaId"
           params={{ orgSlug, ideaId: row.original._id }}
           className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
-          title={row.getValue("title")}
+          title={row.original.title}
           style={{ width: "100%" }}
         >
           <StatusBadge showLabel={false} status={row.original.status} />
-          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+          <span className="min-w-0 flex-1 truncate">{row.original.title}</span>
         </Link>
       ) : (
         <div
           className="flex min-w-0 flex-1 items-center gap-2 font-medium"
-          title={row.getValue("title")}
+          title={row.original.title}
           style={{ width: "100%" }}
         >
           <StatusBadge showLabel={false} status={row.original.status} />
-          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+          <span className="min-w-0 flex-1 truncate">{row.original.title}</span>
         </div>
       ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+    cell: ({ row }) => <StatusBadge status={row.original.status} />,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -126,7 +126,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
     accessorKey: "revenue",
     header: "Revenue",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("revenue") || "0");
+      const amount = row.original.revenue;
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
@@ -141,7 +141,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
     cell: ({ row }) => {
       return (
         <div className="text-muted-foreground text-sm">
-          {format(row.getValue("createdAt"), "MMM d, yyyy")}
+          {format(row.original._creationTime, "MMM d, yyyy")}
         </div>
       );
     },

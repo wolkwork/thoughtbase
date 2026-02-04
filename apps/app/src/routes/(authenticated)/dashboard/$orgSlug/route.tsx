@@ -3,11 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { AppSidebar } from "~/components/app-sidebar";
-import { TrialStatusBanner } from "~/components/trial-status-banner";
 import { SidebarProvider } from "~/components/ui/sidebar";
 import { useOrganization } from "~/hooks/organization";
-import { SubscriptionTier } from "~/lib/api/permissions";
-import { plans } from "~/plans";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
   beforeLoad: async ({ context, params }) => {
@@ -21,10 +18,6 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
       throw notFound();
     }
 
-    // const isMember = await $checkMembership({
-    //   data: { organizationId: organization.id, userId: context.user.id },
-    // });
-
     const isMember = await context.queryClient.ensureQueryData(
       convexQuery(api.auth.checkMembership, {
         organizationId: organization._id,
@@ -36,10 +29,11 @@ export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug")({
       throw redirect({ to: "/dashboard" });
     }
 
-    // const plan = await $getPlanPermissions({ data: { organizationId: organization.id } });
+    context.convexQueryClient.serverHttpClient?.action(api.permissions.refreshCustomer, {
+      organizationId: organization._id,
+    });
 
-    // Provide organization and permissions to child routes via context
-    return { organization, plan: plans.business as (typeof plans)[SubscriptionTier] };
+    return { organization };
   },
   component: DashboardLayout,
 });
@@ -62,7 +56,6 @@ function DashboardLayout() {
         orgSlug={orgSlug}
       />
       <main className="w-full flex-1 overflow-auto">
-        <TrialStatusBanner />
         <Outlet />
       </main>
     </SidebarProvider>

@@ -32,8 +32,7 @@ export function PublicIdeaDetail({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(idea.title);
   const [editDescription, setEditDescription] = useState(idea.description || "");
-  const { hasPermission } = usePermissionsPublic();
-  const canWrite = true;
+  const canWrite = usePermissionsPublic().canWrite();
 
   // Check if current user is the author
   const isAuthor =

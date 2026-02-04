@@ -13,6 +13,7 @@ import { ChevronsUpDown, CircleDashed, LogOut, Plus, Settings } from "lucide-rea
 import { useState } from "react";
 import { OnboardingDialog } from "~/components/onboarding-dialog";
 import { StatusBadge, STATUSES } from "~/components/status-badge";
+import { SubscriptionStatusBanner } from "~/components/subscription-status-banner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +23,6 @@ import {
 import { useOrganization } from "~/hooks/organization";
 import { usePermissions } from "~/hooks/use-permissions";
 import { authClient } from "~/lib/auth/auth-client-convex";
-import { Permission } from "~/plans";
 import { CreateIdeaDialog } from "./create-idea-dialog";
 import { SidebarOrganizationSwitcher } from "./sidebar-organization-switcher";
 import { Button } from "./ui/button";
@@ -59,9 +59,10 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
 
   const location = useLocation();
 
-  const { hasPermission } = usePermissions();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = usePermissions().canWrite();
 
+  const url = new URL(location.url);
+  const boardUrl = `${url.protocol}//${orgSlug}.${url.host}`;
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -225,7 +226,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                 <SidebarMenuButton
                   render={
                     <a
-                      href={`https://${orgSlug}.thoughtbase.app`}
+                      href={boardUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex gap-2.5 text-black/70"
@@ -246,6 +247,8 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
       </SidebarContent>
 
       <SidebarFooter>
+        <SubscriptionStatusBanner />
+
         <SidebarMenu>
           <SidebarMenuItem className="mb-2">
             <SidebarMenuButton

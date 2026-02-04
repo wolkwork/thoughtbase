@@ -64,7 +64,7 @@ function PublicIdeaDetailPage() {
         <PublicIdeaDetail
           idea={idea}
           currentUser={user}
-          organizationId={org.id}
+          organizationId={org._id}
           onLoginRequired={handleLoginRequired}
         />
       </div>
@@ -74,7 +74,7 @@ function PublicIdeaDetailPage() {
         <DialogContent className="sm:max-w-[425px]">
           <AuthForm
             orgName={org.name}
-            orgId={org.id}
+            orgId={org._id}
             onSuccess={handleLoginSuccess}
             mode="dialog"
           />
@@ -90,7 +90,7 @@ function PublicIdeaDetailPage() {
             </DialogDescription>
           </DialogHeader>
           <ProfileForm
-            orgId={org.id}
+            orgId={org._id}
             initialName={user?.name || ""}
             onSuccess={handleProfileSuccess}
           />

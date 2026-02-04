@@ -52,7 +52,7 @@ import {
   TableRow,
 } from "~/components/ui/table";
 
-export type Changelog = Doc<"changelog"> & {
+type Changelog = Doc<"changelog"> & {
   ideas: Doc<"idea">[];
 };
 
@@ -79,18 +79,18 @@ const createColumns = (
           to="/dashboard/$orgSlug/changelog/$changelogId"
           params={{ orgSlug, changelogId: row.original._id }}
           className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
-          title={row.getValue("title")}
+          title={row.original.title}
           style={{ width: "100%" }}
         >
-          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+          <span className="min-w-0 flex-1 truncate">{row.original.title}</span>
         </Link>
       ) : (
         <div
           className="flex min-w-0 flex-1 items-center gap-2 font-medium"
-          title={row.getValue("title")}
+          title={row.original.title}
           style={{ width: "100%" }}
         >
-          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+          <span className="min-w-0 flex-1 truncate">{row.original.title}</span>
         </div>
       ),
   },
@@ -98,7 +98,7 @@ const createColumns = (
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const status = row.original.status;
       return (
         <Badge variant={status === "published" ? "default" : "secondary"}>{status}</Badge>
       );
@@ -111,7 +111,7 @@ const createColumns = (
     accessorKey: "publishedAt",
     header: "Published",
     cell: ({ row }) => {
-      const publishedAt = row.getValue("publishedAt") as Date | null;
+      const publishedAt = row.original.publishedAt;
       return (
         <div className="text-muted-foreground text-sm">
           {publishedAt ? format(publishedAt, "MMM d, yyyy") : "-"}
@@ -156,7 +156,7 @@ const createColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-muted-foreground text-sm">
-          {format(row.getValue("createdAt"), "MMM d, yyyy")}
+          {format(row.original._creationTime, "MMM d, yyyy")}
         </div>
       );
     },

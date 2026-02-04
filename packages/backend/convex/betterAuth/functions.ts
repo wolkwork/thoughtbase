@@ -174,3 +174,33 @@ export const getAdminCount = query({
     return adminCount;
   },
 });
+
+export const setOrganizationSubscription = mutation({
+  args: {
+    organizationId: v.id("organization"),
+    subscriptionStatus: v.union(
+      v.literal("active"),
+      v.literal("expired"),
+      v.literal("scheduled"),
+      v.literal("trialing"),
+      v.literal("past_due"),
+    ),
+    subscriptionPeriodStart: v.optional(v.number()),
+    subscriptionPeriodEnd: v.optional(v.number()),
+  },
+  handler: async (
+    ctx,
+    {
+      organizationId,
+      subscriptionStatus,
+      subscriptionPeriodStart,
+      subscriptionPeriodEnd,
+    },
+  ) => {
+    await ctx.db.patch(organizationId, {
+      subscriptionStatus,
+      subscriptionPeriodStart,
+      subscriptionPeriodEnd,
+    });
+  },
+});

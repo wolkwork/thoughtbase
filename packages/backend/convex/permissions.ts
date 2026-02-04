@@ -1,193 +1,118 @@
+import { action, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { api, components } from "./_generated/api";
-import { query } from "./_generated/server";
+import { autumn } from "./autumn";
+import { components } from "./_generated/api";
 
-/**
- * Subscription tier types
- */
-export type SubscriptionTier = "free" | "start" | "pro" | "business";
+const isCloud = process.env.THOUGHTBASE_CLOUD === "1";
 
-/**
- * Permissions matrix mapping subscription tiers to feature limits
- * Mocked to assume business plan (unlimited admins)
- */
-export const PERMISSIONS_MATRIX: Record<
-  SubscriptionTier,
-  { maxAdmins: number | null }
-> = {
-  free: { maxAdmins: null },
-  start: { maxAdmins: null },
-  pro: { maxAdmins: null },
-  business: { maxAdmins: null }, // null means unlimited
-};
+export const checkAllowed = action({
+  args: { organizationId: v.string() },
+  handler: async (ctx, { organizationId }) => {
+    // Always allow in self-hosted mode
+    if (!isCloud) {
+      return true;
+    }
 
-/**
- * Get the active subscription tier for an organization
- * MOCKED: Always returns "business" as requested
- */
-export const getSubscriptionTier = query({
-  args: {
-    organizationId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Mock: Always return business plan
-    return "business" as SubscriptionTier;
-  },
-});
-
-/**
- * Count the number of admin/owner members in an organization
- * Both "admin" and "owner" roles count toward the admin limit
- */
-export const getAdminCount = query({
-  args: {
-    organizationId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Query admin count from betterAuth component
-    const adminCount = await ctx.runQuery(
-      components.betterAuth.functions.getAdminCount,
+    const { data, error } = await autumn.check(
+      { ...ctx, organizationId },
       {
-        organizationId: args.organizationId,
+        featureId: "cloud",
       },
     );
 
-    return adminCount;
+    if (error) {
+      console.error(error);
+      return false;
+    }
+
+    return data?.allowed ?? false;
   },
 });
 
-/**
- * Check if an organization can add another admin
- * Returns true if the organization hasn't reached its admin limit
- * MOCKED: Always returns true (business plan has unlimited admins)
- */
-export const canAddAdmin = query({
-  args: {
-    organizationId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Mock: Business plan has unlimited admins, so always return true
-    return true;
-  },
-});
+export const refreshCustomer = action({
+  args: { organizationId: v.string() },
+  handler: async (ctx, { organizationId }) => {
+    if (!isCloud) {
+      await ctx.scheduler.runAfter(
+        0,
+        components.betterAuth.functions.setOrganizationSubscription,
+        {
+          organizationId,
+          subscriptionStatus: "active",
+          subscriptionPeriodStart: undefined,
+          subscriptionPeriodEnd: undefined,
+        },
+      );
+      return undefined;
+    }
 
-/**
- * Get full permissions object for an organization
- * Includes subscription tier, admin limits, and current counts
- * MOCKED: Returns business plan permissions
- */
-export const getPermissions = query({
-  args: {
-    organizationId: v.string(),
-  },
-  handler: async (
-    ctx,
-    args,
-  ): Promise<{
-    tier: SubscriptionTier;
-    maxAdmins: number | null;
-    currentAdminCount: number;
-    canAddAdmin: boolean;
-  }> => {
-    const tier = "business" as SubscriptionTier; // Mocked
-
-    const currentAdminCount = await ctx.runQuery(
-      api.permissions.getAdminCount,
-      {
-        organizationId: args.organizationId,
-      },
-    );
-
-    const maxAdmins = PERMISSIONS_MATRIX[tier].maxAdmins;
-    const canAdd = maxAdmins === null || currentAdminCount < maxAdmins;
-
-    return {
-      tier,
-      maxAdmins,
-      currentAdminCount,
-      canAddAdmin: canAdd,
-    };
-  },
-});
-
-/**
- * Get the plan object for an organization based on subscription tier
- * Returns the plan with its permissions array
- * MOCKED: Returns business plan
- */
-export const getPlanPermissions = query({
-  args: {
-    organizationId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Mock: Return business plan permissions
-    return {
-      slug: "business",
-      name: "Business",
-      price: {
-        month: 99,
-        year: 990,
-      },
-      permissions: [
-        "read",
-        "write",
-        "custom-domain",
-        "white-label",
-        "private-boards",
-        "sso",
-        "integrations",
-      ],
-    };
-  },
-});
-
-/**
- * Check if an organization has a specific permission
- * @param organizationId The organization ID
- * @param permission The permission to check
- * @returns true if the organization has the permission, false otherwise
- */
-export const hasPermission = query({
-  args: {
-    organizationId: v.string(),
-    permission: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Mock: Business plan has all permissions
-    const businessPermissions = [
-      "read",
-      "write",
-      "custom-domain",
-      "white-label",
-      "private-boards",
-      "sso",
-      "integrations",
-    ];
-    return businessPermissions.includes(args.permission);
-  },
-});
-
-/**
- * Require a specific permission for an organization
- * Throws an error if the organization doesn't have the permission
- * MOCKED: Always succeeds (business plan has all permissions)
- */
-export const requirePermission = query({
-  args: {
-    organizationId: v.string(),
-    permission: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Mock: Business plan has all permissions, so this always succeeds
-    const hasAccess = await ctx.runQuery(api.permissions.hasPermission, {
-      organizationId: args.organizationId,
-      permission: args.permission,
+    const { data, error } = await autumn.customers.get({
+      ...ctx,
+      organizationId,
     });
 
-    if (!hasAccess) {
-      throw new Error(
-        "Your trial has ended. Upgrade to continue creating and editing ideas.",
-      );
+    if (error || !data) {
+      console.error(error);
+      return undefined;
     }
+
+    const [product] = data.products;
+
+    if (!product) {
+      await ctx.scheduler.runAfter(
+        0,
+        components.betterAuth.functions.setOrganizationSubscription,
+        {
+          organizationId,
+          subscriptionStatus: "expired",
+          subscriptionPeriodStart: undefined,
+          subscriptionPeriodEnd: undefined,
+        },
+      );
+
+      return undefined;
+    }
+
+    await ctx.scheduler.runAfter(
+      0,
+      components.betterAuth.functions.setOrganizationSubscription,
+      {
+        organizationId,
+        subscriptionStatus: product.status,
+        subscriptionPeriodStart: product.current_period_start ?? undefined,
+        subscriptionPeriodEnd: product.current_period_end ?? undefined,
+      },
+    );
+
+    return data;
+  },
+});
+
+export const getBillingPortalUrl = action({
+  args: {
+    organizationId: v.string(),
+    returnUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, { organizationId, returnUrl }) => {
+    if (!isCloud) {
+      return null;
+    }
+
+    const { data, error } = await autumn.customers.billingPortal(
+      {
+        ...ctx,
+        organizationId,
+      },
+      {
+        returnUrl,
+      },
+    );
+
+    if (error || !data) {
+      console.error("Failed to get billing portal URL:", error);
+      return null;
+    }
+
+    return data;
   },
 });

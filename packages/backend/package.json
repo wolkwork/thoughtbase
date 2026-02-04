@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@useautumn/convex": "^0.0.23",
     "@vercel/sdk": "^1.0.0",
+    "autumn-js": "^0.1.75",
     "convex": "^1.31.6",
     "jose": "^6.1.3"
   },

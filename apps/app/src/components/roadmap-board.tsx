@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { STATUSES, type IdeaStatus } from "~/components/status-badge";
 import { usePermissions } from "~/hooks/use-permissions";
 import { usePermissionsPublic } from "~/hooks/use-permissions-public";
-import { Permission } from "~/plans";
 import { RoadmapCard } from "./roadmap-card";
 import { RoadmapColumn } from "./roadmap-column";
 
@@ -56,8 +55,9 @@ export function RoadmapBoard({
 }: RoadmapBoardProps) {
   const [activeId, setActiveId] = useState<Id<"idea"> | null>(null);
   // Optimistic state
-  const { hasPermission } = isPublic ? usePermissionsPublic() : usePermissions();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = isPublic
+    ? usePermissionsPublic().canWrite()
+    : usePermissions().canWrite();
   const effectiveReadOnly = readOnly || !canWrite;
 
   const sensors = useSensors(
