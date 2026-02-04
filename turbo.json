@@ -1,10 +1,17 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["VITE_CONVEX_URL"],
   "globalDependencies": ["**/.env.*local"],
   "tasks": {
     "build": {
       "outputs": ["dist/**", ".output/**"],
-      "dependsOn": ["^build"]
+      "env": [
+        "VERCEL_BRANCH_URL",
+        "VERCEL",
+        "BETTER_AUTH_SECRET",
+        "BLOB_READ_WRITE_TOKEN",
+        "RESEND_API_KEY"
+      ]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
