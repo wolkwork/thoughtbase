@@ -4,8 +4,6 @@ import * as z from "zod";
 export const env = createEnv({
   server: {
     VITE_CONVEX_URL: z.string(),
-    VITE_CONVEX_SITE_URL: z.string(),
-    VITE_SITE_URL: z.string(),
 
     DATABASE_URL: z.url(),
     VERCEL_BRANCH_URL: z.string(),
