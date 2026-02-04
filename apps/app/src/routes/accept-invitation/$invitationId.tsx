@@ -1,12 +1,12 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { authClient } from "~/lib/auth/auth-client-convex";
-import { api } from "~/lib/convex/client";
 
 export const Route = createFileRoute("/accept-invitation/$invitationId")({
   component: AcceptInvitationPage,

@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { ArrowDown01, Search, SlidersHorizontal } from "lucide-react";
 import * as React from "react";
 
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { FunctionReturnType } from "convex/server";
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { StatusBadge } from "~/components/status-badge";
@@ -44,7 +45,6 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { api } from "~/lib/convex/client";
 import { UserAvatar } from "./user-avatar";
 
 // Define the Idea type based on what we receive from the API
@@ -273,22 +273,10 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
       case "newest":
         setSorting([{ id: "createdAt", desc: true }]);
         break;
-      case "top": // Top = most reactions
-        // We don't have a direct 'reactionCount' column accessor, but we can sort by engagement or add a hidden column.
-        // Actually 'engagement' is sum of both.
-        // Let's add a hidden column for reactionCount if we want strict "Top" as just reactions, or use engagement.
-        // The user said "Top" usually implies "Top Rated" (reactions).
-        // Let's assume "Top" means sort by reactionCount.
-        // Since we don't have a column for just reactionCount visible, we can sort by the engagement column which is close enough,
-        // or better, let's just use the engagement column for "Top" and "Trending" for now.
-        // Or I can programmatically sort by a key that exists in data even if not a column?
-        // TanStack table sorts by column IDs.
-        // I'll add a specific sort handler that accesses the raw data if needed, but easier to just map to existing columns.
-        // I'll use "engagement" for Top.
+      case "top":
         setSorting([{ id: "engagement", desc: true }]);
         break;
       case "trending":
-        // For trending, ideally we'd have recent stats. We'll use engagement for now as a proxy.
         setSorting([{ id: "engagement", desc: true }]);
         break;
       case "revenue":

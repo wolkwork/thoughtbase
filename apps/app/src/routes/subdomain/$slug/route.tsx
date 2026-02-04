@@ -1,8 +1,8 @@
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { SessionProvider } from "convex-helpers/react/sessions";
 import { PublicHeader } from "~/components/public-header";
-import { api } from "~/lib/convex/client";
 
 // Known base domains for subdomain detection (must match router.tsx)
 
