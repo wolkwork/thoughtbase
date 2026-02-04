@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["VITE_CONVEX_URL"],
   "tasks": {
     "build": {
       "outputs": ["dist/**", ".output/**"],
@@ -8,8 +9,7 @@
         "VERCEL",
         "BETTER_AUTH_SECRET",
         "BLOB_READ_WRITE_TOKEN",
-        "RESEND_API_KEY",
-        "VITE_CONVEX_URL"
+        "RESEND_API_KEY"
       ]
     },
     "check-types": {
