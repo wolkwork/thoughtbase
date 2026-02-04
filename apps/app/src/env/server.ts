@@ -24,6 +24,6 @@ export const env = createEnv({
   },
   runtimeEnv: {
     ...process.env,
-    CONVEX_URL: process.env.CONVEX_URL,
+    CONVEX_URL: process.env.VITE_CONVEX_URL || process.env.CONVEX_URL,
   },
 });
