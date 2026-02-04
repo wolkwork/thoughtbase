@@ -8,6 +8,7 @@ import { DefaultNotFound } from "~/components/default-not-found";
 import { routeTree } from "./routeTree.gen";
 
 import { ConvexQueryClient } from "@convex-dev/react-query";
+import { env } from "./env/client";
 
 const BASE_DOMAIN = "thoughtbase.app";
 
@@ -90,7 +91,7 @@ export function getRouter() {
     notifyManager.setScheduler(window.requestAnimationFrame);
   }
 
-  const convexUrl = (import.meta as any).env.VITE_CONVEX_URL!;
+  const convexUrl = env.VITE_CONVEX_URL;
 
   const convexQueryClient = new ConvexQueryClient(convexUrl);
 

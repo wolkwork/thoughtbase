@@ -5,7 +5,6 @@ export const env = createEnv({
   server: {
     CONVEX_URL: z.string(),
 
-    DATABASE_URL: z.url(),
     VERCEL_BRANCH_URL: z.string(),
     VERCEL_PROJECT_PRODUCTION_URL: z.string(),
     VERCEL: z.string().default("0"),
@@ -23,5 +22,8 @@ export const env = createEnv({
     VERCEL_TEAM_ID: z.string().optional(),
     VERCEL_TEAM_SLUG: z.string().optional(),
   },
-  runtimeEnv: process.env,
+  runtimeEnv: {
+    ...process.env,
+    CONVEX_URL: process.env.CONVEX_URL,
+  },
 });
