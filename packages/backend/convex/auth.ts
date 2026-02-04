@@ -71,6 +71,15 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       enabled: true,
       requireEmailVerification: false,
     },
+    // Cookie configuration to ensure cookies work across all routes
+    // This is necessary because the auth API is at /subdomain/$slug/api/auth/*
+    // but the cookies need to be available at /subdomain/$slug/* as well
+    advanced: {
+      defaultCookieAttributes: {
+        path: "/",
+        sameSite: "lax",
+      },
+    },
     plugins: [
       organization(),
       apiKey(),

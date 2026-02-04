@@ -1,3 +1,4 @@
+import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/subdomain/$slug")({
     // Otherwise, use the slug normally
     const slug = params.slug === "_custom" ? "" : params.slug;
 
-    // Use Convex to get organization
+    // Use Convex to get organization (doesn't require auth)
     const convexClient = context.convexQueryClient.convexClient;
     const org = await convexClient.query(
       api.organizations.getOrganizationBySlugOrDomain,
@@ -61,17 +62,23 @@ export const Route = createFileRoute("/subdomain/$slug")({
       }
     }
 
-    // Fetch unified user and profile to support both internal and external users
-    const user = await convexClient.query(api.auth.getUnifiedUser, {
-      sessionId: sessionId ?? "no-external-session",
-    });
+    // Fetch unified user using convexQuery (goes through authenticated serverHttpClient)
+    const user = await context.queryClient.ensureQueryData(
+      convexQuery(api.auth.getUnifiedUser, {
+        sessionId: (sessionId ?? "no-external-session") as
+          | Id<"externalSession">
+          | "no-external-session",
+      }),
+    );
 
     let profile = null;
 
     if (user) {
-      profile = await convexClient.query(api.auth.getUnifiedProfile, {
-        userId: user._id,
-      });
+      profile = await context.queryClient.ensureQueryData(
+        convexQuery(api.auth.getUnifiedProfile, {
+          userId: user._id,
+        }),
+      );
     }
 
     return { org, user, profile, sessionId };

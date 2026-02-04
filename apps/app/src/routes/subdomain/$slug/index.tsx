@@ -66,7 +66,7 @@ function OrganizationIndexPage() {
 
   const [sessionId] = useSessionId();
 
-  const handleUpvote = async (e: React.MouseEvent, idea: any) => {
+  const handleUpvote = async (e: React.MouseEvent, ideaId: Id<"idea">) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -75,10 +75,8 @@ function OrganizationIndexPage() {
       return;
     }
 
-    const isExternal = user.type === "external";
-
     await toggleReactionMutation({
-      ideaId: idea.id,
+      ideaId,
       type: "upvote",
       sessionId: sessionId as Id<"externalSession"> | undefined,
     });
@@ -163,7 +161,7 @@ function OrganizationIndexPage() {
                   <div className="group flex gap-6 p-6 py-8 transition-colors">
                     <div>
                       <button
-                        onClick={(e) => handleUpvote(e, idea)}
+                        onClick={(e) => handleUpvote(e, idea._id)}
                         className={cn(
                           "hover:bg-accent text-muted-foreground flex aspect-6/5 flex-col items-center gap-1 rounded-sm border px-3 py-1.5 pt-2 text-xs transition-colors",
                           "cursor-pointer",

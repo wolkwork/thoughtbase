@@ -63,7 +63,7 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
       toast.success("Account created successfully");
       onSuccess();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       setFormError(error.message ?? "Failed to sign up");
     },
   });

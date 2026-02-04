@@ -18,7 +18,7 @@ export const getSidebarCounts = query({
     const ideas = await ctx.db
       .query("idea")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId),
+        q.eq("organizationId", args.organizationId)
       )
       .collect();
 
@@ -45,7 +45,7 @@ export const getIdeas = query({
     const ideasQuery = ctx.db
       .query("idea")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId),
+        q.eq("organizationId", args.organizationId)
       );
 
     const ideas = await ideasQuery.collect();
@@ -54,12 +54,12 @@ export const getIdeas = query({
     let filteredIdeas = ideas;
     if (args.status) {
       filteredIdeas = filteredIdeas.filter(
-        (idea) => idea.status === args.status,
+        (idea) => idea.status === args.status
       );
     }
     if (args.boardId) {
       filteredIdeas = filteredIdeas.filter(
-        (idea) => idea.boardId === args.boardId,
+        (idea) => idea.boardId === args.boardId
       );
     }
 
@@ -104,7 +104,7 @@ export const getIdeas = query({
                   color: tag.color || null,
                 }
               : null;
-          }),
+          })
         );
 
         // Fetch comments count
@@ -124,7 +124,7 @@ export const getIdeas = query({
         for (const reaction of reactions) {
           if (reaction.authorType === "external") {
             const extUser = await ctx.db.get(
-              reaction.userId as Id<"externalUser">,
+              reaction.userId as Id<"externalUser">
             );
             if (extUser?.revenue) {
               revenue += extUser.revenue;
@@ -141,7 +141,7 @@ export const getIdeas = query({
           reactionCount: reactions.length,
           revenue,
         };
-      }),
+      })
     );
 
     return result;
@@ -158,13 +158,13 @@ export const getIdeasPublic = query({
     status: v.optional(v.string()),
     boardId: v.optional(v.id("board")),
     sort: v.optional(
-      v.union(v.literal("newest"), v.literal("top"), v.literal("trending")),
+      v.union(v.literal("newest"), v.literal("top"), v.literal("trending"))
     ),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (
     ctx,
-    args,
+    args
   ): Promise<PaginationResult<Awaited<ReturnType<typeof enrichIdea>>>> => {
     const sort = args.sort || "newest";
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -173,7 +173,7 @@ export const getIdeasPublic = query({
     let ideasQuery = ctx.db
       .query("idea")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId),
+        q.eq("organizationId", args.organizationId)
       );
 
     // For "newest" sort, we can use pagination directly
@@ -188,7 +188,7 @@ export const getIdeasPublic = query({
         query = query.filter(
           (q) =>
             q.neq(q.field("status"), "pending") &&
-            q.neq(q.field("status"), "closed"),
+            q.neq(q.field("status"), "closed")
         );
       }
 
@@ -202,7 +202,7 @@ export const getIdeasPublic = query({
       const page = await Promise.all(
         paginated.page.map(async (idea) => {
           return await enrichIdea(ctx, idea);
-        }),
+        })
       );
 
       return {
@@ -217,18 +217,18 @@ export const getIdeasPublic = query({
 
     // Filter ideas
     let filteredIdeas = allIdeas.filter(
-      (idea) => idea.status !== "pending" && idea.status !== "closed",
+      (idea) => idea.status !== "pending" && idea.status !== "closed"
     );
 
     if (args.status) {
       filteredIdeas = filteredIdeas.filter(
-        (idea) => idea.status === args.status,
+        (idea) => idea.status === args.status
       );
     }
 
     if (args.boardId) {
       filteredIdeas = filteredIdeas.filter(
-        (idea) => idea.boardId === args.boardId,
+        (idea) => idea.boardId === args.boardId
       );
     }
 
@@ -251,7 +251,7 @@ export const getIdeasPublic = query({
             .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
             .collect();
           score = reactions.filter(
-            (r) => r._creationTime >= sevenDaysAgo,
+            (r) => r._creationTime >= sevenDaysAgo
           ).length;
         }
 
@@ -260,7 +260,7 @@ export const getIdeasPublic = query({
           score,
           createdAt: idea._creationTime,
         };
-      }),
+      })
     );
 
     // Sort by score (descending), then by creation time (descending)
@@ -286,7 +286,7 @@ export const getIdeasPublic = query({
     const enrichedPage = await Promise.all(
       page.map(async ({ idea }) => {
         return await enrichIdea(ctx, idea);
-      }),
+      })
     );
 
     return {
@@ -326,7 +326,7 @@ async function enrichIdea(ctx: QueryCtx, idea: Doc<"idea">) {
   const tags = await Promise.all(
     ideaTags.map(async (it) => {
       return ctx.db.get(it.tagId);
-    }),
+    })
   );
 
   // Fetch comments count
@@ -396,7 +396,7 @@ export const getIdea = query({
               color: tag.color || null,
             }
           : null;
-      }),
+      })
     );
 
     // Fetch comments with their authors and reactions
@@ -433,7 +433,7 @@ export const getIdea = query({
             authorType: r.authorType,
           })),
         };
-      }),
+      })
     );
 
     // Fetch reactions with user data
@@ -454,7 +454,7 @@ export const getIdea = query({
           authorType: reaction.authorType,
           user,
         };
-      }),
+      })
     );
 
     return {
@@ -521,7 +521,7 @@ export const getPublicIdea = query({
               color: tag.color || null,
             }
           : null;
-      }),
+      })
     );
 
     // Fetch comments with their authors and reactions
@@ -558,7 +558,7 @@ export const getPublicIdea = query({
             authorType: r.authorType,
           })),
         };
-      }),
+      })
     );
 
     // Fetch reactions with user data
@@ -579,7 +579,7 @@ export const getPublicIdea = query({
           authorType: reaction.authorType,
           user,
         };
-      }),
+      })
     );
 
     return {
@@ -637,7 +637,7 @@ export const createIdea = mutation({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!isMember) {
@@ -676,7 +676,7 @@ export const updateIdeaStatus = mutation({
       v.literal("in_progress"),
       v.literal("completed"),
       v.literal("closed"),
-      v.literal("pending"),
+      v.literal("pending")
     ),
     organizationId: v.string(),
   },
@@ -693,7 +693,7 @@ export const updateIdeaStatus = mutation({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!isMember) {
@@ -760,7 +760,7 @@ export const createComment = mutation({
       {
         organizationId: idea.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!isMember) {
@@ -803,17 +803,18 @@ export const toggleReaction = mutation({
     commentId: v.optional(v.id("comment")),
     type: v.optional(v.string()),
     sessionId: v.optional(
-      v.union(v.literal("no-external-session"), v.id("externalSession")),
+      v.union(v.literal("no-external-session"), v.id("externalSession"))
     ),
   },
   handler: async (ctx, args) => {
     // Get current authenticated user (internal)
-    const user = await authComponent.safeGetAuthUser(ctx);
+    const user = await ctx.runQuery(api.auth.getUnifiedUser, {
+      sessionId: args.sessionId ?? "no-external-session",
+    });
 
     // For external users, we need the externalUserId from args
-    const externalUserId = args.sessionId;
 
-    if (!user && !externalUserId) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -845,28 +846,6 @@ export const toggleReaction = mutation({
       organizationId = idea.organizationId;
     }
 
-    // For external users, verify they belong to the organization
-    if (externalUserId) {
-      const externalUser = await ctx.db.get(
-        externalUserId as Id<"externalUser">,
-      );
-      if (!externalUser || externalUser.organizationId !== organizationId) {
-        throw new Error("Unauthorized");
-      }
-    } else if (user) {
-      // For internal users, verify membership
-      const isMember = await ctx.runQuery(
-        components.betterAuth.functions.checkMembership,
-        {
-          organizationId: organizationId!,
-          userId: user._id,
-        },
-      );
-      if (!isMember) {
-        throw new Error("Unauthorized");
-      }
-    }
-
     // Find existing reaction
     let existingReaction = null;
 
@@ -877,9 +856,6 @@ export const toggleReaction = mutation({
         .collect();
 
       existingReaction = reactions.find((r) => {
-        if (externalUserId) {
-          return r.userId === externalUserId && r.type === reactionType;
-        }
         return r.userId === user!._id && r.type === reactionType;
       });
     } else if (args.commentId) {
@@ -889,27 +865,20 @@ export const toggleReaction = mutation({
         .collect();
 
       existingReaction = reactions.find((r) => {
-        if (externalUserId) {
-          return r.userId === externalUserId && r.type === reactionType;
-        }
         return r.userId === user!._id && r.type === reactionType;
       });
     }
 
     if (existingReaction) {
-      // Remove reaction
       await ctx.db.delete(existingReaction._id);
-      return { action: "removed" };
     } else {
-      // Add reaction
       await ctx.db.insert("reaction", {
-        userId: externalUserId ?? user!._id,
-        authorType: externalUserId ? "external" : "internal",
+        userId: user!._id,
+        authorType: user.type,
         ideaId: args.ideaId || undefined,
         commentId: args.commentId || undefined,
         type: reactionType,
       });
-      return { action: "added" };
     }
   },
 });
@@ -936,7 +905,7 @@ export const updateIdeaEta = mutation({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!isMember) {
@@ -992,7 +961,7 @@ export const updateIdea = mutation({
       {
         organizationId: idea.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!isMember) {
@@ -1053,7 +1022,7 @@ export const deleteIdea = mutation({
       {
         organizationId: args.organizationId,
         userId: user._id,
-      },
+      }
     );
 
     if (!isMember) {
@@ -1117,7 +1086,7 @@ export const getPublicRoadmapIdeas = query({
       components.betterAuth.functions.getOrganizationBySlug,
       {
         slug: args.organizationSlug,
-      },
+      }
     );
 
     if (!organization) {
@@ -1128,7 +1097,7 @@ export const getPublicRoadmapIdeas = query({
     const allIdeas = await ctx.db
       .query("idea")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", organization._id),
+        q.eq("organizationId", organization._id)
       )
       .collect();
 
@@ -1157,7 +1126,7 @@ export const getPublicRoadmapIdeas = query({
           ideaTags.map(async (it) => {
             const tag = await ctx.db.get(it.tagId);
             return tag;
-          }),
+          })
         );
 
         // Count comments
@@ -1197,7 +1166,7 @@ export const getPublicRoadmapIdeas = query({
           commentCount: comments.length,
           reactionCount: reactions.length,
         };
-      }),
+      })
     );
 
     return result;
