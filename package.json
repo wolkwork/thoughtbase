@@ -16,8 +16,5 @@
   },
   "dependencies": {
     "tldts": "^7.0.19"
-  },
-  "overrides": {
-    "@tanstack/react-start": "1.158.0"
   }
 }

@@ -4,7 +4,5 @@ import { env } from "~/env/server";
 export const { handler, getToken, fetchAuthQuery, fetchAuthMutation, fetchAuthAction } =
   convexBetterAuthReactStart({
     convexUrl: env.CONVEX_URL,
-    convexSiteUrl: !["development", "playwright"].includes(env.VERCEL_ENV)
-      ? env.CONVEX_URL.replace(".convex.cloud", ".convex.site")
-      : "http://127.0.0.1:3211",
+    convexSiteUrl: env.CONVEX_URL.replace(".convex.cloud", ".convex.site"),
   });

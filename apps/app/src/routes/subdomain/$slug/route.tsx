@@ -4,8 +4,6 @@ import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { SessionProvider } from "convex-helpers/react/sessions";
 import { PublicHeader } from "~/components/public-header";
 
-// Known base domains for subdomain detection (must match router.tsx)
-
 export const Route = createFileRoute("/subdomain/$slug")({
   loaderDeps: ({ search: { sso_token } }: { search: { sso_token?: string } }) => ({
     sso_token,
