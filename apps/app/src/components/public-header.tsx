@@ -1,5 +1,9 @@
 import { SparkleIcon } from "@phosphor-icons/react";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import type { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
+import { Doc } from "@thoughtbase/backend/convex/_generated/dataModel";
+import { UnifiedUser } from "@thoughtbase/backend/convex/auth";
+import { Doc as AuthDoc } from "@thoughtbase/backend/convex/betterAuth/_generated/dataModel";
 import { useState } from "react";
 import { AuthForm } from "~/components/auth-form";
 import { Button } from "~/components/ui/button";
@@ -12,24 +16,19 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { usePermissionsPublic } from "~/hooks/use-permissions-public";
-import { Permission } from "~/plans";
 import { CreateIdeaDialog } from "./create-idea-dialog";
 import { ProfileForm } from "./profile-form";
 import { UserAvatar } from "./user-avatar";
 import { WorkspaceAvatar } from "./workspace-avatar";
 
 interface PublicHeaderProps {
-  org: {
-    id: string;
-    name: string;
-    slug: string;
-    logo?: string | null;
-  };
-  user: any;
-  profile: any;
+  org: Omit<AuthDoc<"organization">, "_id"> & { _id: string };
+  user: UnifiedUser | null;
+  profile: Doc<"profile"> | null;
+  sessionId?: Id<"externalSession"> | "no-external-session";
 }
 
-export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
+export function PublicHeader({ org, user, profile, sessionId }: PublicHeaderProps) {
   const router = useRouter();
   const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -53,15 +52,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
     }
   };
 
-  const handleProfileSuccess = () => {
-    setProfileOpen(false);
-    router.invalidate();
-    setCreateOpen(true); // Auto open create after profile setup
-  };
-
-  const { hasPermission } = usePermissionsPublic();
-  const canWrite = hasPermission(Permission.WRITE);
-  const hasWhiteLabel = hasPermission(Permission.WHITE_LABEL);
+  const canWrite = usePermissionsPublic().canWrite();
 
   return (
     <>
@@ -130,7 +121,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
                 <DialogContent className="sm:max-w-[425px]">
                   <AuthForm
                     orgName={org.name}
-                    orgId={org.id}
+                    orgId={org._id}
                     onSuccess={handleLoginSuccess}
                     mode="dialog"
                   />
@@ -145,7 +136,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
         <DialogContent className="sm:max-w-[425px]">
           <AuthForm
             orgName={org.name}
-            orgId={org.id}
+            orgId={org._id}
             onSuccess={handleLoginSuccess}
             mode="dialog"
           />
@@ -161,9 +152,9 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
             </DialogDescription>
           </DialogHeader>
           <ProfileForm
-            orgId={org.id}
+            orgId={org._id}
             initialName={user?.name || ""}
-            onSuccess={handleProfileSuccess}
+            sessionId={sessionId}
           />
         </DialogContent>
       </Dialog>
@@ -171,29 +162,27 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
       <CreateIdeaDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        organizationId={org.id}
+        organizationId={org._id}
         orgSlug={org.slug}
         onSuccess={(newIdea) => {
           navigate({
             to: "/subdomain/$slug/$ideaId",
-            params: { slug: org.slug, ideaId: newIdea.id },
+            params: { slug: org.slug, ideaId: newIdea._id },
           });
         }}
       />
 
-      {!hasWhiteLabel && (
-        <div className="text-muted-foreground fixed right-0 bottom-0 left-0 border-t bg-white px-4 py-2 text-center text-xs">
-          Powered by{" "}
-          <a
-            href="https://thoughtbase.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground font-medium transition-colors"
-          >
-            Thoughtbase
-          </a>
-        </div>
-      )}
+      <div className="text-muted-foreground fixed right-0 bottom-0 left-0 border-t bg-white px-4 py-2 text-center text-xs">
+        Powered by{" "}
+        <a
+          href="https://thoughtbase.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-foreground font-medium transition-colors"
+        >
+          Thoughtbase
+        </a>
+      </div>
     </>
   );
 }

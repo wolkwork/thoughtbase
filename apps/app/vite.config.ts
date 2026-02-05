@@ -7,6 +7,15 @@ import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  // ssr: {
+  //   noExternal: ["@convex-dev/better-auth"],
+  // },
+  optimizeDeps: {
+    exclude: ["@convex-dev/better-auth"],
+  },
+  define: {
+    "process.env.CONVEX_URL": JSON.stringify(process.env.VITE_CONVEX_URL),
+  },
   plugins: [
     devtools(),
     tsConfigPaths({

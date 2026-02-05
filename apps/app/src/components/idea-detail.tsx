@@ -1,21 +1,16 @@
+import { useConvexMutation } from "@convex-dev/react-query";
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
 import { format, formatDistanceToNow } from "date-fns";
 import { lowerCase } from "lodash";
 import { ArrowLeftIcon, CalendarIcon, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { usePermissions } from "~/hooks/use-permissions";
-import {
-  $createComment,
-  $deleteIdea,
-  $toggleReaction,
-  $updateIdeaEta,
-  $updateIdeaStatus,
-} from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
-import { Permission } from "~/plans";
 import { IdeaStatus, StatusPill } from "./status-badge";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -33,8 +28,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { UserAvatar } from "./user-avatar";
 
 interface IdeaDetailProps {
-  idea: any; // Replace with proper type inference if possible
-  currentUser: any;
+  idea: NonNullable<FunctionReturnType<typeof api.ideas.getIdea>>;
+  currentUser: NonNullable<FunctionReturnType<typeof api.auth.getSafeCurrentUser>>;
   orgSlug?: string;
   organizationId?: string;
 }
@@ -50,169 +45,94 @@ const STATUS_OPTIONS = [
 
 export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProps) {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [activeTab, setActiveTab] = useState("comments");
-  const { hasPermission } = usePermissions();
-  const canWrite = hasPermission(Permission.WRITE);
+  const canWrite = usePermissions().canWrite();
 
-  const { mutate: addComment, isPending: isCommentPending } = useMutation({
-    mutationFn: $createComment,
-    onMutate: async (newComment) => {
-      const tempId = crypto.randomUUID();
+  const createComment = useConvexMutation(api.ideas.createComment);
+  const [isCommentPending, setIsCommentPending] = useState(false);
+
+  const handleAddComment = async () => {
+    if (!comment.trim()) return;
+
+    setIsCommentPending(true);
+    try {
+      const newComment = await createComment({
+        ideaId: idea.id as any, // Convert string to Id<"idea">
+        content: comment,
+      });
+
+      // Optimistic update
       const optimisticComment = {
-        id: tempId,
-        content: newComment.data.content,
-        createdAt: new Date(),
+        id: String(newComment.id),
+        content: newComment.content,
+        createdAt: new Date(newComment.createdAt),
         author: {
           name: currentUser.name,
+          email: currentUser.email,
           image: currentUser.image,
         },
         reactions: [],
       };
 
-      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
-        ...old,
-        comments: [optimisticComment, ...old.comments],
-      }));
+      // Optimistic update - add the comment to the query cache
+      queryClient.setQueryData(
+        [api.ideas.getIdea, { ideaId: idea.id as any }],
+        (old: any) => {
+          if (!old) return old;
+          return {
+            ...old,
+            comments: [optimisticComment, ...(old.comments || [])],
+          };
+        },
+      );
 
-      return { tempId };
-    },
-    onSuccess: () => {
       setComment("");
       toast.success("Comment added");
-      router.invalidate();
-    },
-    onError: () => {
+    } catch (error) {
+      console.error("Failed to add comment:", error);
       toast.error("Failed to add comment");
-      router.invalidate();
-    },
-  });
+    } finally {
+      setIsCommentPending(false);
+    }
+  };
 
-  const { mutate: toggleReaction } = useMutation({
-    mutationFn: $toggleReaction,
-    onMutate: async (newReaction) => {
-      // Optimistically update reaction count/state
-      queryClient.setQueryData(["idea", idea.id], (old: any) => {
-        const hasReacted = old.reactions.some(
-          (r: any) => r.userId === currentUser.id && r.type === newReaction.data.type,
-        );
-        let newReactions = [...old.reactions];
+  const toggleReaction = useConvexMutation(api.ideas.toggleReaction);
 
-        if (hasReacted) {
-          newReactions = newReactions.filter(
-            (r: any) =>
-              !(r.userId === currentUser.id && r.type === newReaction.data.type),
-          );
-        } else {
-          newReactions.push({
-            id: "optimistic-" + Math.random(),
-            userId: currentUser.id,
-            type: newReaction.data.type,
-          });
-        }
+  const updateStatus = useConvexMutation(api.ideas.updateIdeaStatus);
+  const updateEta = useConvexMutation(api.ideas.updateIdeaEta);
 
-        return {
-          ...old,
-          reactions: newReactions,
-        };
-      });
-    },
-    onSuccess: () => {
-      router.invalidate();
-    },
-    onError: () => {
-      router.invalidate();
-    },
-  });
+  const deleteIdea = useConvexMutation(api.ideas.deleteIdea);
 
-  const { mutate: updateStatus } = useMutation({
-    mutationFn: $updateIdeaStatus,
-    onMutate: async (newData) => {
-      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
-        ...old,
-        status: newData.data.status,
-      }));
-    },
-    onSuccess: () => {
-      toast.success("Status updated");
-      // Invalidate sidebar counts and ideas list
-      if (organizationId) {
-        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
-        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
-      }
-      router.invalidate();
-    },
-    onError: () => {
-      toast.error("Failed to update status");
-      router.invalidate();
-    },
-  });
-
-  const { mutate: updateEta } = useMutation({
-    mutationFn: $updateIdeaEta,
-    onMutate: async (newData) => {
-      queryClient.setQueryData(["idea", idea.id], (old: any) => ({
-        ...old,
-        eta: newData.data.eta ? new Date(newData.data.eta) : null,
-      }));
-    },
-    onSuccess: () => {
-      toast.success("ETA updated");
-      // Invalidate ideas list (ETA doesn't affect sidebar counts)
-      queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
-      router.invalidate();
-    },
-    onError: () => {
-      toast.error("Failed to update ETA");
-      router.invalidate();
-    },
-  });
-
-  const { mutate: deleteIdea, isPending: isDeleting } = useMutation({
-    mutationFn: $deleteIdea,
-    onSuccess: () => {
-      toast.success("Idea deleted");
-      // Invalidate sidebar counts and ideas list
-      if (organizationId) {
-        queryClient.invalidateQueries({ queryKey: ["sidebar-counts", organizationId] });
-        queryClient.invalidateQueries({ queryKey: ["ideas", "all"] });
-      }
-      navigate({ to: ".." });
-    },
-    onError: () => {
-      toast.error("Failed to delete idea");
-    },
-  });
-
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!organizationId) return;
     if (
       window.confirm(
         "Are you sure you want to delete this idea? This action cannot be undone.",
       )
     ) {
-      deleteIdea({ data: { ideaId: idea.id, organizationId } });
+      await deleteIdea({ ideaId: idea.id, organizationId });
+      navigate({ to: ".." });
     }
   };
 
-  const handleUpdateStatus = (status: string) => {
+  const handleUpdateStatus = (status: string | null) => {
     if (!organizationId) return;
-    updateStatus({ data: { ideaId: idea.id, status, organizationId } });
+    updateStatus({ ideaId: idea.id, status: status as IdeaStatus, organizationId });
   };
 
-  const handleUpdateEta = (eta: string | null) => {
-    if (!organizationId) return;
-    updateEta({ data: { ideaId: idea.id, eta, organizationId } });
+  const handleUpdateEta = (eta: number | undefined) => {
+    if (!organizationId || !eta) return;
+    updateEta({ ideaId: idea.id, eta, organizationId });
   };
 
   const handleUpvote = () => {
-    toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
+    toggleReaction({ ideaId: idea.id, type: "upvote" });
   };
 
   const hasUpvoted = idea.reactions.some(
-    (r: any) => r.userId === currentUser.id && r.type === "upvote",
+    (r) => r.userId === currentUser._id && r.type === "upvote",
   );
 
   return (
@@ -239,7 +159,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
                       variant="outline"
                       size="icon"
                       onClick={handleDelete}
-                      disabled={isDeleting || !canWrite}
+                      disabled={!canWrite}
                       aria-label="Delete idea"
                     >
                       <Trash2 className="size-4" />
@@ -310,9 +230,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
                     size="sm"
                     className="absolute right-2 bottom-2"
                     disabled={!comment.trim() || isCommentPending}
-                    onClick={() =>
-                      addComment({ data: { ideaId: idea.id, content: comment } })
-                    }
+                    onClick={() => handleAddComment()}
                   >
                     Comment
                   </Button>
@@ -411,7 +329,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
           <UserAvatar user={idea.author} />
           <div className="flex flex-col gap-0.5">
             <div className="text-foreground flex items-center gap-2 font-medium">
-              <span>{idea.author.name}</span>
+              <span>{idea.author?.name || "Unknown"}</span>
             </div>
             <span className="text-xs">
               {formatDistanceToNow(new Date(idea.createdAt), { addSuffix: true })}
@@ -462,38 +380,34 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
               <Tooltip>
                 <TooltipTrigger
                   render={
-                    <span>
-                      <Popover>
-                        <PopoverTrigger
-                          render={
-                            <Button
-                              variant="outline"
-                              disabled={!canWrite}
-                              className={cn(
-                                "w-full shrink justify-start text-left font-normal",
-                                !idea.eta && "text-muted-foreground",
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {idea.eta
-                                ? format(new Date(idea.eta), "PPP")
-                                : "Select ETA"}
-                            </Button>
+                    <Popover>
+                      <PopoverTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            disabled={!canWrite}
+                            className={cn(
+                              "w-full shrink justify-start text-left font-normal",
+                              !idea.eta && "text-muted-foreground",
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {idea.eta ? format(new Date(idea.eta), "PPP") : "Select ETA"}
+                          </Button>
+                        }
+                      />
+                      <PopoverContent align="start">
+                        <Calendar
+                          mode="single"
+                          selected={idea.eta ? new Date(idea.eta) : undefined}
+                          onSelect={(date) =>
+                            canWrite
+                              ? handleUpdateEta(date ? date.getTime() : undefined)
+                              : undefined
                           }
                         />
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={idea.eta ? new Date(idea.eta) : undefined}
-                            onSelect={(date) =>
-                              canWrite
-                                ? handleUpdateEta(date ? date.toISOString() : null)
-                                : undefined
-                            }
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </span>
+                      </PopoverContent>
+                    </Popover>
                   }
                 />
                 {!canWrite && (
@@ -505,7 +419,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
             </TooltipProvider>
             {idea.eta && canWrite && (
               <button
-                onClick={() => handleUpdateEta(null)}
+                onClick={() => handleUpdateEta(undefined)}
                 className="text-muted-foreground hover:text-foreground hover:bg-accent rounded p-1 transition-colors"
                 title="Clear ETA"
               >
@@ -524,7 +438,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
           </div>
         )}
 
-        {idea.author.revenue !== null && idea.author.revenue !== undefined && (
+        {typeof idea.author?.revenue === "number" && (
           <div>
             <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
               Revenue
@@ -538,7 +452,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
           </div>
         )}
 
-        {idea.author.metadata &&
+        {idea.author?.metadata &&
           Object.keys(idea.author.metadata as object).length > 0 && (
             <div>
               <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">

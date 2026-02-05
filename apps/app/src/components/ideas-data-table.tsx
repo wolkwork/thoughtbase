@@ -16,6 +16,8 @@ import { format } from "date-fns";
 import { ArrowDown01, Search, SlidersHorizontal } from "lucide-react";
 import * as React from "react";
 
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
 import { CommentBadge, LikeBadge } from "~/components/engagement-badges";
 import { StatusBadge } from "~/components/status-badge";
 import { Button } from "~/components/ui/button";
@@ -46,34 +48,13 @@ import {
 import { UserAvatar } from "./user-avatar";
 
 // Define the Idea type based on what we receive from the API
-export type Idea = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  createdAt: Date;
-  author: {
-    name: string;
-    image?: string | null;
-  };
-  tags: {
-    tag: {
-      id: string;
-      name: string;
-      color: string | null;
-    };
-  }[];
-  commentCount: number;
-  reactionCount: number;
-  // Placeholder for revenue
-  revenue?: number;
-};
+export type Idea = NonNullable<FunctionReturnType<typeof api.ideas.getIdeas>>[number];
 
 // Custom filter for tags
 const tagsFilter: FilterFn<Idea> = (row, columnId, filterValue: string[]) => {
   const tags = row.getValue(columnId) as Idea["tags"];
   if (!filterValue || filterValue.length === 0) return true;
-  const tagNames = tags.map((t) => t.tag.name);
+  const tagNames = tags.map((t) => t.name);
   return filterValue.some((val) => tagNames.includes(val));
 };
 
@@ -82,7 +63,7 @@ const globalSearchFilter: FilterFn<Idea> = (row, columnId, filterValue: string) 
   const search = filterValue.toLowerCase();
   const title = row.original.title.toLowerCase();
   const description = row.original.description?.toLowerCase() || "";
-  const authorName = row.original.author.name.toLowerCase();
+  const authorName = row.original.author?.name?.toLowerCase() || "";
 
   return (
     title.includes(search) || description.includes(search) || authorName.includes(search)
@@ -100,29 +81,29 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       orgSlug ? (
         <Link
           to="/dashboard/$orgSlug/ideas/$ideaId"
-          params={{ orgSlug, ideaId: row.original.id }}
+          params={{ orgSlug, ideaId: row.original._id }}
           className="hover:text-primary flex min-w-0 flex-1 items-center gap-2 font-medium hover:underline"
-          title={row.getValue("title")}
+          title={row.original.title}
           style={{ width: "100%" }}
         >
           <StatusBadge showLabel={false} status={row.original.status} />
-          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+          <span className="min-w-0 flex-1 truncate">{row.original.title}</span>
         </Link>
       ) : (
         <div
           className="flex min-w-0 flex-1 items-center gap-2 font-medium"
-          title={row.getValue("title")}
+          title={row.original.title}
           style={{ width: "100%" }}
         >
           <StatusBadge showLabel={false} status={row.original.status} />
-          <span className="min-w-0 flex-1 truncate">{row.getValue("title")}</span>
+          <span className="min-w-0 flex-1 truncate">{row.original.title}</span>
         </div>
       ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+    cell: ({ row }) => <StatusBadge status={row.original.status} />,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -145,7 +126,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
     accessorKey: "revenue",
     header: "Revenue",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("revenue") || "0");
+      const amount = row.original.revenue;
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
@@ -160,7 +141,7 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
     cell: ({ row }) => {
       return (
         <div className="text-muted-foreground text-sm">
-          {format(row.getValue("createdAt"), "MMM d, yyyy")}
+          {format(row.original._creationTime, "MMM d, yyyy")}
         </div>
       );
     },
@@ -173,8 +154,8 @@ const createColumns = (orgSlug?: string): ColumnDef<Idea>[] => [
       return (
         <div className="flex items-center gap-2">
           <UserAvatar user={author} className="size-6!" />
-          <span className="max-w-[120px] truncate text-sm" title={author.name}>
-            {author.name}
+          <span className="max-w-[120px] truncate text-sm" title={author?.name || ""}>
+            {author?.name || "Unknown User"}
           </span>
         </div>
       );
@@ -257,7 +238,7 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
   const allTags = React.useMemo(() => {
     const tags = new Set<string>();
     data.forEach((idea) => {
-      idea.tags.forEach((t) => tags.add(t.tag.name));
+      idea.tags.forEach((t) => tags.add(t.name));
     });
     return Array.from(tags).sort();
   }, [data]);
@@ -292,22 +273,10 @@ export function IdeasDataTable({ data, initialStatus, orgSlug }: IdeasDataTableP
       case "newest":
         setSorting([{ id: "createdAt", desc: true }]);
         break;
-      case "top": // Top = most reactions
-        // We don't have a direct 'reactionCount' column accessor, but we can sort by engagement or add a hidden column.
-        // Actually 'engagement' is sum of both.
-        // Let's add a hidden column for reactionCount if we want strict "Top" as just reactions, or use engagement.
-        // The user said "Top" usually implies "Top Rated" (reactions).
-        // Let's assume "Top" means sort by reactionCount.
-        // Since we don't have a column for just reactionCount visible, we can sort by the engagement column which is close enough,
-        // or better, let's just use the engagement column for "Top" and "Trending" for now.
-        // Or I can programmatically sort by a key that exists in data even if not a column?
-        // TanStack table sorts by column IDs.
-        // I'll add a specific sort handler that accesses the raw data if needed, but easier to just map to existing columns.
-        // I'll use "engagement" for Top.
+      case "top":
         setSorting([{ id: "engagement", desc: true }]);
         break;
       case "trending":
-        // For trending, ideally we'd have recent stats. We'll use engagement for now as a proxy.
         setSorting([{ id: "engagement", desc: true }]);
         break;
       case "revenue":

@@ -8,9 +8,9 @@ import Feature2 from "@/components/features/Feature2.astro";
 import Pricing1 from "@/components/pricing/Pricing1.astro";
 import Cta1 from "@/components/ctas/Cta1.astro";
 import Cta2 from "@/components/ctas/Cta2.astro";
-// import { SignJWT } from "jose";
+import { SignJWT } from "jose";
 
-// const secret = "DLePfZvOs24wxZdn24-Q9AjL7eB7DU0j";
+// const secret = import.meta.env.THOUGHTBASE_SSO_SECRET;
 // const secretKey = new TextEncoder().encode(secret);
 
 // const token = await new SignJWT({
@@ -51,11 +51,24 @@ import Cta2 from "@/components/ctas/Cta2.astro";
   <Cta1 />
 </BaseLayout>
 
+<feedback-widget></feedback-widget>
+
 <script>
   import { initFeedbackWidget } from "@thoughtbase/widget";
-  const ORGANIZATION_SLUG = import.meta.env.PUBLIC_ORGANIZATION_SLUG;
+  const ORGANIZATION_SLUG = import.meta.env.PUBLIC_ORGANIZATION_SLUG as string;
+  const CONVEX_URL = import.meta.env.PUBLIC_CONVEX_URL as string;
 
-  initFeedbackWidget({
-    organizationSlug: ORGANIZATION_SLUG,
-  });
+  class FeedbackWidget extends HTMLElement {
+    constructor() {
+      super();
+
+      initFeedbackWidget({
+        organizationSlug: ORGANIZATION_SLUG,
+        convexUrl: CONVEX_URL,
+        // ssoToken: this.dataset.token,
+      });
+    }
+  }
+
+  customElements.define("feedback-widget", FeedbackWidget);
 </script>

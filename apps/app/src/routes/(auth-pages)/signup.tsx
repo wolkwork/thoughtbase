@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -6,8 +6,7 @@ import { Logo } from "~/components/logo";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authClient } from "~/lib/auth/auth-client";
-import { authQueryOptions } from "~/lib/auth/queries";
+import { authClient } from "~/lib/auth/auth-client-convex";
 
 export const Route = createFileRoute("/(auth-pages)/signup")({
   component: SignupForm,
@@ -15,7 +14,6 @@ export const Route = createFileRoute("/(auth-pages)/signup")({
 
 function SignupForm() {
   const { redirectUrl } = Route.useRouteContext();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { mutate: signupMutate, isPending } = useMutation({
@@ -30,7 +28,6 @@ function SignupForm() {
             toast.error(error.message || "An error occurred while signing up.");
           },
           onSuccess: () => {
-            queryClient.removeQueries({ queryKey: authQueryOptions().queryKey });
             navigate({ to: redirectUrl });
           },
         },

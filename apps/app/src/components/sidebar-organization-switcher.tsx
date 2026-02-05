@@ -1,8 +1,11 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useRouteContext } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import startCase from "lodash/startCase";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
-import { usePermissions } from "~/hooks/use-permissions";
-import { authClient } from "~/lib/auth/auth-client";
+import { useOrganization } from "~/hooks/organization";
 import { cn } from "~/lib/utils";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import {
@@ -26,10 +29,17 @@ export function SidebarOrganizationSwitcher({
     from: "/(authenticated)/dashboard/$orgSlug",
   });
 
-  const { data: organizations } = authClient.useListOrganizations();
+  const { data: organizations } = useSuspenseQuery(
+    convexQuery(api.auth.listOrganizations, {}),
+  );
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-  const { plan } = usePermissions();
+  const organization = useOrganization();
+
+  const timeLeft = organization.subscriptionPeriodEnd
+    ? organization.subscriptionPeriodEnd - Date.now()
+    : 0;
+  const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
 
   return (
     <>
@@ -54,13 +64,16 @@ export function SidebarOrganizationSwitcher({
                 <span
                   className={cn(
                     "truncate text-xs",
-                    plan.slug === "free" && "text-amber-600 dark:text-amber-400",
-                    plan.slug === "start" && "text-emerald-600",
-                    plan.slug === "pro" && "text-emerald-600",
-                    plan.slug === "business" && "text-emerald-600",
+                    organization.subscriptionStatus === "trialing" &&
+                      "text-amber-600 dark:text-amber-400",
+                    organization.subscriptionStatus === "active" && "text-emerald-600",
+                    organization.subscriptionStatus === "expired" && "text-red-600",
+                    organization.subscriptionStatus === "past_due" && "text-red-600",
                   )}
                 >
-                  {plan.slug === "free" ? "Read-only" : plan.name}
+                  {organization.subscriptionStatus === "trialing"
+                    ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left in trial`
+                    : startCase(organization.subscriptionStatus || "")}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4!" />

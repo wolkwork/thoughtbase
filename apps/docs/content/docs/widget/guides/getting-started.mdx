@@ -9,11 +9,12 @@ The Thoughtbase widget is an embeddable component that lets your users submit fe
 
 ## Quick Start
 
-### Step 1: Get Your Organization ID
+### Step 1: Get Your Organization Slug
 
 1. Log in to your Thoughtbase dashboard
 2. Navigate to your organization settings
-3. Copy your **Organization ID** (you'll need this to initialize the widget)
+3. Copy your **Organization slug** (you'll need this to initialize the widget)
+4. If you are self-hosting, you will also need to get your **Convex URL**
 
 ### Step 2: Add the Widget Script
 
@@ -23,6 +24,8 @@ Add this script tag to your website's HTML, typically in the `<head>` or just be
 <script src="https://app.thoughtbase.app/widget.js"></script>
 ```
 
+If you are self-hosting, get the widget script from your self-hosted instance.
+
 ### Step 3: Initialize the Widget
 
 Add this initialization code after the script tag:
@@ -30,15 +33,17 @@ Add this initialization code after the script tag:
 ```html
 <script>
   window.thoughtbase.initWidget({
-    organizationId: 'your-organization-id-here'
+    organizationSlug: 'your-organization-slug',
   });
 </script>
 ```
+
+For SSO, pass **`ssoToken`** in the config when you have a JWT from your backend; see [SSO Integration](/widget/guides/sso-integration).
 
 That's it! The widget will appear as a floating button in the bottom-right corner of your website.
 
 ## Next Steps
 
 - Learn about [Customization](/widget/guides/customization) options
-- Set up [SSO Integration](/widget/guides/sso-integration) to identify users
+- Set up [SSO Integration](/widget/guides/sso-integration) and pass `ssoToken` to the widget
 - Check the [API Reference](/widget/api/reference) for advanced usage

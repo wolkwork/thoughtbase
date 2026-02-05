@@ -1,19 +1,18 @@
+import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { authQueryOptions } from "~/lib/auth/queries";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 
 export const Route = createFileRoute("/(authenticated)")({
   component: Outlet,
   beforeLoad: async ({ context }) => {
-    const sessionData = await context.queryClient.ensureQueryData({
-      ...authQueryOptions(),
-      revalidateIfStale: true,
-    });
-    if (!sessionData) {
+    const user = await context.queryClient.ensureQueryData(
+      convexQuery(api.auth.getSafeCurrentUser, {}),
+    );
+
+    if (!user) {
       throw redirect({ to: "/login" });
     }
 
-    // Organization context now comes from URL ($orgSlug param)
-    // The $orgSlug route handles membership validation
-    return { user: sessionData.user, session: sessionData.session };
+    return { user };
   },
 });

@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
 import { ChangelogView } from "./widget/changelog-view";
 import { RoadmapView } from "./widget/roadmap-view";
 import { SubmitView } from "./widget/submit-view";
 import { Tab, WidgetLayout } from "./widget/widget-layout";
-import { getWidgetOrganization } from "../lib/api/widget-client";
+import React from "react";
 
 interface FeedbackWidgetProps {
   organizationSlug: string;
@@ -18,30 +17,9 @@ export function FeedbackWidget({
   isOpen,
   onClose,
   ssoToken,
-  thoughtbaseBranding,
+  thoughtbaseBranding = true,
 }: FeedbackWidgetProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("feedback");
-  const [showThoughtbaseBranding, setShowThoughtbaseBranding] = useState(true);
-
-  useEffect(() => {
-    if (isOpen && organizationSlug) {
-      // If thoughtbaseBranding is explicitly set to false, check permissions
-      if (thoughtbaseBranding === false) {
-        getWidgetOrganization(organizationSlug)
-          .then((data) => {
-            setShowThoughtbaseBranding(data.showThoughtbaseBranding ?? true);
-          })
-          .catch((err) => {
-            console.error("Failed to load organization branding:", err);
-            // Default to showing branding on error
-            setShowThoughtbaseBranding(true);
-          });
-      } else {
-        // If not explicitly set to false, always show branding
-        setShowThoughtbaseBranding(true);
-      }
-    }
-  }, [isOpen, organizationSlug, thoughtbaseBranding]);
+  const [activeTab, setActiveTab] = React.useState<Tab>("feedback");
 
   if (!isOpen) return null;
 
@@ -50,7 +28,7 @@ export function FeedbackWidget({
       activeTab={activeTab}
       onTabChange={setActiveTab}
       onClose={onClose}
-      showThoughtbaseBranding={showThoughtbaseBranding}
+      showThoughtbaseBranding={thoughtbaseBranding}
     >
       {activeTab === "feedback" && (
         <SubmitView organizationSlug={organizationSlug} ssoToken={ssoToken} />

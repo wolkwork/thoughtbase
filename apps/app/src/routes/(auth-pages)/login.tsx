@@ -6,7 +6,7 @@ import { Logo } from "~/components/logo";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 
 export const Route = createFileRoute("/(auth-pages)/login")({
   component: LoginForm,
@@ -26,12 +26,6 @@ function LoginForm() {
           onError: ({ error }) => {
             toast.error(error.message || "An error occurred while signing in.");
           },
-          // better-auth seems to trigger a hard navigation on login,
-          // so we don't have to revalidate & navigate ourselves
-          // onSuccess: () => {
-          //   queryClient.removeQueries({ queryKey: authQueryOptions().queryKey });
-          //   navigate({ to: redirectUrl });
-          // },
         },
       ),
   });

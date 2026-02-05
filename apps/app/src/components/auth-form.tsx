@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authClient } from "~/lib/auth/auth-client";
+import { authClient } from "~/lib/auth/auth-client-convex";
 import { Alert, AlertDescription } from "./ui/alert";
 
 interface AuthFormProps {
@@ -63,7 +63,7 @@ export function AuthForm({ orgName, orgId, onSuccess, mode = "page" }: AuthFormP
       toast.success("Account created successfully");
       onSuccess();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       setFormError(error.message ?? "Failed to sign up");
     },
   });

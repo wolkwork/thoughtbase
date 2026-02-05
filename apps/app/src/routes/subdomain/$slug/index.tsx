@@ -1,6 +1,9 @@
+import { useConvexMutation } from "@convex-dev/react-query";
 import { HeartIcon } from "@phosphor-icons/react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useLoaderData, useRouter } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
+import { usePaginatedQuery } from "convex/react";
 import { format } from "date-fns";
 import { ArrowDown, ArrowUp, Flame } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { UserAvatar } from "~/components/user-avatar";
-import { $getIdeasFeed, $toggleReaction } from "~/lib/api/ideas";
 import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/subdomain/$slug/")({
@@ -24,43 +26,29 @@ export const Route = createFileRoute("/subdomain/$slug/")({
 });
 
 function OrganizationIndexPage() {
-  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
+  const { org, user, sessionId } = useLoaderData({ from: "/subdomain/$slug" });
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const [loginOpen, setLoginOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "top" | "trending">("newest");
 
   const {
-    data: ideasData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    results: ideas,
     status,
-  } = useInfiniteQuery({
-    queryKey: ["public-ideas", org.id, sortBy],
-    queryFn: ({ pageParam }) =>
-      $getIdeasFeed({
-        data: {
-          organizationId: org.id,
-          sort: sortBy,
-          page: pageParam,
-          limit: 20,
-        },
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  });
-
-  const ideas = ideasData?.pages.flatMap((page) => page.items) || [];
+    loadMore,
+  } = usePaginatedQuery(
+    api.ideas.getIdeasPublic,
+    { organizationId: org._id, sort: sortBy },
+    { initialNumItems: 10 },
+  );
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
+          loadMore(10);
         }
       },
       { threshold: 0.1, rootMargin: "100px" },
@@ -71,70 +59,11 @@ function OrganizationIndexPage() {
     }
 
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [status, loadMore]);
 
-  const { mutate: toggleReaction } = useMutation({
-    mutationFn: $toggleReaction,
-    onMutate: async (newReaction) => {
-      // Optimistic update for list
-      await queryClient.cancelQueries({ queryKey: ["public-ideas", org.id, sortBy] });
-      const previousData = queryClient.getQueryData(["public-ideas", org.id, sortBy]);
+  const toggleReactionMutation = useConvexMutation(api.ideas.toggleReaction);
 
-      queryClient.setQueryData(["public-ideas", org.id, sortBy], (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => ({
-            ...page,
-            items: page.items.map((idea: any) => {
-              if (idea.id !== newReaction.data.ideaId) return idea;
-
-              const isExternal = user?.type === "external";
-              const hasReacted = idea.reactions.some((r: any) => {
-                if (isExternal)
-                  return r.externalUserId === user?.id && r.type === "upvote";
-                return r.userId === user?.id && r.type === "upvote";
-              });
-
-              let newReactions = [...idea.reactions];
-
-              if (hasReacted) {
-                newReactions = newReactions.filter((r: any) => {
-                  if (isExternal)
-                    return !(r.externalUserId === user?.id && r.type === "upvote");
-                  return !(r.userId === user?.id && r.type === "upvote");
-                });
-              } else {
-                newReactions.push({
-                  id: "optimistic-" + Math.random(),
-                  userId: isExternal ? null : user?.id,
-                  externalUserId: isExternal ? user?.id : null,
-                  type: "upvote",
-                  createdAt: new Date().toISOString(),
-                });
-              }
-
-              return {
-                ...idea,
-                reactions: newReactions,
-                reactionCount: newReactions.length,
-              };
-            }),
-          })),
-        };
-      });
-      return { previousData };
-    },
-    onError: (err, newReaction, context) => {
-      queryClient.setQueryData(["public-ideas", org.id, sortBy], context?.previousData);
-      router.invalidate();
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["public-ideas", org.id, sortBy] });
-    },
-  });
-
-  const handleUpvote = (e: React.MouseEvent, idea: any) => {
+  const handleUpvote = async (e: React.MouseEvent, ideaId: Id<"idea">) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -142,7 +71,12 @@ function OrganizationIndexPage() {
       setLoginOpen(true);
       return;
     }
-    toggleReaction({ data: { ideaId: idea.id, type: "upvote" } });
+
+    await toggleReactionMutation({
+      ideaId,
+      type: "upvote",
+      sessionId: sessionId as Id<"externalSession"> | undefined,
+    });
   };
 
   const handleLoginSuccess = () => {
@@ -208,26 +142,23 @@ function OrganizationIndexPage() {
 
           <div className="divide-border divide-y">
             {ideas.map((idea) => {
-              const isExternal = user?.type === "external";
               const hasReacted =
                 !!user &&
-                idea.reactions.some((r: any) => {
-                  if (isExternal)
-                    return r.externalUserId === user.id && r.type === "upvote";
-                  return r.userId === user.id && r.type === "upvote";
+                idea.reactions.some((r) => {
+                  return r.userId === user._id && r.type === "upvote";
                 });
 
               return (
                 <Link
-                  key={idea.id}
+                  key={idea._id}
                   to="/subdomain/$slug/$ideaId"
-                  params={{ slug: org.slug, ideaId: idea.id }}
+                  params={{ slug: org.slug, ideaId: idea._id }}
                   className="block"
                 >
                   <div className="group flex gap-6 p-6 py-8 transition-colors">
                     <div>
                       <button
-                        onClick={(e) => handleUpvote(e, idea)}
+                        onClick={(e) => handleUpvote(e, idea._id)}
                         className={cn(
                           "hover:bg-accent text-muted-foreground flex aspect-6/5 flex-col items-center gap-1 rounded-sm border px-3 py-1.5 pt-2 text-xs transition-colors",
                           "cursor-pointer",
@@ -254,14 +185,10 @@ function OrganizationIndexPage() {
 
                       <div className="flex w-full items-center gap-3">
                         <div className="text-muted-foreground flex w-full items-center gap-4 text-sm">
-                          {/* TODO: fix */}
-                          {/* @ts-expect-error - user is not typed */}
                           <UserAvatar user={idea.author} />
                           <div className="flex flex-col gap-0.5">
                             <div className="text-foreground flex items-center gap-2 font-medium">
-                              <span>
-                                {"name" in idea.author ? idea.author.name : "Unknown"}
-                              </span>
+                              <span>{idea.author?.name}</span>
                             </div>
                             <span className="text-xs">
                               {format(new Date(idea.createdAt), "MMM d, yyyy")}
@@ -282,12 +209,12 @@ function OrganizationIndexPage() {
               );
             })}
 
-            {ideas.length === 0 && status === "success" && (
+            {ideas.length === 0 && status === "Exhausted" && (
               <div className="text-muted-foreground py-12 text-center">
                 No feedback yet. Be the first to submit!
               </div>
             )}
-            {status === "pending" && (
+            {status === "LoadingFirstPage" && (
               <div className="text-muted-foreground py-12 text-center">
                 Loading ideas...
               </div>
@@ -299,11 +226,11 @@ function OrganizationIndexPage() {
             ref={loadMoreRef}
             className="text-muted-foreground py-4 text-center text-sm"
           >
-            {isFetchingNextPage ? (
+            {status === "LoadingMore" ? (
               <span>Loading more...</span>
-            ) : hasNextPage ? (
+            ) : status === "CanLoadMore" ? (
               <span>Load more</span>
-            ) : ideas.length > 0 ? (
+            ) : status === "Exhausted" && ideas.length > 0 ? (
               <span>You've reached the end</span>
             ) : null}
           </div>
@@ -315,7 +242,7 @@ function OrganizationIndexPage() {
         <DialogContent className="sm:max-w-[425px]">
           <AuthForm
             orgName={org.name}
-            orgId={org.id}
+            orgId={org._id}
             onSuccess={handleLoginSuccess}
             mode="dialog"
           />

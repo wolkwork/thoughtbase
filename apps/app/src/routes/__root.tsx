@@ -5,30 +5,45 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useRouteContext,
 } from "@tanstack/react-router";
 
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
-import { authQueryOptions, type AuthQueryResult } from "~/lib/auth/queries";
 import appCss from "~/styles.css?url";
 
+import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { convexQuery, type ConvexQueryClient } from "@convex-dev/react-query";
+import { createServerFn } from "@tanstack/react-start";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { ThemeProvider } from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
+import { authClient } from "~/lib/auth/auth-client-convex";
+import { getToken } from "~/lib/auth/auth-server";
+
+const getAuth = createServerFn({ method: "GET" }).handler(async () => {
+  return await getToken();
+});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  user: AuthQueryResult;
+  convexQueryClient: ConvexQueryClient;
 }>()({
-  beforeLoad: ({ context }) => {
-    // we're using react-query for client-side caching to reduce client-to-server calls, see /src/router.tsx
-    // better-auth's cookieCache is also enabled server-side to reduce server-to-db calls, see /src/lib/auth/auth.ts
-    context.queryClient.prefetchQuery(authQueryOptions());
+  beforeLoad: async ({ context }) => {
+    const token = await getAuth();
 
-    // typically we don't need the user immediately in landing pages,
-    // so we're only prefetching here and not awaiting.
-    // for protected routes with loader data, see /(authenticated)/route.tsx
+    if (token) {
+      context.convexQueryClient.serverHttpClient?.setAuth(token);
+    }
+
+    await context.queryClient.ensureQueryData(convexQuery(api.config.isCloud, {}));
+
+    return {
+      isAuthenticated: !!token,
+      token,
+    };
   },
   head: () => ({
     meta: [
@@ -53,10 +68,18 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const context = useRouteContext({ from: Route.id });
+
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <ConvexBetterAuthProvider
+      client={context.convexQueryClient.convexClient}
+      authClient={authClient}
+      initialToken={context.token}
+    >
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </ConvexBetterAuthProvider>
   );
 }
 

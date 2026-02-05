@@ -1,43 +1,43 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { Plus } from "lucide-react";
 import { ChangelogDataTable } from "~/components/changelog-data-table";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-import { $deleteChangelog, $getChangelogs } from "~/lib/api/changelogs";
+import { useOrganization } from "~/hooks/organization";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/changelog/")({
   loader: async ({ context }) => {
-    // Use organization from parent route context
-    const changelogs = await $getChangelogs({
-      data: { organizationId: context.organization.id },
-    });
-    return { changelogs, organizationId: context.organization.id };
+    await context.queryClient.ensureQueryData(
+      convexQuery(api.changelogs.getChangelogs, {
+        organizationId: context.organization._id,
+      }),
+    );
   },
   component: ChangelogListPage,
 });
 
 function ChangelogListPage() {
-  const { changelogs: initialChangelogs, organizationId } = Route.useLoaderData();
   const { orgSlug } = Route.useParams();
-  const queryClient = useQueryClient();
+  const organization = useOrganization();
 
-  const { data: changelogs } = useQuery({
-    queryKey: ["changelogs", organizationId],
-    queryFn: () => $getChangelogs({ data: { organizationId } }),
-    initialData: initialChangelogs,
-  });
+  const { data: changelogs } = useSuspenseQuery(
+    convexQuery(api.changelogs.getChangelogs, {
+      organizationId: organization._id,
+    }),
+  );
 
-  const { mutate: deleteChangelog } = useMutation({
-    mutationFn: $deleteChangelog,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["changelogs", organizationId] });
-    },
-  });
+  const deleteChangelog = useConvexMutation(api.changelogs.deleteChangelog);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: Id<"changelog">) => {
     if (confirm("Are you sure you want to delete this changelog?")) {
-      deleteChangelog({ data: { id, organizationId } });
+      deleteChangelog({
+        id,
+        organizationId: organization._id,
+      });
     }
   };
 

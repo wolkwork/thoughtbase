@@ -7,25 +7,24 @@ import {
   UsersThreeIcon,
   WrenchIcon,
 } from "@phosphor-icons/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
-import { AlertCircle, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 // import type { BundledLanguage } from "shiki";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { toast } from "sonner";
 import { BrandingSettings } from "~/components/branding-settings";
 import { CustomDomainSettings } from "~/components/custom-domain-settings";
-import { SubscriptionDialog } from "~/components/subscription-dialog";
 import { InviteMemberForm } from "~/components/team-settings";
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { ShikiCodeBlock } from "~/components/ui/shiki-code-block";
-import { usePermissions } from "~/hooks/use-permissions";
-import { $generateOrgSecret, $getOrgSecret } from "~/lib/api/organizations";
+import { useOrganization } from "~/hooks/organization";
+import { useConfig } from "~/hooks/use-config";
 import { cn } from "~/lib/utils";
-import { Permission } from "~/plans";
 import { CopyButton } from "./ui/shadcn-io/copy-button";
 
 type StepId =
@@ -96,11 +95,17 @@ export function OnboardingDialog({
   organizationId,
 }: OnboardingDialogProps) {
   const [activeStepId, setActiveStepId] = useState<StepId>("install-widget");
-  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const { isCloud } = useConfig();
+
+  // Filter out cloud-only steps in self-hosted mode
+  const visibleSteps = useMemo(
+    () => (isCloud ? STEPS : STEPS.filter((s) => s.id !== "setup-custom-domain")),
+    [isCloud],
+  );
 
   const activeStep = useMemo(
-    () => STEPS.find((s) => s.id === activeStepId) ?? STEPS[0],
-    [activeStepId],
+    () => visibleSteps.find((s) => s.id === activeStepId) ?? visibleSteps[0],
+    [activeStepId, visibleSteps],
   );
 
   return (
@@ -129,7 +134,7 @@ export function OnboardingDialog({
               </DialogHeader>
 
               <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
-                {STEPS.map((step) => {
+                {visibleSteps.map((step) => {
                   const isActive = step.id === activeStepId;
                   return (
                     <button
@@ -177,12 +182,7 @@ export function OnboardingDialog({
                   {activeStepId === "install-widget" && (
                     <InstallWidgetStep organizationSlug={orgSlug} />
                   )}
-                  {activeStepId === "enable-auto-login" && (
-                    <EnableAutoLoginStep
-                      organizationId={organizationId}
-                      onUpgrade={() => setSubscriptionOpen(true)}
-                    />
-                  )}
+                  {activeStepId === "enable-auto-login" && <EnableAutoLoginStep />}
                   {activeStepId === "invite-team" && (
                     <InviteTeamStep orgSlug={orgSlug} organizationId={organizationId} />
                   )}
@@ -190,12 +190,8 @@ export function OnboardingDialog({
                     <CustomizeBrandingStep organizationId={organizationId} />
                   )}
                   {activeStepId === "share-board" && <ShareBoardStep orgSlug={orgSlug} />}
-                  {activeStepId === "setup-custom-domain" && (
-                    <SetupCustomDomainStep
-                      organizationId={organizationId}
-                      orgSlug={orgSlug}
-                      onUpgrade={() => setSubscriptionOpen(true)}
-                    />
+                  {activeStepId === "setup-custom-domain" && isCloud && (
+                    <SetupCustomDomainStep />
                   )}
                 </div>
               </div>
@@ -203,8 +199,6 @@ export function OnboardingDialog({
           </div>
         </DialogContent>
       </Dialog>
-
-      <SubscriptionDialog open={subscriptionOpen} onOpenChange={setSubscriptionOpen} />
     </>
   );
 }
@@ -298,39 +292,18 @@ function InstallWidgetStep({ organizationSlug }: { organizationSlug: string }) {
   );
 }
 
-function EnableAutoLoginStep({
-  organizationId,
-  onUpgrade,
-}: {
-  organizationId?: string;
-  onUpgrade?: () => void;
-}) {
-  const queryClient = useQueryClient();
-  const { hasPermission } = usePermissions();
-  const canUseSSO = hasPermission(Permission.SSO);
+function EnableAutoLoginStep() {
+  const organization = useOrganization();
 
-  const { data, isPending } = useQuery({
-    queryKey: ["org-secret", organizationId],
-    queryFn: async () => {
-      if (!organizationId) return { secret: null as string | null };
-      return await $getOrgSecret({ data: { organizationId } });
-    },
-    enabled: !!organizationId && canUseSSO,
-  });
+  const { data: orgSecret } = useSuspenseQuery(
+    convexQuery(api.organizations.getOrgSecret, {
+      organizationId: organization?._id,
+    }),
+  );
 
-  const { mutate: generateSecret, isPending: isGenerating } = useMutation({
-    mutationFn: async () => {
-      if (!organizationId) throw new Error("Missing organizationId");
-      return await $generateOrgSecret({ data: { organizationId } });
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["org-secret", organizationId] });
-      toast.success("SSO secret generated");
-    },
-    onError: () => toast.error("Failed to generate secret"),
-  });
+  const generateSecret = useConvexMutation(api.organizations.generateOrgSecret);
 
-  const secret = data?.secret ?? null;
+  const secret = orgSecret.secret;
 
   const joseExample = `import { SignJWT } from "jose";
 
@@ -348,28 +321,6 @@ const token = await new SignJWT({
 
 // Pass token into the widget as ssoToken`;
 
-  if (!canUseSSO) {
-    return (
-      <div className="space-y-6">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Auto-login is available on the Business plan.{" "}
-            {onUpgrade && (
-              <Button
-                variant="link"
-                className="h-auto p-0 font-semibold"
-                onClick={onUpgrade}
-              >
-                Upgrade now
-              </Button>
-            )}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="rounded-lg border p-4">
@@ -383,12 +334,7 @@ const token = await new SignJWT({
         </div>
 
         <div className="mt-4">
-          {isPending ? (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading...
-            </div>
-          ) : secret ? (
+          {secret ? (
             <div className="flex items-center gap-2">
               <code className="bg-muted rounded px-2 py-1 text-xs">{secret}</code>
               <CopyButton variant="outline" content={secret} />
@@ -396,10 +342,8 @@ const token = await new SignJWT({
           ) : (
             <Button
               type="button"
-              onClick={() => generateSecret()}
-              disabled={isGenerating}
+              onClick={() => generateSecret({ organizationId: organization?._id })}
             >
-              {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate secret
             </Button>
           )}
@@ -485,7 +429,7 @@ function CustomizeBrandingStep({ organizationId }: { organizationId?: string }) 
 function ShareBoardStep({ orgSlug }: { orgSlug: string }) {
   const location = useLocation();
   const url = new URL(location.url);
-  const boardUrl = `${url.protocol}//${orgSlug}.thoughtbase.app`;
+  const boardUrl = `${url.protocol}//${orgSlug}.${url.host}`;
 
   return (
     <div className="space-y-6">
@@ -514,22 +458,10 @@ function ShareBoardStep({ orgSlug }: { orgSlug: string }) {
   );
 }
 
-function SetupCustomDomainStep({
-  organizationId,
-  orgSlug,
-  onUpgrade,
-}: {
-  organizationId?: string;
-  orgSlug: string;
-  onUpgrade: () => void;
-}) {
-  if (!organizationId) {
-    return <div className="text-muted-foreground text-sm">No organization selected.</div>;
-  }
-
+function SetupCustomDomainStep() {
   return (
     <div className="space-y-6">
-      <CustomDomainSettings organizationId={organizationId} onUpgrade={onUpgrade} />
+      <CustomDomainSettings />
     </div>
   );
 }

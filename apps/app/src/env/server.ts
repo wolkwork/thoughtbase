@@ -3,27 +3,13 @@ import * as z from "zod";
 
 export const env = createEnv({
   server: {
-    DATABASE_URL: z.url(),
+    CONVEX_URL: z.string(),
+
     VERCEL_BRANCH_URL: z.string(),
     VERCEL_PROJECT_PRODUCTION_URL: z.string(),
     VERCEL: z.string().default("0"),
     VERCEL_ENV: z.string().default("development"),
     BETTER_AUTH_SECRET: z.string().min(1),
-
-    // OAuth2 providers, optional, update as needed
-    GITHUB_CLIENT_ID: z.string().optional(),
-    GITHUB_CLIENT_SECRET: z.string().optional(),
-    GOOGLE_CLIENT_ID: z.string().optional(),
-    GOOGLE_CLIENT_SECRET: z.string().optional(),
-
-    POLAR_ACCESS_TOKEN: z.string().min(1),
-    POLAR_WEBHOOK_SECRET: z.string().min(1),
-
-    POLAR_START_ID: z.string().min(1),
-    POLAR_PRO_ID: z.string().min(1),
-    POLAR_BUSINESS_ID: z.string().min(1),
-
-    BLOB_READ_WRITE_TOKEN: z.string().optional(),
 
     // Email (Resend)
     RESEND_API_KEY: z.string().min(1),
@@ -34,5 +20,8 @@ export const env = createEnv({
     VERCEL_TEAM_ID: z.string().optional(),
     VERCEL_TEAM_SLUG: z.string().optional(),
   },
-  runtimeEnv: process.env,
+  runtimeEnv: {
+    ...process.env,
+    CONVEX_URL: process.env.VITE_CONVEX_URL || process.env.CONVEX_URL,
+  },
 });

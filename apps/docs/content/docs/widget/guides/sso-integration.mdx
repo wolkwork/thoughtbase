@@ -1,11 +1,11 @@
 ---
 title: SSO Integration
-description: Set up Single Sign-On to identify users in the widget
+description: Set up Single Sign-On by passing ssoToken to the widget
 ---
 
 ## Overview
 
-Single Sign-On (SSO) allows you to identify users who are already logged into your application. This enables you to:
+Single Sign-On (SSO) lets the widget know who the current user is. **Pass `ssoToken` in the widget config** when you initialize it. This enables you to:
 - Track which users submitted feedback
 - Maintain user context across your app and the widget
 
@@ -39,43 +39,40 @@ const ssoToken = await new SignJWT({
   .sign(secret);
 ```
 
-### Step 3: Identify Users in the Widget
+### Step 3: Pass ssoToken to the Widget
 
-After initializing the widget and when a user logs in, call the identify function:
+When you initialize the widget, pass the SSO token as `ssoToken` in the config. Get the token from your backend (e.g. from your session or after the user logs in), then pass it when calling `initWidget`:
 
 ```html
 <script>
-  // Initialize widget
-  window.thoughtbase.initWidget({
-    organizationId: 'your-organization-id-here'
-  });
-  
-  // After user logs in on your site
-  function onUserLogin(user) {
-    // Get SSO token from your backend
-    fetch('/api/generate-sso-token', {
+  // When you have the token (e.g. from session or after login), pass it as ssoToken
+  async function initWidgetWithUser() {
+    const data = await fetch('/api/generate-sso-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Identify user in widget
-      window.thoughtbase.identify(data.token);
+      body: JSON.stringify({ userId: currentUser.id })
+    }).then(r => r.json());
+
+    window.thoughtbase.initWidget({
+      organizationSlug: 'your-organization-slug',
+      convexUrl: 'https://your-project.convex.cloud',
+      ssoToken: data.token
     });
   }
+  initWidgetWithUser();
 </script>
 ```
 
 ## SSO Token Format
 
-Your SSO token should be a JWT with the following payload:
+Your SSO token should be a JWT with the following payload (use `sub` for user id with jose):
 
 ```json
 {
-  "userId": "user-id-from-your-system",
+  "sub": "user-id-from-your-system",
   "email": "user@example.com",
-  "organizationId": "your-thoughtbase-org-id"
+  "name": "User Name",
+  "image": "https://..."
 }
 ```
 
@@ -99,9 +96,10 @@ app.post("/api/generate-sso-token", authenticateUser, async (req, res) => {
   );
 
   const token = await new SignJWT({
-    userId: user.id,
+    sub: user.id,
     email: user.email,
-    organizationId: process.env.THOUGHTBASE_ORG_ID,
+    name: user.name,
+    image: user.avatarUrl,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -114,7 +112,7 @@ app.post("/api/generate-sso-token", authenticateUser, async (req, res) => {
 
 ## Complete Integration Example
 
-Here's a complete example of integrating the widget with SSO:
+Here's a complete example of integrating the widget with SSO by passing `ssoToken` when initializing:
 
 ```html
 <!DOCTYPE html>
@@ -131,37 +129,29 @@ Here's a complete example of integrating the widget with SSO:
   <!-- Load widget script -->
   <script src="https://app.thoughtbase.app/widget.js"></script>
   
-  <!-- Initialize widget -->
+  <!-- Initialize widget with ssoToken -->
   <script>
-    // Initialize widget with custom button
-    window.thoughtbase.initWidget({
-      organizationId: 'your-organization-id-here',
-      selector: '#feedback-btn'
-    });
-    
-    // Example: Identify user after login
-    async function handleUserLogin(userId) {
+    async function initWidget() {
       try {
-        // Get SSO token from your backend
+        // Get SSO token from your backend (e.g. from session or after login)
         const response = await fetch('/api/generate-sso-token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId })
+          body: JSON.stringify({ userId: currentUserId })
         });
-        
         const { token } = await response.json();
-        
-        // Identify user in widget
-        if (window.thoughtbase) {
-          window.thoughtbase.identify(token);
-        }
+
+        window.thoughtbase.initWidget({
+          organizationSlug: 'your-organization-slug',
+          convexUrl: 'https://your-project.convex.cloud',
+          selector: '#feedback-btn',
+          ssoToken: token
+        });
       } catch (error) {
-        console.error('Failed to identify user:', error);
+        console.error('Failed to init widget with SSO:', error);
       }
     }
-    
-    // Call this when user logs in
-    // handleUserLogin(currentUserId);
+    initWidget();
   </script>
 </body>
 </html>

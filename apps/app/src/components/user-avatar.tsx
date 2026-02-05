@@ -8,13 +8,13 @@ export function UserAvatar({
   user,
   className,
 }: {
-  user: {
+  user?: {
     name?: string;
-    image?: string | null | undefined | undefined;
+    image?: string | null | undefined;
   };
   className?: string;
 }) {
-  if (!user.name) {
+  if (!user?.name) {
     return (
       <Avatar className={cn("bg-muted flex items-center justify-center", className)}>
         <HatGlasses className="size-4" />
@@ -26,7 +26,7 @@ export function UserAvatar({
     return (
       <div
         className={cn(
-          "size-8 [&>div]:size-full! [&>div>span]:size-[50%]! [&>div>span>svg]:size-full!",
+          "size-8 rounded-full [&>div]:size-full! [&>div>span]:size-[50%]! [&>div>span>svg]:size-full!",
           className,
         )}
       >
@@ -42,7 +42,7 @@ export function UserAvatar({
       fallback="wsrv"
       width={32}
       height={32}
-      className={className}
+      className={cn("rounded-full", className)}
     />
   );
 }

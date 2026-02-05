@@ -1,12 +1,26 @@
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Image } from "@unpic/react";
-import { useEffect, useState } from "react";
-import {
-  getWidgetChangelogs,
-  type Changelog,
-} from "../../lib/api/widget-client";
+import { useQuery } from "convex/react";
 
 interface ChangelogViewProps {
   organizationSlug: string;
+}
+
+interface Changelog {
+  id: string;
+  title: string;
+  content: string | null;
+  featuredImage: string | null;
+  publishedAt: number | null;
+  status: string;
+  organizationId: string;
+  createdAt: number;
+  ideas: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    reactionCount: number;
+  }>;
 }
 
 // Helper to render Tiptap JSON content as plain text for the widget
@@ -40,10 +54,10 @@ function extractText(node: any): string {
 }
 
 // Format date in a relative way
-function formatDate(dateString: string | null): string {
+function formatDate(dateString: string | number | null): string {
   if (!dateString) return "";
 
-  const date = new Date(dateString);
+  const date = typeof dateString === "number" ? new Date(dateString) : new Date(dateString);
   const now = new Date();
   const diffInDays = Math.floor(
     (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
@@ -62,27 +76,12 @@ function formatDate(dateString: string | null): string {
 }
 
 export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
-  const [changelogs, setChangelogs] = useState<Changelog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const changelogs = useQuery(api.widget.getWidgetChangelogs, {
+    organizationSlug,
+  }) as Changelog[] | undefined;
 
-  useEffect(() => {
-    if (!organizationSlug) return;
-
-    setLoading(true);
-    getWidgetChangelogs(organizationSlug)
-      .then((data) => {
-        setChangelogs(data);
-        setError(null);
-      })
-      .catch((err) => {
-        console.error("Failed to load changelogs", err);
-        setError("Failed to load updates");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [organizationSlug]);
+  const loading = changelogs === undefined;
+  const error = changelogs === null ? "Failed to load updates" : null;
 
   if (loading) {
     return (
@@ -112,7 +111,7 @@ export function ChangelogView({ organizationSlug }: ChangelogViewProps) {
     );
   }
 
-  if (changelogs.length === 0) {
+  if (!changelogs || changelogs.length === 0) {
     return (
       <div className="flex flex-col">
         <div className="border-b px-6 pb-6">

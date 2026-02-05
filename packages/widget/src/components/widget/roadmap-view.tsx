@@ -1,6 +1,6 @@
+import { api } from "@thoughtbase/backend/convex/_generated/api";
+import { useQuery } from "convex/react";
 import { Clock8, Heart } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getWidgetIdeas, type Idea } from "../../lib/api/widget-client";
 
 interface RoadmapViewProps {
   ssoToken?: string;
@@ -8,27 +8,32 @@ interface RoadmapViewProps {
   organizationSlug: string;
 }
 
+interface Idea {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  reactionCount: number;
+}
+
 export function RoadmapView({
   organizationSlug,
   ssoToken,
   host = process.env.NODE_ENV === "development"
-    ? "http://thoughtbase.localhost:3000"
-    : "https://app.thoughtbase.app",
+    ? "thoughtbase.localhost:3000"
+    : "thoughtbase.app",
 }: RoadmapViewProps) {
-  const [ideas, setIdeas] = useState<Idea[]>([]);
-
-  useEffect(() => {
-    getWidgetIdeas(organizationSlug)
-      .then(setIdeas)
-      .catch((err) => console.error("Failed to load ideas", err));
-  }, [organizationSlug]);
+  const ideas = useQuery(api.widget.getWidgetIdeas, {
+    organizationSlug,
+  }) as Idea[] | undefined;
 
   const inProgressIdeas =
-    ideas?.filter((i) => i.status === "in_progress") || [];
-  const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
+    (ideas?.filter((i) => i.status === "in_progress") as Idea[]) || [];
+  const plannedIdeas =
+    (ideas?.filter((i) => i.status === "planned") as Idea[]) || [];
 
   const getIdeaUrl = (idea: any) => {
-    const baseUrl = `${host}/org/${organizationSlug}/${idea.id}`;
+    const baseUrl = `//${organizationSlug}.${host}/${idea.id}`;
     if (ssoToken) {
       return `${baseUrl}?sso_token=${encodeURIComponent(ssoToken)}`;
     }

@@ -1,6 +1,7 @@
+import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { z } from "zod";
-import { $getSession } from "~/lib/auth/functions";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -9,12 +10,14 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/(auth-pages)")({
   component: RouteComponent,
   validateSearch: searchSchema,
-  beforeLoad: async ({ search }) => {
+  beforeLoad: async ({ context, search }) => {
     const redirectUrl = search.redirect || "/dashboard";
 
-    const session = await $getSession();
+    const user = await context.queryClient.ensureQueryData(
+      convexQuery(api.auth.getSafeCurrentUser, {}),
+    );
 
-    if (session?.user) {
+    if (user) {
       throw redirect({
         to: redirectUrl,
       });

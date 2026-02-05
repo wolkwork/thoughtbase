@@ -1,11 +1,11 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Image } from "@unpic/react";
+import { usePaginatedQuery } from "convex/react";
 import { format } from "date-fns";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { LikeBadge } from "~/components/engagement-badges";
-import { $getPublishedChangelogs } from "~/lib/api/changelogs";
 
 export const Route = createFileRoute("/subdomain/$slug/changelog")({
   component: ChangelogPage,
@@ -162,34 +162,22 @@ function ChangelogPage() {
   const { org } = useLoaderData({ from: "/subdomain/$slug" });
 
   const {
-    data: changelogsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    results: changelogs,
     status,
-  } = useInfiniteQuery({
-    queryKey: ["public-changelogs", org.id],
-    queryFn: ({ pageParam }) =>
-      $getPublishedChangelogs({
-        data: {
-          organizationSlug: org.slug,
-          page: pageParam,
-          limit: 10,
-        },
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  });
-
-  const changelogs = changelogsData?.pages.flatMap((page) => page.items) || [];
+    loadMore,
+  } = usePaginatedQuery(
+    api.changelogs.getPublishedChangelogs,
+    { organizationSlug: org.slug },
+    { initialNumItems: 10 },
+  );
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
+          loadMore(10);
         }
       },
       { threshold: 0.1, rootMargin: "100px" },
@@ -200,7 +188,7 @@ function ChangelogPage() {
     }
 
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [status, loadMore]);
 
   return (
     <div className="bg-background text-foreground relative min-h-screen">
@@ -212,13 +200,13 @@ function ChangelogPage() {
           </p>
         </div>
 
-        {status === "pending" && (
+        {status === "LoadingFirstPage" && (
           <div className="text-muted-foreground py-12 text-center">
             Loading updates...
           </div>
         )}
 
-        {status === "success" && changelogs.length === 0 && (
+        {status !== "LoadingFirstPage" && changelogs.length === 0 && (
           <div className="text-muted-foreground py-12 text-center">
             No updates yet. Check back soon!
           </div>
@@ -267,24 +255,31 @@ function ChangelogPage() {
                     Related Ideas
                   </h3>
                   <div className="">
-                    {changelog.ideas.map((idea) => (
-                      <Link
-                        key={idea.id}
-                        to="/subdomain/$slug/$ideaId"
-                        params={{ slug: org.slug, ideaId: idea.id }}
-                        className="hover:bg-muted/50 flex items-center justify-between gap-3 border-t px-3 py-3"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <h4 className="text-sm font-medium">{idea.title}</h4>
-                          {idea.description && (
-                            <p className="text-muted-foreground mt-1 line-clamp-1 text-xs">
-                              {idea.description}
-                            </p>
-                          )}
-                        </div>
-                        <LikeBadge count={idea.reactionCount} />
-                      </Link>
-                    ))}
+                    {changelog.ideas.map(
+                      (idea: {
+                        id: string;
+                        title: string;
+                        description: string | null;
+                        reactionCount: number;
+                      }) => (
+                        <Link
+                          key={idea.id}
+                          to="/subdomain/$slug/$ideaId"
+                          params={{ slug: org.slug, ideaId: idea.id }}
+                          className="hover:bg-muted/50 flex items-center justify-between gap-3 border-t px-3 py-3"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-medium">{idea.title}</h4>
+                            {idea.description && (
+                              <p className="text-muted-foreground mt-1 line-clamp-1 text-xs">
+                                {idea.description}
+                              </p>
+                            )}
+                          </div>
+                          <LikeBadge count={idea.reactionCount} />
+                        </Link>
+                      ),
+                    )}
                   </div>
                 </div>
               )}
@@ -294,11 +289,11 @@ function ChangelogPage() {
 
         {/* Infinite Scroll Sentinel */}
         <div ref={loadMoreRef} className="text-muted-foreground py-4 text-center text-sm">
-          {isFetchingNextPage ? (
+          {status === "LoadingMore" ? (
             <span>Loading more...</span>
-          ) : hasNextPage ? (
+          ) : status === "CanLoadMore" ? (
             <span>Load more</span>
-          ) : changelogs.length > 0 ? (
+          ) : status === "Exhausted" && changelogs.length > 0 ? (
             <span>You've reached the beginning</span>
           ) : null}
         </div>

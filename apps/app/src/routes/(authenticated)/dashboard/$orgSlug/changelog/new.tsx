@@ -1,16 +1,17 @@
-import { useMutation } from "@tanstack/react-query";
+import { useConvexMutation } from "@convex-dev/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
+import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { ArrowLeft } from "lucide-react";
 import { ChangelogEditor } from "~/components/changelog-editor";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { $createChangelog } from "~/lib/api/changelogs";
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/changelog/new")(
   {
     loader: async ({ context }) => {
       // Use organization from parent route context
-      return { organizationId: context.organization.id };
+      return { organizationId: context.organization._id };
     },
     component: NewChangelogPage,
   },
@@ -21,32 +22,26 @@ function NewChangelogPage() {
   const { orgSlug } = Route.useParams();
   const navigate = useNavigate();
 
-  const { mutate: createChangelog, isPending } = useMutation({
-    mutationFn: $createChangelog,
-    onSuccess: () => {
-      navigate({ to: "/dashboard/$orgSlug/changelog", params: { orgSlug } });
-    },
-  });
+  const createChangelog = useConvexMutation(api.changelogs.createChangelog);
 
   const handleSubmit = (data: {
     title: string;
     content: string;
-    featuredImage: string | null;
-    publishedAt: string | null;
+    featuredImage?: string;
+    publishedAt?: string;
     status: "draft" | "published";
-    ideaIds: string[];
+    ideaIds: Id<"idea">[];
   }) => {
     createChangelog({
-      data: {
-        organizationId,
-        title: data.title,
-        content: data.content,
-        featuredImage: data.featuredImage,
-        publishedAt: data.publishedAt ?? undefined,
-        status: data.status,
-        ideaIds: data.ideaIds,
-      },
+      organizationId,
+      title: data.title,
+      content: data.content,
+      featuredImage: data.featuredImage,
+      publishedAt: data.publishedAt,
+      status: data.status,
+      ideaIds: data.ideaIds.map((id) => id as any), // Convert strings to Id<"idea">
     });
+    navigate({ to: "/dashboard/$orgSlug/changelog", params: { orgSlug } });
   };
 
   return (
@@ -74,11 +69,7 @@ function NewChangelogPage() {
           <CardTitle>Changelog Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <ChangelogEditor
-            organizationId={organizationId}
-            onSubmit={handleSubmit}
-            isSubmitting={isPending}
-          />
+          <ChangelogEditor organizationId={organizationId} onSubmit={handleSubmit} />
         </CardContent>
       </Card>
     </div>
