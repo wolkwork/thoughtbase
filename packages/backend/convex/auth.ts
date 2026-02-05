@@ -25,7 +25,7 @@ const staticTrustedOrigins = [
   "http://thoughtbase.localhost:3000",
   "http://*.thoughtbase.localhost:3000",
   "https://*-wolkwork.vercel.app",
-  "https://*-thoughtbase.app",
+  "https://*.thoughtbase.app",
   "https://thoughtbase.app",
 ];
 

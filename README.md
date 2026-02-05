@@ -71,9 +71,6 @@ VITE_CONVEX_URL=https://your-project.convex.cloud
 # Authentication (Better Auth)
 BETTER_AUTH_SECRET=<generate-a-secret>
 BETTER_AUTH_URL=https://your-app-domain.com
-
-# Optional: Vercel Blob for image uploads
-BLOB_READ_WRITE_TOKEN=...
 ```
 
 ### Step 4: Deploy the Web App
@@ -99,16 +96,14 @@ https://your-app-domain.com/widget.js
 ## Development
 
 ```bash
+# cd into app directory
+cd apps/app
+
 # Install dependencies
 bun install
 
 # Start all apps in development mode
 bun run dev
-
-# Or start specific apps
-cd apps/app && bun run dev      # Main app on port 3000
-cd apps/docs && bun run dev     # Docs on port 4322
-cd apps/landing && bun run dev  # Landing page on port 4321
 ```
 
 ## Tech Stack
