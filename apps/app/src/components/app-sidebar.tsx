@@ -62,7 +62,7 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
   const canWrite = usePermissions().canWrite();
 
   const url = new URL(location.url);
-  const boardUrl = `${url.protocol}//${orgSlug}.${url.host}`;
+  const boardUrl = `${url.protocol}//${orgSlug}.${url.host.replace("app.", "")}`;
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
