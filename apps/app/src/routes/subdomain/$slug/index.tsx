@@ -3,7 +3,6 @@ import { HeartIcon } from "@phosphor-icons/react";
 import { createFileRoute, Link, useLoaderData, useRouter } from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
-import { useSessionId } from "convex-helpers/react/sessions";
 import { usePaginatedQuery } from "convex/react";
 import { format } from "date-fns";
 import { ArrowDown, ArrowUp, Flame } from "lucide-react";
@@ -27,7 +26,7 @@ export const Route = createFileRoute("/subdomain/$slug/")({
 });
 
 function OrganizationIndexPage() {
-  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
+  const { org, user, sessionId } = useLoaderData({ from: "/subdomain/$slug" });
   const router = useRouter();
 
   const [loginOpen, setLoginOpen] = useState(false);
@@ -63,8 +62,6 @@ function OrganizationIndexPage() {
   }, [status, loadMore]);
 
   const toggleReactionMutation = useConvexMutation(api.ideas.toggleReaction);
-
-  const [sessionId] = useSessionId();
 
   const handleUpvote = async (e: React.MouseEvent, ideaId: Id<"idea">) => {
     e.preventDefault();

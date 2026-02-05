@@ -35,7 +35,7 @@ function PublicIdeaDetailPage() {
     }),
   );
 
-  const { org, user } = useLoaderData({ from: "/subdomain/$slug" });
+  const { org, user, sessionId } = useLoaderData({ from: "/subdomain/$slug" });
   const router = useRouter();
 
   const [loginOpen, setLoginOpen] = useState(false);
@@ -66,6 +66,7 @@ function PublicIdeaDetailPage() {
           currentUser={user}
           organizationId={org._id}
           onLoginRequired={handleLoginRequired}
+          sessionId={sessionId}
         />
       </div>
 
@@ -93,6 +94,7 @@ function PublicIdeaDetailPage() {
             orgId={org._id}
             initialName={user?.name || ""}
             onSuccess={handleProfileSuccess}
+            sessionId={sessionId}
           />
         </DialogContent>
       </Dialog>

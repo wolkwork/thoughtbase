@@ -2,8 +2,8 @@ import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute, notFound, Outlet, redirect } from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
-import { SessionProvider } from "convex-helpers/react/sessions";
 import { PublicHeader } from "~/components/public-header";
+import { $exchangeSsoToken, getExternalSessionIdFromCookie } from "~/lib/sso-server";
 
 export const Route = createFileRoute("/subdomain/$slug")({
   loaderDeps: ({ search: { sso_token } }: { search: { sso_token?: string } }) => ({
@@ -32,57 +32,49 @@ export const Route = createFileRoute("/subdomain/$slug")({
       throw notFound();
     }
 
-    let sessionId: Id<"externalSession"> | undefined = undefined;
-
-    console.log("sso_token", sso_token);
-    // Handle SSO token from query parameter
+    // Handle SSO token: exchange via server function, set cookie, redirect without sso_token
     if (sso_token && typeof sso_token === "string") {
       try {
-        const session = await convexClient.mutation(api.externalSessions.signInWithSSO, {
-          ssoToken: sso_token,
-          organizationId: org._id,
-        });
+        const redirectUrl = new URL(location.url);
+        redirectUrl.searchParams.delete("sso_token");
+        const redirectPath = redirectUrl.pathname + (redirectUrl.search || "");
 
-        sessionId = session?._id;
-
-        const url = new URL(location.url);
-        // Remove the sso_token query parameter
-        url.searchParams.delete("sso_token");
-        // Redirect to the same URL without the sso_token parameter
-        throw redirect({
-          to: url.pathname + (url.search ? url.search : ""),
-          replace: true,
+        const { redirectTo } = await $exchangeSsoToken({
+          data: {
+            ssoToken: sso_token,
+            organizationId: org._id,
+            redirectPath,
+          },
         });
+        throw redirect({ to: redirectTo, replace: true });
       } catch (error) {
-        // If it's a redirect, re-throw it
         if (error instanceof Response && error.status === 307) {
           throw error;
         }
-        // Otherwise, log the error but continue (user will be unauthenticated)
         console.error("SSO authentication failed:", error);
       }
     }
 
-    // Fetch unified user using convexQuery (goes through authenticated serverHttpClient)
+    // Read session from cookie via server function (avoids importing server-only getCookie in this file)
+    const sessionIdRaw = await getExternalSessionIdFromCookie();
+    const sessionId = sessionIdRaw ? (sessionIdRaw as Id<"externalSession">) : undefined;
+    const sessionIdForQuery = (sessionId ?? "no-external-session") as
+      | Id<"externalSession">
+      | "no-external-session";
+
+    // Fetch unified user using convexQuery
     const user = await context.queryClient.ensureQueryData(
-      convexQuery(api.auth.getUnifiedUser, {
-        sessionId: (sessionId ?? "no-external-session") as
-          | Id<"externalSession">
-          | "no-external-session",
-      }),
+      convexQuery(api.auth.getUnifiedUser, { sessionId: sessionIdForQuery }),
     );
 
     let profile = null;
-
     if (user) {
       profile = await context.queryClient.ensureQueryData(
-        convexQuery(api.auth.getUnifiedProfile, {
-          userId: user._id,
-        }),
+        convexQuery(api.auth.getUnifiedProfile, { userId: user._id }),
       );
     }
 
-    return { org, user, profile, sessionId };
+    return { org, user, profile, sessionId: sessionIdForQuery };
   },
   component: PublicLayout,
 });
@@ -91,15 +83,9 @@ function PublicLayout() {
   const { org, user, profile, sessionId } = Route.useLoaderData();
 
   return (
-    <SessionProvider
-      storageKey="thoughtbase-sso-token"
-      ssrFriendly
-      idGenerator={() => sessionId ?? "no-external-session"}
-    >
-      <div className="bg-background text-foreground relative flex min-h-screen flex-col">
-        <PublicHeader org={org} user={user} profile={profile} />
-        <Outlet />
-      </div>
-    </SessionProvider>
+    <div className="bg-background text-foreground relative flex min-h-screen flex-col">
+      <PublicHeader org={org} user={user} profile={profile} sessionId={sessionId} />
+      <Outlet />
+    </div>
   );
 }

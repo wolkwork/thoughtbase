@@ -1,7 +1,6 @@
 import { useConvexMutation } from "@convex-dev/react-query";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
-import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
-import { useSessionId } from "convex-helpers/react/sessions";
+import type { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -9,13 +8,15 @@ import { Label } from "~/components/ui/label";
 interface ProfileFormProps {
   orgId: string;
   initialName?: string;
-  onSuccess: () => void;
+  sessionId?: Id<"externalSession"> | "no-external-session";
 }
 
-export function ProfileForm({ orgId, initialName = "", onSuccess }: ProfileFormProps) {
+export function ProfileForm({
+  orgId,
+  initialName = "",
+  sessionId = "no-external-session",
+}: ProfileFormProps) {
   const upsertProfile = useConvexMutation(api.profiles.upsertProfile);
-
-  const [sessionId] = useSessionId();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export function ProfileForm({ orgId, initialName = "", onSuccess }: ProfileFormP
     upsertProfile({
       organizationId: orgId,
       name,
-      sessionId: sessionId as Id<"externalSession"> | "no-external-session",
+      sessionId,
     });
   };
 

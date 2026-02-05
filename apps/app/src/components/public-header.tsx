@@ -1,5 +1,6 @@
 import { SparkleIcon } from "@phosphor-icons/react";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import type { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { Doc } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { UnifiedUser } from "@thoughtbase/backend/convex/auth";
 import { Doc as AuthDoc } from "@thoughtbase/backend/convex/betterAuth/_generated/dataModel";
@@ -24,9 +25,10 @@ interface PublicHeaderProps {
   org: Omit<AuthDoc<"organization">, "_id"> & { _id: string };
   user: UnifiedUser | null;
   profile: Doc<"profile"> | null;
+  sessionId?: Id<"externalSession"> | "no-external-session";
 }
 
-export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
+export function PublicHeader({ org, user, profile, sessionId }: PublicHeaderProps) {
   const router = useRouter();
   const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -48,12 +50,6 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
     } else {
       setCreateOpen(true);
     }
-  };
-
-  const handleProfileSuccess = () => {
-    setProfileOpen(false);
-    router.invalidate();
-    setCreateOpen(true); // Auto open create after profile setup
   };
 
   const canWrite = usePermissionsPublic().canWrite();
@@ -158,7 +154,7 @@ export function PublicHeader({ org, user, profile }: PublicHeaderProps) {
           <ProfileForm
             orgId={org._id}
             initialName={user?.name || ""}
-            onSuccess={handleProfileSuccess}
+            sessionId={sessionId}
           />
         </DialogContent>
       </Dialog>

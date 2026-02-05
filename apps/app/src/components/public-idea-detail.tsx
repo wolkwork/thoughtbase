@@ -1,7 +1,7 @@
 import { useConvexMutation } from "@convex-dev/react-query";
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
-import { useSessionMutation } from "convex-helpers/react/sessions";
+import type { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { format, formatDistanceToNow } from "date-fns";
 import { PencilIcon } from "lucide-react";
@@ -21,12 +21,14 @@ interface PublicIdeaDetailProps {
   currentUser: FunctionReturnType<typeof api.auth.getUnifiedUser>;
   organizationId?: string;
   onLoginRequired?: () => void;
+  sessionId?: Id<"externalSession"> | "no-external-session";
 }
 
 export function PublicIdeaDetail({
   idea,
   currentUser,
   onLoginRequired,
+  sessionId = "no-external-session",
 }: PublicIdeaDetailProps) {
   const [comment, setComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -34,60 +36,12 @@ export function PublicIdeaDetail({
   const [editDescription, setEditDescription] = useState(idea.description || "");
   const canWrite = usePermissionsPublic().canWrite();
 
-  // Check if current user is the author
-  const isAuthor =
-    currentUser && currentUser.type === "external" && idea.authorId === currentUser._id;
+  // Check if current user is the author (internal or external)
+  const isAuthor = currentUser && idea.authorId === currentUser._id;
 
   const addComment = useConvexMutation(api.ideas.createComment);
 
-  // const { mutate: toggleReaction } = useMutation({
-  //   mutationFn: $toggleReaction,
-  //   onMutate: async (newReaction) => {
-  //     // Optimistically update reaction count/state
-  //     queryClient.setQueryData(["idea", idea.id], (old: any) => {
-  //       const isExternal = currentUser?.type === "external";
-  //       const hasReacted = old.reactions.some((r: any) => {
-  //         if (isExternal)
-  //           return (
-  //             r.externalUserId === currentUser.id && r.type === newReaction.data.type
-  //           );
-  //         return r.userId === currentUser.id && r.type === newReaction.data.type;
-  //       });
-
-  //       let newReactions = [...old.reactions];
-
-  //       if (hasReacted) {
-  //         newReactions = newReactions.filter((r: any) => {
-  //           if (isExternal)
-  //             return !(
-  //               r.externalUserId === currentUser.id && r.type === newReaction.data.type
-  //             );
-  //           return !(r.userId === currentUser.id && r.type === newReaction.data.type);
-  //         });
-  //       } else {
-  //         newReactions.push({
-  //           id: "optimistic-" + Math.random(),
-  //           userId: isExternal ? null : currentUser.id,
-  //           externalUserId: isExternal ? currentUser.id : null,
-  //           type: newReaction.data.type,
-  //         });
-  //       }
-
-  //       return {
-  //         ...old,
-  //         reactions: newReactions,
-  //       };
-  //     });
-  //   },
-  //   onSuccess: () => {
-  //     router.invalidate();
-  //   },
-  //   onError: () => {
-  //     router.invalidate();
-  //   },
-  // });
-
-  const toggleReaction = useSessionMutation(api.ideas.toggleReaction);
+  const toggleReactionMutation = useConvexMutation(api.ideas.toggleReaction);
 
   const updateIdea = useConvexMutation(api.ideas.updateIdea);
 
@@ -101,6 +55,7 @@ export function PublicIdeaDetail({
       ideaId: idea.id,
       title: editTitle,
       description: editDescription,
+      sessionId,
     });
 
     setIsEditing(false);
@@ -122,7 +77,7 @@ export function PublicIdeaDetail({
       toast.error("Your trial has ended. Upgrade to interact with ideas.");
       return;
     }
-    toggleReaction({ ideaId: idea.id, type: "upvote" });
+    toggleReactionMutation({ ideaId: idea.id, type: "upvote", sessionId });
   };
 
   const handleSubmitComment = async () => {
@@ -132,7 +87,11 @@ export function PublicIdeaDetail({
     }
 
     try {
-      await addComment({ ideaId: idea.id, content: comment });
+      await addComment({
+        ideaId: idea.id,
+        content: comment,
+        sessionId,
+      });
       setComment("");
     } catch (error) {
       toast.error("Failed to add comment");
@@ -141,7 +100,7 @@ export function PublicIdeaDetail({
 
   const hasUpvoted =
     currentUser &&
-    idea.reactions.some((r) => {
+    idea.reactions.some((r: { userId: string; type: string }) => {
       return r.userId === currentUser._id && r.type === "upvote";
     });
 

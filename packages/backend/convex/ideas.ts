@@ -735,15 +735,20 @@ export const updateIdeaStatus = mutation({
 
 /**
  * Create a comment on an idea
+ * Supports both internal (betterAuth) and external users via unified user
  */
 export const createComment = mutation({
   args: {
     ideaId: v.id("idea"),
     content: v.string(),
+    sessionId: v.optional(
+      v.union(v.literal("no-external-session"), v.id("externalSession"))
+    ),
   },
   handler: async (ctx, args) => {
-    // Get current authenticated user
-    const user = await authComponent.getAuthUser(ctx);
+    const user = await ctx.runQuery(api.auth.getUnifiedUser, {
+      sessionId: args.sessionId ?? "no-external-session",
+    });
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -754,42 +759,13 @@ export const createComment = mutation({
       throw new Error("Idea not found");
     }
 
-    // Verify user is a member of the organization
-    const isMember = await ctx.runQuery(
-      components.betterAuth.functions.checkMembership,
-      {
-        organizationId: idea.organizationId,
-        userId: user._id,
-      }
-    );
-
-    if (!isMember) {
-      throw new Error("You are not a member of this organization");
-    }
-
-    // Create the comment
-    const commentId = await ctx.db.insert("comment", {
+    // Create the comment (unified user covers both internal and external)
+    await ctx.db.insert("comment", {
       ideaId: args.ideaId,
       authorId: user._id,
-      authorType: "internal",
+      authorType: user.type,
       content: args.content,
     });
-
-    // Return the created comment
-    const comment = await ctx.db.get(commentId);
-    if (!comment) {
-      throw new Error("Failed to create comment");
-    }
-
-    return {
-      id: comment._id,
-      ideaId: comment.ideaId,
-      authorId: comment.authorId,
-      authorType: comment.authorType,
-      content: comment.content,
-      createdAt: comment._creationTime,
-      updatedAt: comment._creationTime,
-    };
   },
 });
 
@@ -935,16 +911,21 @@ export const updateIdeaEta = mutation({
 
 /**
  * Update an idea's title and description
+ * Supports both internal (betterAuth) and external users via unified user
  */
 export const updateIdea = mutation({
   args: {
     ideaId: v.id("idea"),
     title: v.string(),
     description: v.optional(v.string()),
+    sessionId: v.optional(
+      v.union(v.literal("no-external-session"), v.id("externalSession"))
+    ),
   },
   handler: async (ctx, args) => {
-    // Get current authenticated user
-    const user = await authComponent.getAuthUser(ctx);
+    const user = await ctx.runQuery(api.auth.getUnifiedUser, {
+      sessionId: args.sessionId ?? "no-external-session",
+    });
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -955,20 +936,7 @@ export const updateIdea = mutation({
       throw new Error("Idea not found");
     }
 
-    // Verify user is a member of the organization
-    const isMember = await ctx.runQuery(
-      components.betterAuth.functions.checkMembership,
-      {
-        organizationId: idea.organizationId,
-        userId: user._id,
-      }
-    );
-
-    if (!isMember) {
-      throw new Error("You are not a member of this organization");
-    }
-
-    // Check if user is the author (internal users only for now)
+    // Check if user is the author (works for both internal and external)
     if (idea.authorId !== user._id) {
       throw new Error("Only the author can edit this idea");
     }
@@ -978,26 +946,6 @@ export const updateIdea = mutation({
       title: args.title,
       description: args.description,
     });
-
-    // Return the updated idea
-    const updated = await ctx.db.get(args.ideaId);
-    if (!updated) {
-      throw new Error("Failed to update idea");
-    }
-
-    return {
-      id: updated._id,
-      organizationId: updated.organizationId,
-      boardId: updated.boardId,
-      authorId: updated.authorId,
-      authorType: updated.authorType,
-      title: updated.title,
-      description: updated.description || null,
-      status: updated.status,
-      createdAt: updated._creationTime,
-      updatedAt: updated._creationTime,
-      eta: updated.eta || null,
-    };
   },
 });
 
