@@ -13,7 +13,7 @@ Instead of the default floating button, you can use your own button to open the 
 
 <script>
   window.thoughtbase.initWidget({
-    organizationId: 'your-organization-id-here',
+    organizationSlug: 'your-organization-slug',
     selector: '#feedback-button'  // CSS selector for your button
   });
 </script>
@@ -28,7 +28,7 @@ To remove the "Powered by Thoughtbase" branding from the widget footer, set `tho
 ```html
 <script>
   window.thoughtbase.initWidget({
-    organizationId: 'your-organization-id-here',
+    organizationSlug: 'your-organization-slug',
     thoughtbaseBranding: false
   });
 </script>

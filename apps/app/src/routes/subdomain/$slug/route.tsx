@@ -34,6 +34,7 @@ export const Route = createFileRoute("/subdomain/$slug")({
 
     let sessionId: Id<"externalSession"> | undefined = undefined;
 
+    console.log("sso_token", sso_token);
     // Handle SSO token from query parameter
     if (sso_token && typeof sso_token === "string") {
       try {

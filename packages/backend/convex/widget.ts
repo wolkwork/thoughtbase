@@ -91,13 +91,11 @@ export const createWidgetIdea = mutation({
       }
     }
 
-    // Create the idea directly (bypassing membership check for widget submissions)
-    // For external users, we use the external user ID as a string in authorId
-    // Note: The schema allows authorId to reference externalUser._id
     const ideaId = await ctx.db.insert("idea", {
       organizationId: organization._id,
       title: args.title,
       authorId: user?._id,
+      authorType: user?.type ?? undefined,
       description: args.description,
       status: "pending",
     });

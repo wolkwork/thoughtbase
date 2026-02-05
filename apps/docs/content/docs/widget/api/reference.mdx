@@ -5,7 +5,7 @@ description: Complete API reference for the Thoughtbase widget
 
 ## Overview
 
-The Thoughtbase widget exposes a JavaScript API that you can use to initialize the widget and identify users. This reference documents all available functions and their parameters.
+The Thoughtbase widget exposes a JavaScript API that you can use to initialize the widget and pass SSO via the `ssoToken` config option. This reference documents all available functions and their parameters.
 
 ## Functions
 
@@ -16,7 +16,9 @@ Initializes the widget on your page. This function must be called before using a
 #### Parameters
 
 - `config` (object, required): Configuration object
-  - `organizationId` (string, required): Your Thoughtbase organization ID
+  - `organizationSlug` (string, required): Your Thoughtbase organization slug
+  - `convexUrl` (string, required): Your Convex deployment URL
+  - `ssoToken` (string, optional): JWT signed with your SSO secret to log the user into the widget.
   - `selector` (string, optional): CSS selector for a custom trigger button. If provided, the default floating button will be hidden.
   - `thoughtbaseBranding` (boolean, optional): Set to `false` to remove the "Powered by Thoughtbase" branding from the widget footer.
 
@@ -28,15 +30,26 @@ Initializes the widget on your page. This function must be called before using a
 
 ```javascript
 window.thoughtbase.initWidget({
-  organizationId: 'org-123',
+  organizationSlug: 'your-org-slug',
+  convexUrl: 'https://your-project.convex.cloud',
   selector: '#my-button'
+});
+```
+
+```javascript
+// With SSO: pass ssoToken so the widget knows who the user is
+window.thoughtbase.initWidget({
+  organizationSlug: 'your-org-slug',
+  convexUrl: 'https://your-project.convex.cloud',
+  ssoToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 });
 ```
 
 ```javascript
 // Remove Thoughtbase branding
 window.thoughtbase.initWidget({
-  organizationId: 'org-123',
+  organizationSlug: 'your-org-slug',
+  convexUrl: 'https://your-project.convex.cloud',
   thoughtbaseBranding: false
 });
 ```
@@ -50,9 +63,7 @@ window.thoughtbase.initWidget({
 
 ---
 
-### `thoughtbase.identify(token)`
 
-Identifies a user in the widget using an SSO token. This allows you to track which users submitted feedback and maintain user context.
 
 #### Parameters
 
@@ -61,43 +72,13 @@ Identifies a user in the widget using an SSO token. This allows you to track whi
   - `email`: User's email address
   - `organizationId`: Your Thoughtbase organization ID
 
-#### Returns
-
-`undefined`
-
-#### Example
-
-```javascript
-window.thoughtbase.identify('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
-```
-
-#### Notes
-
-- The widget must be initialized before calling this function
-- The token should be generated server-side using your SSO secret
-- Tokens expire after the time specified during generation
-- Call this function after a user logs into your application
-
-#### Error Handling
-
-If the widget is not initialized, this function will log an error to the console:
-
-```javascript
-console.error("Feedback Widget: Initialize widget before calling identify");
-```
-
 ---
 
 ## Global Objects
 
 ### `window.thoughtbase.initWidget`
 
-The initialization function is available on the `window` object after the widget script loads.
-
-### `window.thoughtbase.identify`
-
-An object containing widget functions, available after initialization:
-- `identify(token)`: Identify a user with an SSO token
+The initialization function is available on the `window` object after the widget script loads. Pass `ssoToken` in the config to identify the user.
 
 ## Widget Behavior
 
@@ -146,7 +127,8 @@ The widget requires:
 <script src="https://app.thoughtbase.app/widget.js"></script>
 <script>
   window.thoughtbase.initWidget({
-    organizationId: 'your-org-id'
+    organizationSlug: 'your-org-slug',
+    convexUrl: 'https://your-project.convex.cloud'
   });
 </script>
 ```
@@ -158,7 +140,8 @@ The widget requires:
 <script src="https://app.thoughtbase.app/widget.js"></script>
 <script>
   window.thoughtbase.initWidget({
-    organizationId: 'your-org-id',
+    organizationSlug: 'your-org-slug',
+    convexUrl: 'https://your-project.convex.cloud',
     selector: '#feedback-btn'
   });
 </script>
@@ -166,18 +149,16 @@ The widget requires:
 
 ### With SSO
 
+Pass `ssoToken` in the config when you have the token (e.g. from your session or after fetching it):
+
 ```html
 <script src="https://app.thoughtbase.app/widget.js"></script>
 <script>
   window.thoughtbase.initWidget({
-    organizationId: 'your-org-id'
+    organizationSlug: 'your-org-slug',
+    convexUrl: 'https://your-project.convex.cloud',
+    ssoToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'  // from your backend/session
   });
-  
-  // After user login
-  async function onLogin(userId) {
-    const token = await getSSOToken(userId);
-    window.thoughtbase.identify(token);
-  }
 </script>
 ```
 
@@ -190,10 +171,10 @@ The widget requires:
 - Ensure `organizationId` is correct
 - Check for JavaScript errors blocking execution
 
-### Identify Not Working
+### SSO / ssoToken Not Working
 
-- Verify widget is initialized first
-- Check token format and expiration
+- Pass `ssoToken` in the `initWidget` config when you have the token
+- Verify token format and expiration
 - Ensure SSO secret matches
 - Check browser console for errors
 

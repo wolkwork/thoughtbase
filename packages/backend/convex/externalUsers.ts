@@ -44,7 +44,7 @@ export const upsertExternalUser = mutation({
       .withIndex("by_organization_externalId", (q) =>
         q
           .eq("organizationId", args.organizationId)
-          .eq("externalId", args.externalId),
+          .eq("externalId", args.externalId)
       )
       .first();
 
@@ -75,7 +75,5 @@ export const upsertExternalUser = mutation({
       const user = await ctx.db.get(userId);
       return user;
     }
-
-    return null;
   },
 });

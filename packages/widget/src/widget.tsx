@@ -12,12 +12,7 @@ interface WidgetProps {
   thoughtbaseBranding?: boolean;
   convexUrl: string;
   ssoToken?: string;
-  // TODO: Maybe in the future
-  // radius?: RadiusKey;
 }
-
-// Global state to hold the SSO token for the widget instance
-let ssoToken: string | undefined = undefined;
 
 export function WidgetContainer({
   organizationSlug,
@@ -90,17 +85,10 @@ export function initFeedbackWidget(config: WidgetProps) {
     return;
   }
 
-  // Get Convex URL from config or try to infer from environment
-  const convexUrl =
-    config.convexUrl ||
-    (typeof window !== "undefined" &&
-      (window as any).__THOUGHTBASE_CONVEX_URL) ||
-    "";
+  const { convexUrl } = config;
 
   if (!convexUrl) {
-    console.error(
-      "Feedback Widget: convexUrl is required. Please provide it in the config or set window.__THOUGHTBASE_CONVEX_URL",
-    );
+    console.error("[Thoughtbase Widget] convexUrl is required.");
     return;
   }
 

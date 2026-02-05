@@ -10,7 +10,7 @@ import Cta1 from "@/components/ctas/Cta1.astro";
 import Cta2 from "@/components/ctas/Cta2.astro";
 import { SignJWT } from "jose";
 
-const secret = "edqSmAlewX_4ujVJskkqeCJ1tPbfu2-D";
+const secret = import.meta.env.THOUGHTBASE_SSO_SECRET;
 const secretKey = new TextEncoder().encode(secret);
 
 const token = await new SignJWT({
@@ -54,14 +54,14 @@ const token = await new SignJWT({
 <feedback-widget data-token={token}></feedback-widget>
 
 <script>
-  import { identify, initFeedbackWidget } from "@thoughtbase/widget";
+  import { initFeedbackWidget } from "@thoughtbase/widget";
   const ORGANIZATION_SLUG = import.meta.env.PUBLIC_ORGANIZATION_SLUG as string;
   const CONVEX_URL = import.meta.env.PUBLIC_CONVEX_URL as string;
 
-  console.log("ORGANIZATION_SLUG", ORGANIZATION_SLUG);
   class FeedbackWidget extends HTMLElement {
     constructor() {
       super();
+
       initFeedbackWidget({
         organizationSlug: ORGANIZATION_SLUG,
         convexUrl: CONVEX_URL,
