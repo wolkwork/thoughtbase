@@ -2,6 +2,8 @@
 
 Thoughtbase is an open-source feedback management platform that helps product teams collect user feedback, prioritize their roadmap, and share updates through changelogs.
 
+> **Note:** This is beta software. APIs and Features might change. Handle with care!
+
 ## Features
 
 - **Feedback Collection** - Embeddable widget to collect ideas and suggestions from users
