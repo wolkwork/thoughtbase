@@ -1,5 +1,5 @@
 ---
-export const description = "Pricing section with three tiers";
+export const description = "Pricing section: self-hosted free and Cloud";
 
 // Components
 import Text from "@/components/fundations/elements/Text.astro";
@@ -10,69 +10,51 @@ import Link from "@/components/fundations/elements/Link.astro";
 import Check from "@/components/fundations/icons/Check.astro";
 
 const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
+const DOCS_URL = import.meta.env.PUBLIC_DOCS_URL || "#";
 
 const pricingOptions = [
   {
-    id: "start",
-    cardClass: "bg-sand-50 ",
+    id: "self-hosted",
+    cardClass: "bg-sand-50",
     primaryTextColor: "text-base-900",
     secondaryTextColor: "text-base-500",
     featuresBorderColor: "border-base-200",
-    title: "Start",
-    monthly: "$25",
-    description: "Perfect for small teams.",
+    title: "Self-hosted",
+    priceLabel: "Free",
+    description: "Run Thoughtbase wherever you want.",
     button: {
-      text: "Get started!",
-      variant: "accent",
-      href: SIGNUP_URL,
+      text: "View docs",
+      variant: "default",
+      href: DOCS_URL,
     },
     features: [
       { text: "Unlimited tracked users" },
       { text: "Unlimited idea submissions" },
       { text: "Unlimited admins" },
-      { text: "Beautiful roadmap" },
-      { text: "Beautiful changelog" },
+      { text: "Roadmap & changelog" },
+      { text: "Full control of your data" },
     ],
   },
   {
-    id: "pro",
+    id: "cloud",
     cardClass: "bg-sand-100",
     primaryTextColor: "text-base-900",
     secondaryTextColor: "text-base-500",
     featuresBorderColor: "border-base-200",
-    title: "Pro",
-    monthly: "$49",
-    description: "Perfect for small teams.",
+    title: "Cloud",
+    priceLabel: "$99/month",
+    description: "Hosted by us. All features included.",
     button: {
-      text: "Get started!",
+      text: "Start 14-day trial",
       variant: "accent",
       href: SIGNUP_URL,
     },
     features: [
-      { text: "Everything in Free" },
+      { text: "Everything in self-hosted" },
+      { text: "No setup or maintenance" },
       { text: "Custom domain" },
       { text: "White label" },
-      { text: "Private boards", soon: true },
-    ],
-  },
-  {
-    id: "business",
-    cardClass: "bg-sand-50 ",
-    primaryTextColor: "text-base-900",
-    secondaryTextColor: "text-base-500",
-    featuresBorderColor: "border-base-200",
-    title: "Business",
-    monthly: "$99",
-    description: "Perfect for larger teams.",
-    button: {
-      text: "Get started!",
-      variant: "accent",
-      href: SIGNUP_URL,
-    },
-    features: [
-      { text: "Everything in Pro" },
-      { text: "Automatic login" },
-      { text: "Integrations", soon: true },
+      { text: "14-day trial, no credit card required" },
     ],
   },
 ];
@@ -96,12 +78,13 @@ const pricingOptions = [
         variant="textBase"
         class="max-w-xl mx-auto mt-4 text-base-500"
       >
-        14-day free trial. Cancel anytime.
+        Open-source and free to self-host. Don't want the hassle? Try Cloud with
+        a 14-day trial. No credit card required.
       </Text>
     </div>
 
     <!-- Pricing Cards -->
-    <div class="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div class="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 max-w-2xl mx-auto">
       {
         pricingOptions.map((tier) => (
           <div
@@ -119,12 +102,7 @@ const pricingOptions = [
                 variant="displaySM"
                 class={`font-medium flex items-baseline tracking-tighter mt-2 font-serif ${tier.primaryTextColor}`}
               >
-                {tier.monthly}
-                <span
-                  class={`text-sm font-normal tracking-normal ${tier.secondaryTextColor}`}
-                >
-                  / mo
-                </span>
+                {tier.priceLabel}
               </Text>
               <Text
                 tag="p"

@@ -22,20 +22,24 @@ const SIGNUP_URL = import.meta.env.PUBLIC_APP_URL + "/signup";
         variant="textBase"
         class="max-w-xl mx-auto mt-4 text-base-500"
       >
-        The all-in-one platform to collect ideas, prioritize your roadmap, and
-        publish changelogs.
+        Open-source feedback platform: collect ideas, prioritize your roadmap,
+        and publish changelogs. Self-host for free or use Cloud with a 14-day
+        trial—no credit card required.
       </Text>
     </div>
     <div
       class="flex flex-wrap items-center justify-center w-full mt-10 just gap-2 pb-16"
     >
+      <Link size="sm" variant="accent" href={SIGNUP_URL} class="relative group">
+        Start 14-day Cloud trial
+      </Link>
       <Link
         size="sm"
-        variant="accent"
-        href={SIGNUP_URL}
-        class="opacity-70 relative group"
+        variant="default"
+        href="#pricing-section"
+        class="relative group"
       >
-        Get started for free
+        Self-host for free
       </Link>
       <!-- <Image
       src={Dashboard}
