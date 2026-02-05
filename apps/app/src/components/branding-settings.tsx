@@ -126,6 +126,7 @@ export function BrandingSettings({ organizationId }: BrandingSettingsProps) {
               )}
             </div>
             <div className="grid w-full max-w-sm items-center gap-1.5">
+              {/* TODO: Implement convex files */}
               <Input
                 id="logo"
                 type="file"

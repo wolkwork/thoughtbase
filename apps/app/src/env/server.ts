@@ -11,8 +11,6 @@ export const env = createEnv({
     VERCEL_ENV: z.string().default("development"),
     BETTER_AUTH_SECRET: z.string().min(1),
 
-    BLOB_READ_WRITE_TOKEN: z.string().optional(),
-
     // Email (Resend)
     RESEND_API_KEY: z.string().min(1),
 

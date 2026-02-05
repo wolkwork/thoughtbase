@@ -10,35 +10,35 @@ import Cta1 from "@/components/ctas/Cta1.astro";
 import Cta2 from "@/components/ctas/Cta2.astro";
 import { SignJWT } from "jose";
 
-const secret = import.meta.env.THOUGHTBASE_SSO_SECRET;
-const secretKey = new TextEncoder().encode(secret);
+// const secret = import.meta.env.THOUGHTBASE_SSO_SECRET;
+// const secretKey = new TextEncoder().encode(secret);
 
-const token = await new SignJWT({
-  id: "demo-user-123",
-  email: "demo@example.com",
-  name: "Demo User",
-  avatarUrl: "https://ui-avatars.com/api/?name=Demo+User&background=random",
-  metadata: {
-    absolute: "legend",
-    pizzasEaten: 10,
-    nested: {
-      key: "value",
-    },
-    array: [1, 2, 3],
-    boolean: true,
-    number: 123,
-    string: "hello",
-    null: null,
-    undefined: undefined,
-    date: new Date(),
-    object: { key: "value" },
-  },
-  revenue: 29,
-})
-  .setProtectedHeader({ alg: "HS256" })
-  .setIssuedAt()
-  .setExpirationTime("2h")
-  .sign(secretKey);
+// const token = await new SignJWT({
+//   id: "demo-user-123",
+//   email: "demo@example.com",
+//   name: "Demo User",
+//   avatarUrl: "https://ui-avatars.com/api/?name=Demo+User&background=random",
+//   metadata: {
+//     absolute: "legend",
+//     pizzasEaten: 10,
+//     nested: {
+//       key: "value",
+//     },
+//     array: [1, 2, 3],
+//     boolean: true,
+//     number: 123,
+//     string: "hello",
+//     null: null,
+//     undefined: undefined,
+//     date: new Date(),
+//     object: { key: "value" },
+//   },
+//   revenue: 29,
+// })
+//   .setProtectedHeader({ alg: "HS256" })
+//   .setIssuedAt()
+//   .setExpirationTime("2h")
+//   .sign(secretKey);
 ---
 
 <BaseLayout>
@@ -51,7 +51,7 @@ const token = await new SignJWT({
   <Cta1 />
 </BaseLayout>
 
-<feedback-widget data-token={token}></feedback-widget>
+<feedback-widget></feedback-widget>
 
 <script>
   import { initFeedbackWidget } from "@thoughtbase/widget";
@@ -65,7 +65,7 @@ const token = await new SignJWT({
       initFeedbackWidget({
         organizationSlug: ORGANIZATION_SLUG,
         convexUrl: CONVEX_URL,
-        ssoToken: this.dataset.token,
+        // ssoToken: this.dataset.token,
       });
     }
   }
