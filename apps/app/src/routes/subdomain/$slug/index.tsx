@@ -191,7 +191,7 @@ function OrganizationIndexPage() {
                               <span>{idea.author?.name}</span>
                             </div>
                             <span className="text-xs">
-                              {format(new Date(idea.createdAt), "MMM d, yyyy")}
+                              {format(new Date(idea._creationTime), "MMM d, yyyy")}
                             </span>
                           </div>
                         </div>

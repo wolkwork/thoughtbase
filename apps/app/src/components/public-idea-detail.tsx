@@ -1,7 +1,8 @@
-import { useConvexMutation } from "@convex-dev/react-query";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useLoaderData } from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
-import type { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { format, formatDistanceToNow } from "date-fns";
 import { PencilIcon } from "lucide-react";
@@ -17,18 +18,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { UserAvatar } from "./user-avatar";
 
 interface PublicIdeaDetailProps {
-  idea: NonNullable<FunctionReturnType<typeof api.ideas.getPublicIdea>>;
+  idea: NonNullable<FunctionReturnType<typeof api.ideas.getIdeaPublic>>;
   currentUser: FunctionReturnType<typeof api.auth.getUnifiedUser>;
   organizationId?: string;
   onLoginRequired?: () => void;
-  sessionId?: Id<"externalSession"> | "no-external-session";
 }
 
 export function PublicIdeaDetail({
   idea,
   currentUser,
   onLoginRequired,
-  sessionId = "no-external-session",
 }: PublicIdeaDetailProps) {
   const [comment, setComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -45,6 +44,26 @@ export function PublicIdeaDetail({
 
   const updateIdea = useConvexMutation(api.ideas.updateIdea);
 
+  const { sessionId } = useLoaderData({ from: "/subdomain/$slug" });
+
+  const { data: comments } = useSuspenseQuery(
+    convexQuery(api.ideas.getCommentsByIdea, {
+      ideaId: idea._id,
+    }),
+  );
+
+  const { data: reactions } = useSuspenseQuery(
+    convexQuery(api.ideas.getReactionsByIdea, {
+      ideaId: idea._id,
+    }),
+  );
+
+  const { data: tags } = useSuspenseQuery(
+    convexQuery(api.ideas.getTagsByIdea, {
+      ideaId: idea._id,
+    }),
+  );
+
   const handleSaveEdit = async () => {
     if (!editTitle.trim()) {
       toast.error("Title is required");
@@ -52,7 +71,7 @@ export function PublicIdeaDetail({
     }
 
     await updateIdea({
-      ideaId: idea.id,
+      ideaId: idea._id,
       title: editTitle,
       description: editDescription,
       sessionId,
@@ -77,7 +96,7 @@ export function PublicIdeaDetail({
       toast.error("Your trial has ended. Upgrade to interact with ideas.");
       return;
     }
-    toggleReactionMutation({ ideaId: idea.id, type: "upvote", sessionId });
+    toggleReactionMutation({ ideaId: idea._id, type: "upvote", sessionId });
   };
 
   const handleSubmitComment = async () => {
@@ -88,7 +107,7 @@ export function PublicIdeaDetail({
 
     try {
       await addComment({
-        ideaId: idea.id,
+        ideaId: idea._id,
         content: comment,
         sessionId,
       });
@@ -98,11 +117,12 @@ export function PublicIdeaDetail({
     }
   };
 
-  const hasUpvoted =
-    currentUser &&
-    idea.reactions.some((r: { userId: string; type: string }) => {
-      return r.userId === currentUser._id && r.type === "upvote";
-    });
+  const { data: hasUpvoted } = useQuery(
+    convexQuery(api.ideas.hasUserUpvotedIdea, {
+      ideaId: idea._id,
+      sessionId,
+    }),
+  );
 
   return (
     <div className="flex flex-1 flex-col lg:flex-row">
@@ -168,7 +188,7 @@ export function PublicIdeaDetail({
             )}
           >
             <ChatsCircleIcon weight="bold" className="size-4" />
-            <span className="mt-px font-mono text-xs">{idea.comments.length}</span>
+            <span className="mt-px font-mono text-xs">{comments.length}</span>
           </div>
 
           <button
@@ -183,7 +203,7 @@ export function PublicIdeaDetail({
               weight={hasUpvoted ? "fill" : "bold"}
               className={cn("size-4", hasUpvoted && "fill-red-500")}
             />
-            <span className="mt-px font-mono text-xs">{idea.reactions.length}</span>
+            <span className="mt-px font-mono text-xs">{reactions.length}</span>
           </button>
         </div>
 
@@ -209,30 +229,20 @@ export function PublicIdeaDetail({
 
         <div className="relative">
           <div className="mt-8">
-            {idea.comments.map((comment: any, index: number) => (
-              <div key={comment.id} className="relative flex gap-3 pb-10">
-                {index !== idea.comments.length - 1 && (
+            {comments.map((comment, index) => (
+              <div key={comment._id} className="relative flex gap-3 pb-10">
+                {index !== comments.length - 1 && (
                   <div className="bg-border absolute top-10 bottom-2 left-4 w-px" />
                 )}
 
                 <div className="bg-muted h-8 w-8 shrink-0 overflow-hidden rounded-full">
-                  {comment.author.image ? (
-                    <img
-                      src={comment.author.image}
-                      alt={comment.author.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-[10px]">
-                      {comment.author.name.charAt(0)}
-                    </div>
-                  )}
+                  <UserAvatar user={comment.author} />
                 </div>
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold">{comment.author.name}</span>
+                    <span className="text-sm font-semibold">{comment.author?.name}</span>
                     <span className="text-muted-foreground text-xs font-medium">
-                      {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
+                      {formatDistanceToNow(comment._creationTime, { addSuffix: true })}
                     </span>
                   </div>
                   <p className="text-muted-foreground text-sm">{comment.content}</p>
@@ -252,7 +262,7 @@ export function PublicIdeaDetail({
               <span>{idea.author?.name || "Unknown"}</span>
             </div>
             <span className="text-xs">
-              {formatDistanceToNow(idea.createdAt, { addSuffix: true })}
+              {formatDistanceToNow(idea._creationTime, { addSuffix: true })}
             </span>
           </div>
         </div>
@@ -273,34 +283,23 @@ export function PublicIdeaDetail({
           </div>
         )}
 
-        {idea.board && (
-          <div>
-            <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
-              Board
-            </h4>
-            <span className="text-sm">{idea.board.name}</span>
-          </div>
-        )}
-
-        {idea.tags.length > 0 && (
+        {tags.length > 0 && (
           <div>
             <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
               Tags
             </h4>
             <div className="flex flex-wrap gap-2">
-              {idea.tags.map((t: any) => (
+              {tags.map((t) => (
                 <span
-                  key={t.tag.id}
+                  key={t._id}
                   className="rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600"
                 >
-                  {t.tag.name}
+                  {t.name}
                 </span>
               ))}
             </div>
           </div>
         )}
-
-        {/* Voting/Action Card similar to public index? Or just details. */}
       </div>
     </div>
   );

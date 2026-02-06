@@ -123,14 +123,7 @@ const pricingOptions = [
                         size="sm"
                         class={`shrink-0 ${tier.secondaryTextColor}`}
                       />
-                      <span class={feature.soon ? "text-base-500/75" : ""}>
-                        {feature.text}{" "}
-                        {feature.soon && (
-                          <span class="ml-2 text-xs text-base-500 bg-white py-0.5 px-2 rounded-full">
-                            Coming soon
-                          </span>
-                        )}
-                      </span>
+                      <span>{feature.text} </span>
                     </li>
                   ))}
                 </ul>

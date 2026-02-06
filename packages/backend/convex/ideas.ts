@@ -32,15 +32,21 @@ export const getSidebarCounts = query({
 });
 
 /**
- * Get ideas for an organization with all related data
+ * TODO: Paginate
  */
 export const getIdeas = query({
   args: {
     organizationId: v.string(),
     status: v.optional(v.string()),
-    boardId: v.optional(v.id("board")),
   },
   handler: async (ctx, args) => {
+    // Authenticate user
+    const user = await ctx.auth.getUserIdentity();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
     // Build query with filters
     const ideasQuery = ctx.db
       .query("idea")
@@ -57,11 +63,6 @@ export const getIdeas = query({
         (idea) => idea.status === args.status
       );
     }
-    if (args.boardId) {
-      filteredIdeas = filteredIdeas.filter(
-        (idea) => idea.boardId === args.boardId
-      );
-    }
 
     // Sort by creation time (newest first)
     filteredIdeas.sort((a, b) => b._creationTime - a._creationTime);
@@ -69,24 +70,7 @@ export const getIdeas = query({
     // Fetch related data for each idea
     const result = await Promise.all(
       filteredIdeas.map(async (idea) => {
-        // Fetch author (internal user from betterAuth)
-        // Note: betterAuth users are in a component, so we'll skip for now
-        // and handle it on the client side or via a different approach
         const author = await getUnifiedAuthor(ctx, idea);
-
-        // Fetch board
-        let board = null;
-        if (idea.boardId) {
-          const boardDoc = await ctx.db.get(idea.boardId);
-          if (boardDoc) {
-            board = {
-              id: boardDoc._id,
-              name: boardDoc.name,
-              description: boardDoc.description || null,
-              slug: boardDoc.slug,
-            };
-          }
-        }
 
         // Fetch tags
         const ideaTags = await ctx.db
@@ -96,14 +80,7 @@ export const getIdeas = query({
 
         const tags = await Promise.all(
           ideaTags.map(async (it) => {
-            const tag = await ctx.db.get(it.tagId);
-            return tag
-              ? {
-                  id: tag._id,
-                  name: tag.name,
-                  color: tag.color || null,
-                }
-              : null;
+            return ctx.db.get(it.tagId);
           })
         );
 
@@ -120,22 +97,23 @@ export const getIdeas = query({
           .collect();
 
         // Calculate revenue from reactions
-        let revenue = 0;
-        for (const reaction of reactions) {
-          if (reaction.authorType === "external") {
-            const extUser = await ctx.db.get(
-              reaction.userId as Id<"externalUser">
-            );
-            if (extUser?.revenue) {
-              revenue += extUser.revenue;
-            }
-          }
-        }
+        const externalUsers = (
+          await Promise.all(
+            reactions.map(async (reaction) => {
+              if (reaction.authorType === "external") {
+                return ctx.db.get(reaction.userId as Id<"externalUser">);
+              }
+            })
+          )
+        ).filter((u): u is NonNullable<typeof u> => u !== null);
+
+        const revenue = externalUsers.reduce((acc, user) => {
+          return acc + (user?.revenue || 0);
+        }, 0);
 
         return {
           ...idea,
           author,
-          board,
           tags: tags.filter((t): t is NonNullable<typeof t> => t !== null),
           commentCount: comments.length,
           reactionCount: reactions.length,
@@ -148,15 +126,43 @@ export const getIdeas = query({
   },
 });
 
+export const hasUserUpvotedIdea = query({
+  args: {
+    ideaId: v.id("idea"),
+    sessionId: v.union(
+      v.literal("no-external-session"),
+      v.id("externalSession")
+    ),
+  },
+  handler: async (ctx, { ideaId, sessionId }): Promise<boolean> => {
+    const user = await ctx.runQuery(api.auth.getUnifiedUser, {
+      sessionId: sessionId ?? "no-external-session",
+    });
+
+    if (!user) {
+      return false;
+    }
+
+    const reaction = await ctx.db
+      .query("reaction")
+      .withIndex("by_user_idea", (q) =>
+        q.eq("userId", user._id).eq("ideaId", ideaId)
+      )
+      .first();
+
+    return reaction !== null;
+  },
+});
+
 /**
  * Get public ideas feed with pagination and sorting
  * Filters out pending and closed ideas
  */
 export const getIdeasPublic = query({
   args: {
-    organizationId: v.string(),
+    organizationId: v.optional(v.string()),
+    organizationSlug: v.optional(v.string()),
     status: v.optional(v.string()),
-    boardId: v.optional(v.id("board")),
     sort: v.optional(
       v.union(v.literal("newest"), v.literal("top"), v.literal("trending"))
     ),
@@ -166,6 +172,23 @@ export const getIdeasPublic = query({
     ctx,
     args
   ): Promise<PaginationResult<Awaited<ReturnType<typeof enrichIdea>>>> => {
+    let organizationId = args.organizationId;
+    if (!organizationId) {
+      if (!args.organizationSlug) {
+        throw new Error("Organization ID or slug is required");
+      }
+
+      const organization = await ctx.runQuery(api.auth.getOrganizationBySlug, {
+        slug: args.organizationSlug,
+      });
+
+      if (!organization) {
+        throw new Error("Organization not found");
+      }
+
+      organizationId = organization?._id;
+    }
+
     const sort = args.sort || "newest";
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
@@ -173,7 +196,7 @@ export const getIdeasPublic = query({
     let ideasQuery = ctx.db
       .query("idea")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId)
+        q.eq("organizationId", organizationId)
       );
 
     // For "newest" sort, we can use pagination directly
@@ -190,10 +213,6 @@ export const getIdeasPublic = query({
             q.neq(q.field("status"), "pending") &&
             q.neq(q.field("status"), "closed")
         );
-      }
-
-      if (args.boardId) {
-        query = query.filter((q) => q.eq(q.field("boardId"), args.boardId));
       }
 
       const paginated = await query.paginate(args.paginationOpts);
@@ -223,12 +242,6 @@ export const getIdeasPublic = query({
     if (args.status) {
       filteredIdeas = filteredIdeas.filter(
         (idea) => idea.status === args.status
-      );
-    }
-
-    if (args.boardId) {
-      filteredIdeas = filteredIdeas.filter(
-        (idea) => idea.boardId === args.boardId
       );
     }
 
@@ -303,20 +316,6 @@ export const getIdeasPublic = query({
 async function enrichIdea(ctx: QueryCtx, idea: Doc<"idea">) {
   const author = await getUnifiedAuthor(ctx, idea);
 
-  // Fetch board
-  let board = null;
-  if (idea.boardId) {
-    const boardDoc = await ctx.db.get(idea.boardId);
-    if (boardDoc) {
-      board = {
-        id: boardDoc._id,
-        name: boardDoc.name,
-        description: boardDoc.description || null,
-        slug: boardDoc.slug,
-      };
-    }
-  }
-
   // Fetch tags
   const ideaTags = await ctx.db
     .query("ideaTag")
@@ -342,18 +341,8 @@ async function enrichIdea(ctx: QueryCtx, idea: Doc<"idea">) {
     .collect();
 
   return {
-    _id: idea._id,
-    _creationTime: idea._creationTime,
-    organizationId: idea.organizationId,
-    boardId: idea.boardId,
-    title: idea.title,
-    description: idea.description || null,
-    status: idea.status,
-    createdAt: idea._creationTime,
-    updatedAt: idea._creationTime,
-    eta: idea.eta || null,
+    ...idea,
     author,
-    board,
     tags: tags.filter((t): t is NonNullable<typeof t> => t !== null),
     commentCount: comments.length,
     reactionCount: reactions.length,
@@ -361,10 +350,6 @@ async function enrichIdea(ctx: QueryCtx, idea: Doc<"idea">) {
   };
 }
 
-// TODO: Split these up into idea, comment, and reaction queries
-/**
- * Get a single idea by ID with all related data
- */
 export const getIdea = query({
   args: {
     ideaId: v.id("idea"),
@@ -377,32 +362,34 @@ export const getIdea = query({
 
     const author = await getUnifiedAuthor(ctx, idea);
 
-    // Fetch board
-    const board = idea.boardId ? await ctx.db.get(idea.boardId) : null;
+    return { ...idea, author };
+  },
+});
 
-    // Fetch tags
+export const getTagsByIdea = query({
+  args: {
+    ideaId: v.id("idea"),
+  },
+  handler: async (ctx, args) => {
     const ideaTags = await ctx.db
       .query("ideaTag")
-      .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
+      .withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId))
       .collect();
 
-    const tags = await Promise.all(
-      ideaTags.map(async (it) => {
-        const tag = await ctx.db.get(it.tagId);
-        return tag
-          ? {
-              id: tag._id,
-              name: tag.name,
-              color: tag.color || null,
-            }
-          : null;
-      })
-    );
+    const tags = await Promise.all(ideaTags.map((t) => ctx.db.get(t.tagId)));
 
-    // Fetch comments with their authors and reactions
+    return tags.filter((t): t is NonNullable<typeof t> => t !== null);
+  },
+});
+
+export const getCommentsByIdea = query({
+  args: {
+    ideaId: v.id("idea"),
+  },
+  handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comment")
-      .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
+      .withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId))
       .collect();
 
     // Sort comments by creation time (newest first)
@@ -414,74 +401,45 @@ export const getIdea = query({
         const cAuthor = await getUnifiedAuthor(ctx, comment);
 
         // Fetch comment reactions
-        const commentReactions = await ctx.db
+        const reactions = await ctx.db
           .query("reaction")
           .withIndex("by_comment", (q) => q.eq("commentId", comment._id))
           .collect();
 
         return {
-          id: comment._id,
-          ideaId: comment.ideaId,
-          content: comment.content,
-          createdAt: comment._creationTime,
+          ...comment,
           author: cAuthor,
-          reactions: commentReactions.map((r) => ({
-            id: r._id,
-            type: r.type,
-            createdAt: r._creationTime,
-            userId: r.userId,
-            authorType: r.authorType,
-          })),
+          reactions,
         };
       })
     );
 
-    // Fetch reactions with user data
+    return commentsWithData;
+  },
+});
+
+export const getReactionsByIdea = query({
+  args: {
+    ideaId: v.id("idea"),
+  },
+  handler: async (ctx, args) => {
     const reactions = await ctx.db
       .query("reaction")
-      .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
+      .withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId))
       .collect();
 
     const reactionsWithData = await Promise.all(
       reactions.map(async (reaction) => {
-        const user = await getUnifiedAuthor(ctx, reaction);
+        const author = await getUnifiedAuthor(ctx, reaction);
 
         return {
-          id: reaction._id,
-          type: reaction.type,
-          createdAt: reaction._creationTime,
-          userId: reaction.userId,
-          authorType: reaction.authorType,
-          user,
+          ...reaction,
+          author,
         };
       })
     );
 
-    return {
-      id: idea._id,
-      organizationId: idea.organizationId,
-      boardId: idea.boardId,
-      authorId: idea.authorId,
-      title: idea.title,
-      description: idea.description || null,
-      status: idea.status,
-      createdAt: idea._creationTime,
-      updatedAt: idea._creationTime,
-      eta: idea.eta || null,
-      author,
-      board,
-      tags: tags
-        .filter((t): t is NonNullable<typeof t> => t !== null)
-        .map((tag) => ({
-          tag: {
-            id: tag.id as string,
-            name: tag.name,
-            color: tag.color,
-          },
-        })),
-      comments: commentsWithData,
-      reactions: reactionsWithData,
-    };
+    return reactionsWithData;
   },
 });
 
@@ -489,12 +447,13 @@ export const getIdea = query({
 /**
  * Get a single idea by ID with all related data
  */
-export const getPublicIdea = query({
+export const getIdeaPublic = query({
   args: {
     ideaId: v.id("idea"),
   },
   handler: async (ctx, args) => {
     const idea = await ctx.db.get(args.ideaId);
+
     if (!idea) {
       return null;
     }
@@ -502,110 +461,16 @@ export const getPublicIdea = query({
     // Fetch author (internal user from betterAuth)
     const author = await getUnifiedAuthor(ctx, idea);
 
-    // Fetch board
-    const board = idea.boardId ? await ctx.db.get(idea.boardId) : null;
-
-    // Fetch tags
-    const ideaTags = await ctx.db
-      .query("ideaTag")
-      .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
-      .collect();
-
-    const tags = await Promise.all(
-      ideaTags.map(async (it) => {
-        const tag = await ctx.db.get(it.tagId);
-        return tag
-          ? {
-              id: tag._id,
-              name: tag.name,
-              color: tag.color || null,
-            }
-          : null;
-      })
-    );
-
-    // Fetch comments with their authors and reactions
-    const comments = await ctx.db
-      .query("comment")
-      .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
-      .collect();
-
-    // Sort comments by creation time (newest first)
-    comments.sort((a, b) => b._creationTime - a._creationTime);
-
-    const commentsWithData = await Promise.all(
-      comments.map(async (comment) => {
-        // Fetch comment author (internal user)
-        const cAuthor = await getUnifiedAuthor(ctx, comment);
-
-        // Fetch comment reactions
-        const commentReactions = await ctx.db
-          .query("reaction")
-          .withIndex("by_comment", (q) => q.eq("commentId", comment._id))
-          .collect();
-
-        return {
-          id: comment._id,
-          ideaId: comment.ideaId,
-          content: comment.content,
-          createdAt: comment._creationTime,
-          author: cAuthor,
-          reactions: commentReactions.map((r) => ({
-            id: r._id,
-            type: r.type,
-            createdAt: r._creationTime,
-            userId: r.userId,
-            authorType: r.authorType,
-          })),
-        };
-      })
-    );
-
     // Fetch reactions with user data
     const reactions = await ctx.db
       .query("reaction")
       .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
       .collect();
 
-    const reactionsWithData = await Promise.all(
-      reactions.map(async (reaction) => {
-        const user = await getUnifiedAuthor(ctx, reaction);
-
-        return {
-          id: reaction._id,
-          type: reaction.type,
-          createdAt: reaction._creationTime,
-          userId: reaction.userId,
-          authorType: reaction.authorType,
-          user,
-        };
-      })
-    );
-
     return {
-      id: idea._id,
-      organizationId: idea.organizationId,
-      boardId: idea.boardId,
-      authorId: idea.authorId,
-      title: idea.title,
-      description: idea.description || null,
-      status: idea.status,
-      createdAt: idea._creationTime,
-      updatedAt: idea._creationTime,
-      eta: idea.eta || null,
+      ...idea,
       author,
-      board,
-      tags: tags
-        .filter((t): t is NonNullable<typeof t> => t !== null)
-        .map((tag) => ({
-          tag: {
-            id: tag.id as string,
-            name: tag.name,
-            color: tag.color,
-          },
-        })),
-      comments: commentsWithData,
-      reactions: reactionsWithData,
+      reactionCount: reactions.length,
     };
   },
 });
@@ -1017,106 +882,5 @@ export const deleteIdea = mutation({
     await ctx.db.delete(args.ideaId);
 
     return { success: true };
-  },
-});
-
-/**
- * Get public roadmap ideas for an organization
- * Excludes pending ideas and sensitive data
- */
-export const getPublicRoadmapIdeas = query({
-  args: {
-    organizationSlug: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // Get organization by slug
-    const organization = await ctx.runQuery(
-      components.betterAuth.functions.getOrganizationBySlug,
-      {
-        slug: args.organizationSlug,
-      }
-    );
-
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
-
-    // Get all ideas for this organization, excluding pending
-    const allIdeas = await ctx.db
-      .query("idea")
-      .withIndex("by_organization", (q) =>
-        q.eq("organizationId", organization._id)
-      )
-      .collect();
-
-    // Filter out pending ideas
-    const ideas = allIdeas.filter((idea) => idea.status !== "pending");
-
-    // Sort by creation time (newest first)
-    ideas.sort((a, b) => b._creationTime - a._creationTime);
-
-    // Fetch related data for each idea
-    const result = await Promise.all(
-      ideas.map(async (idea) => {
-        // Fetch author (internal user from betterAuth)
-        const author = await getUnifiedAuthor(ctx, idea);
-
-        // Fetch board
-        const board = idea.boardId ? await ctx.db.get(idea.boardId) : null;
-
-        // Fetch tags
-        const ideaTags = await ctx.db
-          .query("ideaTag")
-          .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
-          .collect();
-
-        const tags = await Promise.all(
-          ideaTags.map(async (it) => {
-            const tag = await ctx.db.get(it.tagId);
-            return tag;
-          })
-        );
-
-        // Count comments
-        const comments = await ctx.db
-          .query("comment")
-          .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
-          .collect();
-
-        // Count reactions
-        const reactions = await ctx.db
-          .query("reaction")
-          .withIndex("by_idea", (q) => q.eq("ideaId", idea._id))
-          .collect();
-
-        return {
-          id: idea._id,
-          title: idea.title,
-          description: idea.description || null,
-          status: idea.status,
-          eta: idea.eta || null,
-          createdAt: idea._creationTime,
-          updatedAt: idea._creationTime,
-          board: board
-            ? {
-                id: board._id,
-                name: board.name,
-              }
-            : null,
-          tags: tags
-            .filter((t): t is NonNullable<typeof t> => t !== null)
-            .map((t) => ({
-              id: t._id,
-              name: t.name,
-              color: t.color || null,
-            })),
-          author,
-          commentCount: comments.length,
-          reactionCount: reactions.length,
-        };
-      })
-    );
-
-    return result;
   },
 });

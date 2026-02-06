@@ -5,21 +5,6 @@ import { api } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 
 /**
- * Get ideas for widget by organization slug
- * Returns public roadmap ideas (excludes pending)
- */
-export const getWidgetIdeas = query({
-  args: {
-    organizationSlug: v.string(),
-  },
-  handler: async (ctx, args): Promise<any[]> => {
-    return await ctx.runQuery(api.ideas.getPublicRoadmapIdeas, {
-      organizationSlug: args.organizationSlug,
-    });
-  },
-});
-
-/**
  * Create an idea from widget
  * Handles organization slug lookup and external session via SSO token
  * Allows external users (who aren't organization members) to submit ideas

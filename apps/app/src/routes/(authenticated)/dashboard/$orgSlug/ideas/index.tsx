@@ -8,21 +8,18 @@ import { useOrganization } from "~/hooks/organization";
 
 const ideasSearchSchema = z.object({
   status: z.string().optional(),
-  boardId: z.string().optional(),
 });
 
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/")({
   validateSearch: ideasSearchSchema,
   loaderDeps: ({ search }) => ({ search }),
   loader: async ({ deps: { search }, context }) => {
-    // Get organization from parent route context
     const organizationId = context.organization._id;
 
     const ideas = await context.queryClient.ensureQueryData(
       convexQuery(api.ideas.getIdeas, {
         organizationId,
         status: search.status,
-        boardId: search.boardId as any, // Convert string to Id<"board"> if needed
       }),
     );
 
@@ -40,7 +37,6 @@ function IdeasPage() {
     convexQuery(api.ideas.getIdeas, {
       organizationId: organization._id,
       status: search.status,
-      boardId: search.boardId as any,
     }),
   );
 

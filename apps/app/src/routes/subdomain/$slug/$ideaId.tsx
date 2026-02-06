@@ -1,6 +1,11 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  notFound,
+  useLoaderData,
+  useRouter,
+} from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { Id } from "@thoughtbase/backend/convex/_generated/dataModel";
 import { useState } from "react";
@@ -17,11 +22,34 @@ import {
 
 export const Route = createFileRoute("/subdomain/$slug/$ideaId")({
   loader: async ({ context, params: { ideaId } }) => {
-    context.queryClient.ensureQueryData(
-      convexQuery(api.ideas.getPublicIdea, {
-        ideaId: ideaId as Id<"idea">,
-      }),
-    );
+    const [idea] = await Promise.all([
+      context.queryClient.ensureQueryData(
+        convexQuery(api.ideas.getIdeaPublic, {
+          ideaId: ideaId as Id<"idea">,
+        }),
+      ),
+      context.queryClient.ensureQueryData(
+        convexQuery(api.ideas.getCommentsByIdea, {
+          ideaId: ideaId as Id<"idea">,
+        }),
+      ),
+      context.queryClient.ensureQueryData(
+        convexQuery(api.ideas.getReactionsByIdea, {
+          ideaId: ideaId as Id<"idea">,
+        }),
+      ),
+      context.queryClient.ensureQueryData(
+        convexQuery(api.ideas.getTagsByIdea, {
+          ideaId: ideaId as Id<"idea">,
+        }),
+      ),
+    ]);
+
+    if (!idea) {
+      throw notFound();
+    }
+
+    return { idea };
   },
   component: PublicIdeaDetailPage,
 });
@@ -30,7 +58,7 @@ function PublicIdeaDetailPage() {
   const { ideaId } = Route.useParams();
 
   const { data: idea } = useSuspenseQuery(
-    convexQuery(api.ideas.getPublicIdea, {
+    convexQuery(api.ideas.getIdeaPublic, {
       ideaId: ideaId as Id<"idea">,
     }),
   );
@@ -48,12 +76,6 @@ function PublicIdeaDetailPage() {
   const handleLoginSuccess = () => {
     setLoginOpen(false);
     router.invalidate();
-    // Typically check for profile next, but user can click action again if needed
-  };
-
-  const handleProfileSuccess = () => {
-    setProfileOpen(false);
-    router.invalidate();
   };
 
   if (!idea) return null;
@@ -66,7 +88,6 @@ function PublicIdeaDetailPage() {
           currentUser={user}
           organizationId={org._id}
           onLoginRequired={handleLoginRequired}
-          sessionId={sessionId}
         />
       </div>
 
@@ -93,7 +114,6 @@ function PublicIdeaDetailPage() {
           <ProfileForm
             orgId={org._id}
             initialName={user?.name || ""}
-            onSuccess={handleProfileSuccess}
             sessionId={sessionId}
           />
         </DialogContent>

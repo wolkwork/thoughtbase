@@ -16,5 +16,8 @@
   },
   "dependencies": {
     "tldts": "^7.0.19"
+  },
+  "patchedDependencies": {
+    "@convex-dev/better-auth@0.10.10": "patches/@convex-dev%2Fbetter-auth@0.10.10.patch"
   }
 }

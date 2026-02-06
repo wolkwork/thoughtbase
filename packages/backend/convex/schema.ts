@@ -36,7 +36,7 @@ export default defineSchema({
     boardId: v.optional(v.id("board")),
     authorId: v.optional(v.string()), // References betterAuth user._id or externalUser._id
     authorType: v.optional(
-      v.union(v.literal("internal"), v.literal("external")),
+      v.union(v.literal("internal"), v.literal("external"))
     ),
     title: v.string(),
     description: v.optional(v.string()),
@@ -46,7 +46,7 @@ export default defineSchema({
       v.literal("in_progress"),
       v.literal("completed"),
       v.literal("closed"),
-      v.literal("pending"),
+      v.literal("pending")
     ),
     eta: v.optional(v.number()), // timestamp in milliseconds
   })
@@ -61,7 +61,7 @@ export default defineSchema({
     ideaId: v.id("idea"),
     authorId: v.string(), // References betterAuth user._id or "external"
     authorType: v.optional(
-      v.union(v.literal("internal"), v.literal("external")),
+      v.union(v.literal("internal"), v.literal("external"))
     ),
     content: v.string(),
   })
@@ -72,7 +72,7 @@ export default defineSchema({
   reaction: defineTable({
     userId: v.string(), // References betterAuth user._id or "external"
     authorType: v.optional(
-      v.union(v.literal("internal"), v.literal("external")),
+      v.union(v.literal("internal"), v.literal("external"))
     ),
     ideaId: v.optional(v.id("idea")),
     commentId: v.optional(v.id("comment")),
@@ -82,7 +82,8 @@ export default defineSchema({
     .index("by_idea", ["ideaId"])
     .index("by_comment", ["commentId"])
     .index("by_idea_type", ["ideaId", "type"])
-    .index("by_comment_type", ["commentId", "type"]),
+    .index("by_comment_type", ["commentId", "type"])
+    .index("by_user_idea", ["userId", "ideaId"]),
 
   // Tags
   tag: defineTable({
@@ -126,7 +127,7 @@ export default defineSchema({
   profile: defineTable({
     userId: v.string(), // References betterAuth user._id or externalUser._id
     authorType: v.optional(
-      v.union(v.literal("internal"), v.literal("external")),
+      v.union(v.literal("internal"), v.literal("external"))
     ),
     organizationId: v.string(), // References betterAuth organization._id
     name: v.string(),

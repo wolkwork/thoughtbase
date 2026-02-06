@@ -1,6 +1,6 @@
-import { useConvexMutation } from "@convex-dev/react-query";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { ChatsCircleIcon, HeartIcon } from "@phosphor-icons/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { api } from "@thoughtbase/backend/convex/_generated/api";
 import { FunctionReturnType } from "convex/server";
@@ -44,7 +44,6 @@ const STATUS_OPTIONS = [
 ];
 
 export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProps) {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [activeTab, setActiveTab] = useState("comments");
@@ -53,45 +52,37 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
   const createComment = useConvexMutation(api.ideas.createComment);
   const [isCommentPending, setIsCommentPending] = useState(false);
 
+  const { data: comments } = useSuspenseQuery(
+    convexQuery(api.ideas.getCommentsByIdea, {
+      ideaId: idea._id,
+    }),
+  );
+
+  const { data: reactions } = useSuspenseQuery(
+    convexQuery(api.ideas.getReactionsByIdea, {
+      ideaId: idea._id,
+    }),
+  );
+
+  const { data: tags } = useSuspenseQuery(
+    convexQuery(api.ideas.getTagsByIdea, {
+      ideaId: idea._id,
+    }),
+  );
+
   const handleAddComment = async () => {
     if (!comment.trim()) return;
 
     setIsCommentPending(true);
     try {
-      const newComment = await createComment({
-        ideaId: idea.id as any, // Convert string to Id<"idea">
+      await createComment({
+        ideaId: idea._id,
         content: comment,
       });
-
-      // Optimistic update
-      const optimisticComment = {
-        id: String(newComment.id),
-        content: newComment.content,
-        createdAt: new Date(newComment.createdAt),
-        author: {
-          name: currentUser.name,
-          email: currentUser.email,
-          image: currentUser.image,
-        },
-        reactions: [],
-      };
-
-      // Optimistic update - add the comment to the query cache
-      queryClient.setQueryData(
-        [api.ideas.getIdea, { ideaId: idea.id as any }],
-        (old: any) => {
-          if (!old) return old;
-          return {
-            ...old,
-            comments: [optimisticComment, ...(old.comments || [])],
-          };
-        },
-      );
 
       setComment("");
       toast.success("Comment added");
     } catch (error) {
-      console.error("Failed to add comment:", error);
       toast.error("Failed to add comment");
     } finally {
       setIsCommentPending(false);
@@ -112,26 +103,26 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
         "Are you sure you want to delete this idea? This action cannot be undone.",
       )
     ) {
-      await deleteIdea({ ideaId: idea.id, organizationId });
+      await deleteIdea({ ideaId: idea._id, organizationId });
       navigate({ to: ".." });
     }
   };
 
   const handleUpdateStatus = (status: string | null) => {
     if (!organizationId) return;
-    updateStatus({ ideaId: idea.id, status: status as IdeaStatus, organizationId });
+    updateStatus({ ideaId: idea._id, status: status as IdeaStatus, organizationId });
   };
 
   const handleUpdateEta = (eta: number | undefined) => {
     if (!organizationId || !eta) return;
-    updateEta({ ideaId: idea.id, eta, organizationId });
+    updateEta({ ideaId: idea._id, eta, organizationId });
   };
 
   const handleUpvote = () => {
-    toggleReaction({ ideaId: idea.id, type: "upvote" });
+    toggleReaction({ ideaId: idea._id, type: "upvote" });
   };
 
-  const hasUpvoted = idea.reactions.some(
+  const hasUpvoted = reactions.some(
     (r) => r.userId === currentUser._id && r.type === "upvote",
   );
 
@@ -190,7 +181,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
               )}
             >
               <ChatsCircleIcon weight="bold" className="size-4" />
-              <span className="mt-px font-mono text-xs">{idea.comments.length}</span>
+              <span className="mt-px font-mono text-xs">{comments.length}</span>
             </div>
 
             <button
@@ -203,7 +194,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
                 weight={hasUpvoted ? "fill" : "bold"}
                 className={cn("size-4", hasUpvoted && "fill-red-500")}
               />
-              <span className="mt-px font-mono text-xs">{idea.reactions.length}</span>
+              <span className="mt-px font-mono text-xs">{reactions.length}</span>
             </button>
           </div>
 
@@ -243,9 +234,9 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
 
               <div className="relative">
                 <div className="mt-8">
-                  {idea.comments.map((comment: any, index: number) => (
-                    <div key={comment.id} className="relative flex gap-3 pb-10">
-                      {index !== idea.comments.length - 1 && (
+                  {comments.map((comment, index) => (
+                    <div key={comment._id} className="relative flex gap-3 pb-10">
+                      {index !== comments.length - 1 && (
                         <div className="bg-border absolute top-10 bottom-2 left-4 w-px" />
                       )}
 
@@ -255,10 +246,10 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold">
-                            {comment.author.name}
+                            {comment.author?.name}
                           </span>
                           <span className="text-muted-foreground text-xs font-medium">
-                            {formatDistanceToNow(new Date(comment.createdAt), {
+                            {formatDistanceToNow(new Date(comment._creationTime), {
                               addSuffix: true,
                             })}
                           </span>
@@ -267,7 +258,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
                       </div>
                     </div>
                   ))}
-                  {idea.comments.length === 0 && (
+                  {comments.length === 0 && (
                     <div className="text-muted-foreground py-8 text-center text-sm italic">
                       No comments yet.
                     </div>
@@ -278,27 +269,26 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
 
             <TabsContent value="reactions">
               <div className="mt-8">
-                {idea.reactions.length === 0 && (
+                {reactions.length === 0 && (
                   <div className="text-muted-foreground py-8 text-center text-sm italic">
                     No reactions yet.
                   </div>
                 )}
 
-                {idea.reactions.map((reaction: any, index: number) => {
-                  const userName =
-                    reaction.user?.name || reaction.externalUser?.name || "User";
-                  const reactionDate = reaction.createdAt
-                    ? formatDistanceToNow(new Date(reaction.createdAt), {
+                {reactions.map((reaction, index) => {
+                  const userName = reaction.author?.name || "User";
+                  const reactionDate = reaction._creationTime
+                    ? formatDistanceToNow(new Date(reaction._creationTime), {
                         addSuffix: true,
                       })
                     : null;
 
                   return (
                     <div
-                      key={reaction.id}
+                      key={reaction._id}
                       className="relative flex items-center gap-3 pb-8"
                     >
-                      {index !== idea.reactions.length - 1 && (
+                      {index !== reactions.length - 1 && (
                         <div className="bg-border absolute top-6 -bottom-3 left-3 z-0 w-px" />
                       )}
 
@@ -332,7 +322,7 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
               <span>{idea.author?.name || "Unknown"}</span>
             </div>
             <span className="text-xs">
-              {formatDistanceToNow(new Date(idea.createdAt), { addSuffix: true })}
+              {formatDistanceToNow(new Date(idea._creationTime), { addSuffix: true })}
             </span>
           </div>
         </div>
@@ -429,15 +419,6 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
           </div>
         </div>
 
-        {idea.board && (
-          <div>
-            <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
-              Board
-            </h4>
-            <span className="text-sm">{idea.board.name}</span>
-          </div>
-        )}
-
         {typeof idea.author?.revenue === "number" && (
           <div>
             <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
@@ -481,18 +462,18 @@ export function IdeaDetail({ idea, currentUser, organizationId }: IdeaDetailProp
             </div>
           )}
 
-        {idea.tags.length > 0 && (
+        {tags.length > 0 && (
           <div>
             <h4 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
               Tags
             </h4>
             <div className="flex flex-wrap gap-2">
-              {idea.tags.map((t: any) => (
+              {tags.map((t) => (
                 <span
-                  key={t.tag.id}
+                  key={t._id}
                   className="rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600"
                 >
-                  {t.tag.name}
+                  {t.name}
                 </span>
               ))}
             </div>

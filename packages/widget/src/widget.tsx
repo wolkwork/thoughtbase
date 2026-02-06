@@ -75,10 +75,7 @@ export function WidgetContainer({
   );
 }
 
-let activeOrganizationSlug: string | null = null;
-
 export function initFeedbackWidget(config: WidgetProps) {
-  activeOrganizationSlug = config.organizationSlug;
   const containerId = "feedback-widget-container";
 
   if (document.getElementById(containerId)) {
@@ -102,24 +99,8 @@ export function initFeedbackWidget(config: WidgetProps) {
   root.render(<WidgetContainer {...config} convexUrl={convexUrl} />);
 }
 
-export function identify(token: string) {
-  if (!activeOrganizationSlug) {
-    console.error("Feedback Widget: Initialize widget before calling identify");
-    return;
-  }
-
-  // Store token in memory
-  ssoToken = token;
-
-  // Update React state if widget is mounted
-  if ((window as any).__setWidgetToken) {
-    (window as any).__setWidgetToken(token);
-  }
-}
-
 if (typeof window !== "undefined") {
   (window as any).thoughtbase = {
-    identify,
     initWidget: initFeedbackWidget,
   };
 }

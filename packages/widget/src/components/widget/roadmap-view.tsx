@@ -1,5 +1,5 @@
 import { api } from "@thoughtbase/backend/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import { Clock8, Heart } from "lucide-react";
 
 interface RoadmapViewProps {
@@ -23,14 +23,17 @@ export function RoadmapView({
     ? "thoughtbase.localhost:3000"
     : "thoughtbase.app",
 }: RoadmapViewProps) {
-  const ideas = useQuery(api.widget.getWidgetIdeas, {
-    organizationSlug,
-  }) as Idea[] | undefined;
+  const { results: ideas } = usePaginatedQuery(
+    api.ideas.getIdeasPublic,
+    {
+      organizationSlug,
+    },
+    { initialNumItems: 1000 }
+  );
 
   const inProgressIdeas =
-    (ideas?.filter((i) => i.status === "in_progress") as Idea[]) || [];
-  const plannedIdeas =
-    (ideas?.filter((i) => i.status === "planned") as Idea[]) || [];
+    ideas?.filter((i) => i.status === "in_progress") || [];
+  const plannedIdeas = ideas?.filter((i) => i.status === "planned") || [];
 
   const getIdeaUrl = (idea: any) => {
     const baseUrl = `//${organizationSlug}.${host}/${idea.id}`;
@@ -56,7 +59,7 @@ export function RoadmapView({
               </span>
               {inProgressIdeas.map((idea, index) => (
                 <div
-                  key={idea.id}
+                  key={idea._id}
                   className="group relative w-full cursor-pointer"
                 >
                   <a
@@ -104,7 +107,7 @@ export function RoadmapView({
               </span>
               {plannedIdeas.map((idea, index) => (
                 <div
-                  key={idea.id}
+                  key={idea._id}
                   className="group relative w-full cursor-pointer"
                 >
                   <a

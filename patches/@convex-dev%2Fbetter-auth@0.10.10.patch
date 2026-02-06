@@ -1,0 +1,60 @@
+diff --git a/node_modules/@convex-dev/better-auth/.bun-tag-1b48fbc83db5bb5d b/.bun-tag-1b48fbc83db5bb5d
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/client/create-client.js b/dist/client/create-client.js
+index 192ea522143b6806b985b744953480f824da8f6b..ba6d224ee39169e761c92966a0ac570914c6f7a9 100644
+--- a/dist/client/create-client.js
++++ b/dist/client/create-client.js
+@@ -224,7 +224,7 @@ export const createClient = (component, config) => {
+             const staticAuth = createAuth({});
+             const path = staticAuth.options.basePath ?? "/api/auth";
+             const authRequestHandler = httpActionGeneric(async (ctx, request) => {
+-                if (config?.verbose) {
++                if (config?.verbose && typeof console !== "undefined") {
+                     // eslint-disable-next-line no-console
+                     console.log("options.baseURL", staticAuth.options.baseURL);
+                     // eslint-disable-next-line no-console
+@@ -232,7 +232,7 @@ export const createClient = (component, config) => {
+                 }
+                 const auth = createAuth(ctx);
+                 const response = await auth.handler(request);
+-                if (config?.verbose) {
++                if (config?.verbose && typeof console !== "undefined") {
+                     // eslint-disable-next-line no-console
+                     console.log("response headers", response.headers);
+                 }
+diff --git a/dist/plugins/convex/index.js b/dist/plugins/convex/index.js
+index 075f4f1be23c979ebc1ab2341f0f5e0bacba01ae..d95485e7b5982479ce34512265426b061570ff40 100644
+--- a/dist/plugins/convex/index.js
++++ b/dist/plugins/convex/index.js
+@@ -25,7 +25,7 @@ const parseAuthConfig = (authConfig, opts) => {
+     if (isDataUriJwks && !opts.jwks) {
+         throw new Error("Static JWKS detected in auth config, but missing from Convex plugin");
+     }
+-    if (!isDataUriJwks && opts.jwks) {
++    if (!isDataUriJwks && opts.jwks && typeof console !== "undefined") {
+         // eslint-disable-next-line no-console
+         console.warn("Static JWKS provided to Convex plugin, but not to auth config. This adds an unnecessary network request for token verification.");
+     }
+diff --git a/src/client/create-client.ts b/src/client/create-client.ts
+index 48d2fd2079c213eee97cb86627254629286520c7..ef970cf20ffd565ba65d787d32cdd7c028ce6904 100644
+--- a/src/client/create-client.ts
++++ b/src/client/create-client.ts
+@@ -353,7 +353,7 @@ export const createClient = <
+       const staticAuth = createAuth({} as any);
+       const path = staticAuth.options.basePath ?? "/api/auth";
+       const authRequestHandler = httpActionGeneric(async (ctx, request) => {
+-        if (config?.verbose) {
++        if (config?.verbose && typeof console !== "undefined") {
+           // eslint-disable-next-line no-console
+           console.log("options.baseURL", staticAuth.options.baseURL);
+           // eslint-disable-next-line no-console
+@@ -361,7 +361,7 @@ export const createClient = <
+         }
+         const auth = createAuth(ctx as any);
+         const response = await auth.handler(request);
+-        if (config?.verbose) {
++        if (config?.verbose && typeof console !== "undefined") {
+           // eslint-disable-next-line no-console
+           console.log("response headers", response.headers);
+         }

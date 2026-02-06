@@ -8,11 +8,28 @@ import { IdeaDetail } from "~/components/idea-detail";
 export const Route = createFileRoute("/(authenticated)/dashboard/$orgSlug/ideas/$ideaId")(
   {
     loader: async ({ context, params: { ideaId } }) => {
-      const idea = await context.queryClient.ensureQueryData(
-        convexQuery(api.ideas.getIdea, {
-          ideaId: ideaId as Id<"idea">,
-        }),
-      );
+      const [idea] = await Promise.all([
+        context.queryClient.ensureQueryData(
+          convexQuery(api.ideas.getIdea, {
+            ideaId: ideaId as Id<"idea">,
+          }),
+        ),
+        context.queryClient.ensureQueryData(
+          convexQuery(api.ideas.getCommentsByIdea, {
+            ideaId: ideaId as Id<"idea">,
+          }),
+        ),
+        context.queryClient.ensureQueryData(
+          convexQuery(api.ideas.getReactionsByIdea, {
+            ideaId: ideaId as Id<"idea">,
+          }),
+        ),
+        context.queryClient.ensureQueryData(
+          convexQuery(api.ideas.getTagsByIdea, {
+            ideaId: ideaId as Id<"idea">,
+          }),
+        ),
+      ]);
 
       if (!idea) {
         throw notFound();
@@ -28,7 +45,7 @@ function IdeaDetailPage() {
 
   const { data: idea } = useSuspenseQuery(
     convexQuery(api.ideas.getIdea, {
-      ideaId: ideaId as any,
+      ideaId: ideaId as Id<"idea">,
     }),
   );
 

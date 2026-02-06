@@ -209,7 +209,6 @@ export function AppSidebar({ counts = {}, orgSlug, ...props }: AppSidebarProps) 
                       to="/dashboard/$orgSlug/settings"
                       params={{ orgSlug }}
                       className="flex gap-2.5 text-black/70"
-                      search={{ success: false }}
                     >
                       <GearSixIcon
                         className="size-5.5!"
